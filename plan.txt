@@ -1,0 +1,34 @@
+Scrape Jobsites -> Queue -> GPT Minify -> DB
+
+DB Contains:
+- Origional Site
+- Job Description
+- Job Company
+- Job Title
+- List of typed questions.
+
+For Each Jobsite We are scraping we need a function to apply to it.
+
+API to Get Job Listings from DB {reccomendation engine}
+API to Apply for Job listings
+API to Get/Set Userdata
+
+API to confirm job is alive {
+	Check's Our DB
+	If our db hasn't checked w/ source of truth in X seconds checks source of truth
+	Updates our db if source of truth changed.
+}
+
+SCRAPING
+===================
+Scraping should ideally be completely asynchronous
+We need to force the jobsite to index all of it's jobs, that we don't allready have
+Getting 98% of jobs from a site is okay
+Need to avoid massive traffic/spam
+Legality?
+
+
+Pitch
+=================
+To Candidates: Job Recruiter allready use ai to reject you, lets fight back
+To Recruiters: Unless you're employing {marketing people?} the candiates that are best at selling themselves arent't nessicarily the best candidates, so let's put everyone on equal footing and use AI to offer you a selection of ideal candidates.

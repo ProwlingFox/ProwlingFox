@@ -3,7 +3,7 @@ import logger as lg
 lg.init()
 logger = lg.log;
 
-import json, argparse, traceback
+import json, argparse
 from answeringEngine import answeringEngine, user
 
 #Load Secret keys
