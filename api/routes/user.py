@@ -13,12 +13,6 @@ def get_current_user_data(req: Request):
 	u = User(req.state.user_id)
 	return u.get_info()
 
-# Check User is Logged In
-@router.get("/user/authcheck")
-@authentication.access_level("Authenticated")
-def current_user_authenticated_check():
-    return {"success": True, "Message": "Yay, You're Authenticated!"}
-
 
 # Update User Password
 class update_password(BaseModel):
