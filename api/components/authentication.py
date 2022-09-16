@@ -2,7 +2,6 @@ from fastapi import HTTPException, Request
 
 # TODO: Enforce w/ pydantic
 # Access Levels: 
- # Unauthenticated - Anyone can access
  # Authenticated - Only Signed in users can access
  # Candidate - Only Validated Users can access
  # Admin - Only Admins can access
@@ -15,38 +14,16 @@ def access_level(accessLevel):
 				if inspect.signature(f).parameters[param].annotation == Request:
 					kwargs[param] = authCheck_request
 
-			if accessLevel == "Unauthenticated":
-				return f(*args, **kwargs)
-
-			authHeader = authCheck_request.headers.get("Authorization")
-			if not authHeader:
-				raise HTTPException(status_code=403, detail="AUTHORIZATION_HEADER_REQUIRED")
-
-			if not authHeader.startswith("Bearer"):
-				raise HTTPException(status_code=403, detail="MALFORMED_AUTHORIZATION_HEADER")
-
-			JWT = authHeader[7:]
-			from components.user import User
-			user = User.authenticate_by_JWT(JWT)
-
-			if not user['success']:
-				raise HTTPException(status_code=403, detail="INVALID_AUTHORIZATION_HEADER")
+			user = decodeJWT( authCheck_request.headers.get("Authorization") )
 
 			authCheck_request.state.user_id = user['user_id']
 			authCheck_request.state.permission = user['permission']
 
-			if accessLevel == "Authenticated":
+			if hasAccess(user['permission'], accessLevel):
 				return f(*args, **kwargs)
-
-			if accessLevel == "Candidate":
-				if user['permission'] in ["Candidate", "Admin"]:
-					return f(*args, **kwargs)
-
-			if accessLevel == "Admin":
-				if user['permission'] == "Admin":
-					return f(*args, **kwargs)
-
-			raise HTTPException(status_code=403, detail="USER_UNAUTHORIZED")
+			else:
+				raise HTTPException(status_code=403, detail="USER_UNAUTHORIZED") 
+			
 
 		# Weird Jiggery Pokery to get the function returned by this decorator to display
 		# like the origional function to the framework. :#
@@ -71,3 +48,37 @@ def access_level(accessLevel):
 	return wrapper
 
 
+def hasAccess(userAccessLevel, requiredAccessLevel):
+	userAccessLevel = userAccessLevel.lower()
+	requiredAccessLevel = requiredAccessLevel.lower()
+
+	if requiredAccessLevel == "authenticated":
+		if userAccessLevel in ["unverified","candidate", "admin"]:
+			return True
+
+	if requiredAccessLevel == "candidate":
+		if userAccessLevel in ["candidate", "admin"]:
+			return True
+
+	if requiredAccessLevel == "admin":
+		if userAccessLevel == "admin":
+			return True
+
+	return False
+
+
+def decodeJWT(auth_token: str):
+	if not auth_token:
+		raise HTTPException(status_code=403, detail="AUTHORIZATION_HEADER_REQUIRED")
+
+	if not auth_token.startswith("Bearer"):
+		raise HTTPException(status_code=403, detail="MALFORMED_AUTHORIZATION_HEADER")
+
+	JWT = auth_token[7:]
+	from components.user import User
+	user = User.authenticate_by_JWT(JWT)
+
+	if not user['success']:
+		raise HTTPException(status_code=403, detail="INVALID_AUTHORIZATION_HEADER")
+
+	return user

@@ -16,6 +16,7 @@ class User:
 			raise Exception("User Could Not Be Found In DB")
 
 		user_data = {
+			"user_id": str(user_from_db['_id']),
 			"name": user_from_db['name'],
 			"permission": user_from_db['permission'],
 		}
@@ -34,6 +35,22 @@ class User:
 
 		return {'success': True}
 
+	def get_job_reccomendations(self):
+		# Right Now Just Gets 10 Jobs at random essentially
+		from api import jobaiDB
+		jobs_from_db = jobaiDB.jobs.find({}, limit=10)
+
+		jobs = [];
+
+		for job in jobs_from_db:
+			jobs.append({
+				"job_id": str(job['_id']),
+				"jobTitle": job['jobTitle'],
+				"company": job['company'],
+				"longListing": job['longListing']
+			})
+
+		return {'success': True, 'data': jobs}
 
 	@staticmethod
 	def authenticate_by_JWT(JWT: str):

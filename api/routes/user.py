@@ -3,12 +3,12 @@ from pydantic import BaseModel
 from components import authentication
 from components.user import User
 
-router = APIRouter()
+router = APIRouter(tags=["User"])
 
 
 # Get current User
 @router.get("/user")
-@authentication.access_level("Authenticated")
+@authentication.access_level("Candidate")
 def get_current_user_data(req: Request):
 	u = User(req.state.user_id)
 	return u.get_info()
