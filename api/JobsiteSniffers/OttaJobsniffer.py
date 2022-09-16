@@ -4,7 +4,10 @@ Currency = "GBP"
 
 import requests
 
-from logger import log as logger
+import components.logger as lg
+global logger
+logger = lg.log
+
 
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
@@ -17,6 +20,7 @@ jobUpdateQuestion = gql(open("JobsiteSniffers/ottaHelpers/answerQuestion.gql", "
 jobApply = gql(open("JobsiteSniffers/ottaHelpers/sendApplication.gql", "r").read())
 
 class ottaJobsniffer:
+	ID = "otta"
 	siteName = "otta"
 	url = "https://app.otta.com/"
 	jobApplicationPath = "jobs/%s/application"

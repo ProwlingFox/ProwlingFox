@@ -1,10 +1,11 @@
 #Start Logger
-import logger as lg
+import components.logger as lg
 lg.init()
 logger = lg.log;
 
 import json, argparse, asyncio
 from pymongo import MongoClient
+from pymongo import errors as MongoErrors
 
 #Load Secret keys
 fSecrets = open("secrets.json", "r")
@@ -22,19 +23,61 @@ def parseArgs():
 		logger.setLogLevel("debug")
 
 
+# Returns Itterable jobsniffer based on module name.
+def loadJobSniffer(jobSnifferName, forceLoad=False):
+	snifferData = secrets["sniffers"][jobSnifferName]
+
+	if not (forceLoad or snifferData["enabled"]) :
+		return False
+
+	try:
+		jsPlugin = __import__("JobsiteSniffers.%s" % jobSnifferName, globals(), locals(), [jobSnifferName], 0)
+		js = getattr(jsPlugin, jobSnifferName)
+		return js(secrets)
+	except Exception as e:
+		logger.trace()
+		print("Error with %s Plugin" % (jobSnifferName))
+		return False
+
+
 def main():
 	mClient = MongoClient(secrets["database"]["credentials"])
+	global jobaiDB
 	jobaiDB = mClient.jobai
 	jobsCollection = jobaiDB.jobs
 
-	testJob = {
-		"jobTitle": "Software Engineer",
-		"company": "Docket Technologies Inc",
-	}
-
-	insertID = jobsCollection.insert_one(testJob).inserted_id
+	for sniffer in secrets["sniffers"]:
+		js = loadJobSniffer(sniffer)
+		if js:
+			updateJobs(js)
 
 	return
+
+def updateJobs(sniffer):
+	jobCounter = 0;
+
+	for job in sniffer:
+		try:
+			insertJobIntoDB({
+				"source": sniffer.ID,
+				"exid": job["exid"],
+				"jobTitle": job["position"],
+				"company": job["company"],
+				"longListing": job["listing"],
+				"questions": job["questions"]
+			})
+			jobCounter += 1
+			print(f"Inserted Job From {job['company']} Into DB | Inserted {jobCounter}")
+		except MongoErrors.DuplicateKeyError:
+			print("Job Allready Existed")
+		except:
+			logger.trace()
+
+	return
+
+def insertJobIntoDB(job):
+	jobsCollection = jobaiDB.jobs
+	jobsCollection.insert_one(job)
 
 if __name__ == "__main__":
 	parseArgs()

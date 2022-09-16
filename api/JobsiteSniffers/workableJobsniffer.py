@@ -1,9 +1,9 @@
 import json, requests, traceback
 import html2text
-from logger import ansicodes
+from components.logger import ansicodes
 
 
-import logger as lg
+import components.logger as lg
 global logger
 logger = lg.log
 
@@ -15,6 +15,7 @@ jobFilter = {
 }
 
 class workableJobsniffer:
+	ID = "workable"
 	jobsStack = []
 
 	def __init__(self, secrets):
@@ -46,10 +47,10 @@ class workableJobsniffer:
 
 	def refillStack(self):
 		querystring = {
-			"remote":"true",
+			"remote":"",
 			"offset":self.jobOffset,
-			"query":"Software Engineer | Web Developer | Devops",
-			"location": "United Kingdom"
+			"query":"",
+			"location": ""
 			}
 		response = requests.request("GET", workableAPI + "jobs", params=querystring)
 		json = response.json()
@@ -114,9 +115,12 @@ class workableJobsniffer:
 		"paragraph": "string",
 		"boolean": "bool",
 		"text": "string",
+		"number": "int",
 		"email": "string",
 		"phone": "string",
 		"multiple": "multiple choice",
+		"dropdown": "multiple choice",
+		"date": None,
 		"group": None,
 		"file": None
 	}

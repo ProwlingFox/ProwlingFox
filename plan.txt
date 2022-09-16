@@ -32,3 +32,41 @@ Pitch
 =================
 To Candidates: Job Recruiter allready use ai to reject you, lets fight back
 To Recruiters: Unless you're employing {marketing people?} the candiates that are best at selling themselves arent't nessicarily the best candidates, so let's put everyone on equal footing and use AI to offer you a selection of ideal candidates.
+
+
+Jobs
+
+{
+	source +--Unique
+	exid   |
+	longListing
+	shortListing
+	jobTitle
+	jobRole
+	contractType
+	location
+	language
+	url
+
+	company
+}
+
+Companies
+
+{
+	Name,
+	Website,
+	Image,
+	Description
+}
+
+Users
+
+{
+	name: str
+	email: str
+	password: str
+	type: "bot" | "user"
+	apiToken: str
+	permission: "unverified" | "candidate" | "admin"
+}

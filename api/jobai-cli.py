@@ -1,5 +1,5 @@
 #Start Logger
-import logger as lg
+import components.logger as lg
 lg.init()
 logger = lg.log;
 

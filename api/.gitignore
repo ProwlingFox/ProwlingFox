@@ -6,5 +6,5 @@
 *.pyo
 secrets.json
 logs/*
-
+__pycache__/
 resume.*
