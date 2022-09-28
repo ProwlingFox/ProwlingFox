@@ -1,6 +1,7 @@
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
 
+
 class Job:
 	def __init__(self, job_id):
 		self.job_id = job_id
@@ -19,3 +20,6 @@ class Job:
 		}
 
 		return {'success': True, 'data': job}
+
+	def apply_to_role(self, questionResponses):
+		return

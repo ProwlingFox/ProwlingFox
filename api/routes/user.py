@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
+from typing import Type, List
+
 from components import authentication
 from components.user import User
 
@@ -43,3 +45,23 @@ class pw_login_user(BaseModel):
 @router.post("/user/login")
 def login_user_using_pass(u: pw_login_user):
 	return User.autenticate_by_email(u.email, u.password)
+
+
+# Update User Details
+class user_job_preferences(BaseModel):
+	roles: List[str] = None
+	locations: List[str] = None
+	remote: bool = None
+	salary: int = None
+
+class user_details(BaseModel):
+	name: str
+	tel: str = None
+	pronouns: str = None
+	job_preferences: user_job_preferences = None
+
+@router.put("/user/update")
+@authentication.access_level("Authenticated")
+def update_user_details(req: Request, ud: user_details):
+	u = User(req.state.user_id)
+	return u.update_details(ud)

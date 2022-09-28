@@ -31,7 +31,26 @@ class User:
 		hashedPassword = bcrypt.hashpw(newpassword.encode('utf-8'), bcrypt.gensalt())
 
 		from api import jobaiDB
-		userId = str( jobaiDB.users.update_one({"_id":ObjectId("6320f4498dd6e6071251de30")}, {"$set":{"password": hashedPassword}}) )
+		update_response = jobaiDB.users.update_one({"_id":ObjectId(self.user_id)}, {"$set":{"password": hashedPassword}})
+
+		return {'success': True}
+
+	def update_details(self, details):
+		print(details)
+		userDetails = {
+			"name": details.name,
+			"tel": details.tel,
+			"pronouns": details.pronouns,
+			"jobPreferences": {
+				"roles": details.job_preferences.roles,
+				"locations": details.job_preferences.locations,
+				"remote": details.job_preferences.remote,
+				"salary": details.job_preferences.salary
+			}
+		}
+
+		from api import jobaiDB
+		update_response = jobaiDB.users.update_one({"_id":ObjectId(self.user_id)}, {"$set": userDetails})
 
 		return {'success': True}
 
@@ -108,7 +127,7 @@ class User:
 			"email": email,
 			"password": hashedPassword,
 			"type": "user",
-			"permission": "unverified"
+			"permission": "candidate"
 		}
 
 		try:
