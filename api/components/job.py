@@ -22,4 +22,4 @@ class Job:
 		return {'success': True, 'data': job}
 
 	def apply_to_role(self, questionResponses):
-		return
+		return 

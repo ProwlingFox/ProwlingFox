@@ -1,4 +1,4 @@
-#Start Logger
+e#Start Logger
 import components.logger as lg
 lg.init()
 logger = lg.log;
@@ -54,6 +54,12 @@ def main():
 	return
 
 def updateJobs(sniffer):
+	# Jobs need to be preprocessed before they are added to the db, the following actions need to be preformed;
+	# - Shorten the Job Listing for both GPT and Display Purposes
+	# - Identify The Job's Role
+	# - Identify any kind of preset responses to the questions that can easily be subbed in instead of getting an answer from GPT
+
+
 	jobCounter = 0;
 
 	for job in sniffer:
@@ -70,9 +76,11 @@ def updateJobs(sniffer):
 			print(f"Inserted Job From {job['company']} Into DB | Inserted {jobCounter}")
 		except MongoErrors.DuplicateKeyError:
 			print("Job Allready Existed")
-		except:
-			logger.trace()
+			continue;
 
+		# Add A Shortened Listing To The Job
+		# Classify The Job's Role
+		# Classify The Job's Question Types
 	return
 
 def insertJobIntoDB(job):
