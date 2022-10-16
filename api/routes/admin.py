@@ -16,17 +16,17 @@ router = APIRouter(tags=["Admin"])
 
 #Question Types
 
-class responses(BaseModel):
-	string: str = None
-	boolean: str = None
-	integer: str = None
-	decimal: str = None
-	multiple_choice: str = None
+# class responses(BaseModel):
+# 	string: str = None
+# 	boolean: str = None
+# 	integer: str = None
+# 	decimal: str = None
+# 	multiple_choice: str = None
 
-class questionType(BaseModel):
-	title: str
-	key_words: List[str]
-	response: responses
+# class questionType(BaseModel):
+# 	title: str
+# 	key_words: List[str]
+# 	response: responses
 
 
 # Get Specific Job Details

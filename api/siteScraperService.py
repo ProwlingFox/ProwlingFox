@@ -1,4 +1,4 @@
-e#Start Logger
+#Start Logger
 import components.logger as lg
 lg.init()
 logger = lg.log;

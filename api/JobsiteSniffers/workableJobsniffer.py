@@ -11,7 +11,7 @@ logger = lg.log
 workableAPI = "https://jobs.workable.com/api/v1/"
 
 jobFilter = {
-	
+
 }
 
 class workableJobsniffer:
@@ -20,7 +20,7 @@ class workableJobsniffer:
 
 	def __init__(self, secrets):
 		self.secrets = secrets["sniffers"]["workableJobsniffer"]
-		self.applicantName = secrets["userInfo"]["firstname"]
+		# self.applicantName = secrets["userInfo"]["firstname"]
 		self.jobOffset = 10
 		return
 
@@ -31,7 +31,7 @@ class workableJobsniffer:
 		#Refill queue if needed or end the itterator
 		if not self.jobsStack:
 			if not self.refillStack():
-				raise StopIteration 
+				raise StopIteration
 		return self.formatJob( self.jobsStack.pop() )
 
 
@@ -47,7 +47,7 @@ class workableJobsniffer:
 
 	def refillStack(self):
 		querystring = {
-			"remote":"",
+			"remote": True,
 			"offset":self.jobOffset,
 			"query":"",
 			"location": ""
@@ -99,7 +99,7 @@ class workableJobsniffer:
 								"url": self.uploadResume(job["exid"]),
 								"name": "resume.pdf"
 							}
-							
+
 						})
 						continue
 				#Check if required
@@ -109,7 +109,7 @@ class workableJobsniffer:
 		headers = {"Content-Type": "application/json"}
 		response = requests.request("POST", applicationURL, headers=headers, json=body)
 		logger.debug(response.text)
-		return True	
+		return True
 
 	questionTypeTranslation = {
 		"paragraph": "string",
@@ -138,7 +138,7 @@ class workableJobsniffer:
 				if question["id"] == "summary":
 					question["label"] = "Create a first person personalised summary of a person who is applying to this position."
 				if question["id"] == "cover_letter":
-					question["label"] = "Create a cover letter for this position from %s." % self.applicantName
+					question["label"] = "Create a cover letter for this position."
 				if "onlyTrueAllowed" in question:
 					qresponse = True
 				questions.append({
