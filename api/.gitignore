@@ -1,6 +1,7 @@
 /GPT3JobEnv
 /env
 /venv
+/.env
 
 *.pyc
 *.pyo
