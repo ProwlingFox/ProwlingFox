@@ -4,11 +4,6 @@ Currency = "GBP"
 
 import requests
 
-import components.logger as lg
-global logger
-logger = lg.log
-
-
 from gql import gql, Client
 from gql.transport.aiohttp import AIOHTTPTransport
 
@@ -198,22 +193,13 @@ class ottaJobsniffer:
 		try:
 			self.sendApplication(False)
 		except:
-			logger.log("Allready applied to this place")
 			return False
 
 
 		for q in qna:
 			try:
 				self.updateQuestionResponse(q)
-				logger.writeReportEvent(logger.questionsfile, [
-					q['question'],
-					q['response'],
-					self.externalJobID
-					])
 			except Exception as e:
-				logger.log('Question "%s" failed.' % q['question'])
-				logger.debug(str(e))
-				logger.trace()
 				errors = True
 		
 		try:
@@ -222,9 +208,6 @@ class ottaJobsniffer:
 			if errors in response: raise Exception("Error sending application")
 			return True;
 		except Exception as e:
-			logger.log("Job Application Failed " + str(e))
-			logger.trace()
-			logger.log("Complete the job application at https://app.otta.com/jobs/%s/apply" % self.externalJobID)
 			return False
 
 	def generateJobListing(self, rawJobData):

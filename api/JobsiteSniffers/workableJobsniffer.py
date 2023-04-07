@@ -1,12 +1,5 @@
 import json, requests, traceback
 import html2text
-from components.logger import ansicodes
-
-
-import components.logger as lg
-global logger
-logger = lg.log
-
 
 workableAPI = "https://jobs.workable.com/api/v1/"
 
@@ -108,7 +101,6 @@ class workableJobsniffer:
 
 		headers = {"Content-Type": "application/json"}
 		response = requests.request("POST", applicationURL, headers=headers, json=body)
-		logger.debug(response.text)
 		return True
 
 	questionTypeTranslation = {
