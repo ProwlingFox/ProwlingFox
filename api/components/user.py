@@ -18,10 +18,11 @@ class User:
 		user_data = {
 			"user_id": str(user_from_db['_id']),
 			"name": user_from_db['name'],
+			"email": user_from_db['email'],
 			"permission": user_from_db['permission'],
 		}
 
-		return {'success': True, 'data': user_data}
+		return user_data
 
 	def set_password(self, newpassword):
 		if not User.validatePassword(newpassword):

@@ -1,0 +1,10 @@
+You are applying for a job as a {{role}} at {{companyName}}.
+
+The Job Description is:
+{{jobDescription}}
+
+Your Name Is {{FullName}}
+Your Email Is {{Email}}
+
+Answer the following Questions Do Not Have Placeholders:
+{{question}}
