@@ -20,3 +20,10 @@ def get_job_reccomendations(req: Request):
 def get_job_details(job_id: str):
 	j = Job(job_id)
 	return j.get_details()
+
+# Get Specific Job Details
+@router.get("/jobs/{job_id}/apply")
+@authentication.access_level("Candidate")
+def get_job_details(job_id: str):
+	j = Job(job_id)
+	return j.get_details()
