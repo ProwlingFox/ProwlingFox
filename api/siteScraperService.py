@@ -1,8 +1,4 @@
-#Start Logger
-import components.logger as lg
-lg.init()
-logger = lg.log;
-
+from codecs import raw_unicode_escape_decode
 import json, argparse, asyncio
 from pymongo import MongoClient
 from pymongo import errors as MongoErrors
@@ -19,10 +15,6 @@ def parseArgs():
 	parser.add_argument('-v', action='store_true', default=False, required=False, help='Verbose Mode')
 	globalSettings = parser.parse_args()
 
-	if (globalSettings.v):
-		logger.setLogLevel("debug")
-
-
 # Returns Itterable jobsniffer based on module name.
 def loadJobSniffer(jobSnifferName, forceLoad=False):
 	snifferData = secrets["sniffers"][jobSnifferName]
@@ -35,7 +27,6 @@ def loadJobSniffer(jobSnifferName, forceLoad=False):
 		js = getattr(jsPlugin, jobSnifferName)
 		return js(secrets)
 	except Exception as e:
-		logger.trace()
 		print("Error with %s Plugin" % (jobSnifferName))
 		return False
 
@@ -95,4 +86,4 @@ if __name__ == "__main__":
 	except KeyboardInterrupt:
 		print("Exiting Gracefully (Kbd Interrupt)...")
 	except Exception as e:
-		logger.trace()
+		raise e
