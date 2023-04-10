@@ -1,5 +1,3 @@
-
-
 <script>
 	import { login } from '$lib/requestUtils'
 
@@ -11,11 +9,11 @@
 	}
 
 	let user: User = {
-        name: '',
-        email: '',
-        pass: '',
-        passConfirm: ''
-    }
+		name: '',
+		email: '',
+		pass: '',
+		passConfirm: ''
+	}
 
 	function validatePassword(pass: string, confirmationPass: string) {
 		if (pass != confirmationPass) {
