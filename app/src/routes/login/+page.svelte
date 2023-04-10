@@ -6,17 +6,14 @@
 
 	async function loginClickHandler() {
 		const loggedIn = await login(email, password)
-		console.log('loggedIn', loggedIn)
-		if (loggedIn) {
-			goto('/jobs')
-		}
+		if (loggedIn) goto('/jobs')
 	}
 
-	function handleEnterKey(e: KeyboardEvent<HTMLInputElement>): void {
-    if (e.key === "Enter") {
-      loginClickHandler();
-    }
-  }
+	function handleEnterKey(e: KeyboardEvent): void {
+		if (e.key === "Enter") {
+			loginClickHandler()
+		}
+	}
 
 </script>
 
@@ -25,11 +22,6 @@
 	<div class="flex justify-center">
 	   	<div class="md:w-1/2">
 			<div class="mt-20 mb-20 ">
-				<div class="flex justify-center mb-6">
-					<a href="index.html" class="bg-white w-fit p-4 rounded-2xl">
-						<h1 class="font-bold inline">Job.Ai</h1>
-					</a>
-				</div>
 				<div class="bg-white rounded-lg">
 					<div class="border-b border-gray-200 p-3 flex justify-center font-bold">
 						<h6>Sign in</h6>
@@ -41,12 +33,8 @@
 								<input type="text" class="block w-full p-3 m-1 rounded-lg bg-slate-200" id="email" placeholder="name@example.com" bind:value={email} on:keyup|preventDefault={handleEnterKey}>
 							</div>
 							<div class="w-full">
-								<label for="password-field">Password</label>
-								<!-- <div class="position-relative "> -->
-									<input id="password-field" type="password" class="block w-full p-3 m-1 rounded-lg bg-slate-200" name="password" placeholder="Password" bind:value={password} on:keyup|preventDefault={handleEnterKey}>
-									<!-- <div class="uil uil-eye-slash text-lighten fs-15 field-icon toggle-password2">
-									</div> -->
-								<!-- </div> -->
+								<label for="password">Password</label>
+								<input id="password" type="password" class="block w-full p-3 m-1 rounded-lg bg-slate-200" name="password" placeholder="Password" bind:value={password} on:keyup|preventDefault={handleEnterKey}>
 							</div>
 							<div class="flex items-center justify-between mt-5 mb-5">
 								<div class="checkbox">
@@ -76,7 +64,7 @@
 				<div class="bg-slate-200 p-5 mt-2 flex justify-center">
 				   <p class="mb-0">
 					  Don't have an account?
-					  <a href="sign-up.html" class="text-blue-400">
+					  <a href="signup" class="text-blue-400">
 						 Sign up
 					  </a>
 				   </p>

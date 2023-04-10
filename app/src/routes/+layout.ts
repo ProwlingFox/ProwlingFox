@@ -11,7 +11,6 @@ const publicPaths = [
 /** @type { import('./$types').LayoutLoad } */
 export function load({ url }) {
   // allways allow access to public pages
-  console.log(url)
   if ( publicPaths.includes(url.pathname) ) {
     return {
 
@@ -23,6 +22,6 @@ export function load({ url }) {
   }
 
   return {
-      
+
   };
 }
