@@ -51,11 +51,14 @@ async function login(email: string, password: string) {
 
 	const response = await post('http://localhost:8000/user/login', body)
 
-	if(response) {
+	if(response.success) {
 		document.cookie = `token=${response.Token}; expires=${(new Date(Date.now() + 1000 * 60 * 60 * 24))}; path=/`
+		return true
 	} else {
-		alert("Login Error")
+		console.warn("Login Error")
+		return false
 	}
+
 }
 
 export {
