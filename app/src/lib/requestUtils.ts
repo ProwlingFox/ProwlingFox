@@ -43,6 +43,14 @@ function getJWT() {
 	return cookies.token
 }
 
+function isJWTValid() {
+	let JWT = getJWT();
+	if (! JWT) {
+		return false
+	}
+	return true
+}
+
 async function login(email: string, password: string) {
 	const body = {
 		"email": email,
@@ -61,5 +69,6 @@ async function login(email: string, password: string) {
 export {
 	get,
 	post,
-	login
+	login,
+	isJWTValid
 }
