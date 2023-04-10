@@ -1,12 +1,12 @@
 <script>
-	import { login } from '$lib/requestUtils.ts'
+	import { login } from '$lib/requestUtils'
 
-	let email, password
+	let email: string, password: string
 
 	function loginClickHandler() {
 		login(email, password)
 	}
-	
+
 </script>
 
 

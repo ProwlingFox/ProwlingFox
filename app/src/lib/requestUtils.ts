@@ -4,18 +4,19 @@ function get(uri: string) {
 	return makeRequest('GET', uri)
 }
 
-function post(uri: string, body) {
+function post(uri: string, body: object) {
 	return makeRequest('POST', uri, body)
 }
 
-async function makeRequest(method: string, uri: string, body) {
-	let headers = {
-		'content-type': 'application/json'
-	}
+async function makeRequest(method: string, uri: string, body?: object) {
+	let headers: Headers = new Headers({
+		"Content-Type": "application/json",
+	 });
+
 
 	let JWT = getJWT()
 	if (JWT) {
-		headers['Authorization'] = 'Bearer ' + JWT
+		headers.append('Authorization', 'Bearer ' + JWT)
 	}
 
 	try {
@@ -30,7 +31,7 @@ async function makeRequest(method: string, uri: string, body) {
 		return undefined;
 	}
 
-	
+
 }
 
 function getJWT() {

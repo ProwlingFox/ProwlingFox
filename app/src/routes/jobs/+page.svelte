@@ -1,8 +1,16 @@
 <script>
-	import { get } from '$lib/requestUtils.ts'
+	import { get } from '$lib/requestUtils'
 	import { onMount } from 'svelte'
 
-	let jobs = '';
+	interface Job {
+		'job_id': string
+		'jobTitle': string
+		'company': string
+		'longListing': string
+		'shortListing'?: string
+	}
+
+	let jobs: Job[] = []
 	let test;
 
 	onMount(() => {
@@ -11,17 +19,17 @@
 			console.log(jobs)
 		})
 	})
-	
+
 </script>
 
 <div id="JobBoard">
-	{#each jobs as job}
+	{#each jobs as Job}
 		<div class="jobListing">
-			<div class="jobTitle">{job.jobTitle}</div>
-			<div class="jobCompany">{job.company}</div>
+			<div class="jobTitle">{Job.jobTitle}</div>
+			<div class="jobCompany">{Job.company}</div>
 		</div>
 	{/each}
-	
+
 </div>
 
 <style>

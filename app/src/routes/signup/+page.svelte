@@ -1,16 +1,18 @@
 
 
 <script>
-	import { login } from '$lib/requestUtils.ts'
+	import { login } from '$lib/requestUtils'
 
-	let user = {
-		name: null,
-		email: null,
-		pass: null,
-		passConfirm: null
+	interface User {
+		name: string
+		email: string
+		pass: string
+		passConfirm: string
 	}
-	
-	function validatePassword(pass, confirmationPass) {
+
+	let user: User
+
+	function validatePassword(pass: string, confirmationPass: string) {
 		if (pass != confirmationPass) {
 			return false
 		}
@@ -18,7 +20,7 @@
 		return true
 	}
 
-	function validateEmail(email) {
+	function validateEmail(email: string) {
 		return true
 	}
 
