@@ -8,6 +8,9 @@
 		'company': string
 		'longListing': string
 		'shortListing'?: string
+		'location'?: string
+		'salary'?: string
+
 	}
 
 	let jobs: Job[] = []
