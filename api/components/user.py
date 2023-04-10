@@ -5,12 +5,12 @@ MIN_PASSWORD_LENGTH = 8
 
 class User:
 	def __init__(self, user_id):
-		self.user_id = user_id
+		self.user_id = ObjectId(user_id)
 		return
 
 	def get_info(self):
 		from api import jobaiDB
-		user_from_db = jobaiDB.users.find_one({"_id": ObjectId(self.user_id)})
+		user_from_db = jobaiDB.users.find_one({"_id": self.user_id})
 
 		if not user_from_db:
 			raise Exception("User Could Not Be Found In DB")
@@ -32,7 +32,7 @@ class User:
 		hashedPassword = bcrypt.hashpw(newpassword.encode('utf-8'), bcrypt.gensalt())
 
 		from api import jobaiDB
-		update_response = jobaiDB.users.update_one({"_id":ObjectId(self.user_id)}, {"$set":{"password": hashedPassword}})
+		update_response = jobaiDB.users.update_one({"_id":self.user_id}, {"$set":{"password": hashedPassword}})
 
 		return {'success': True}
 
@@ -51,14 +51,34 @@ class User:
 		}
 
 		from api import jobaiDB
-		update_response = jobaiDB.users.update_one({"_id":ObjectId(self.user_id)}, {"$set": userDetails})
+		update_response = jobaiDB.users.update_one({"_id":self.user_id}, {"$set": userDetails})
 
 		return {'success': True}
 
 	def get_job_reccomendations(self):
-		# Right Now Just Gets 10 Jobs at random essentially
+		# Right Now Just Gets 10 Jobs at random essentially, filtering out those marked as read
 		from api import jobaiDB
-		jobs_from_db = jobaiDB.jobs.find({}, limit=10)
+		# jobs_from_db = jobaiDB.jobs.find({}, limit=10)
+		jobs_from_db = jobaiDB.jobs.aggregate([
+			{
+				'$lookup': {
+					'from': 'user_jobs', 
+					'localField': '_id', 
+					'foreignField': 'job_id', 
+					'as': 'matched_docs'
+				}
+			}, {
+				'$match': {
+					'matched_docs': {
+						'$not': {
+							'$elemMatch': {
+								'user_id': self.user_id
+							}
+						}
+					}
+				}
+			}
+		])
 
 		jobs = [];
 

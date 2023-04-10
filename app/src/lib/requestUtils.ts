@@ -1,14 +1,14 @@
 import cookie from 'cookie'
 
-function get(uri) {
+function get(uri: string) {
 	return makeRequest('GET', uri)
 }
 
-function post(uri, body) {
+function post(uri: string, body) {
 	return makeRequest('POST', uri, body)
 }
 
-async function makeRequest(method, uri, body) {
+async function makeRequest(method: string, uri: string, body) {
 	let headers = {
 		'content-type': 'application/json'
 	}
@@ -42,7 +42,7 @@ function getJWT() {
 	return cookies.token
 }
 
-async function login(email, password) {
+async function login(email: string, password: string) {
 	const body = {
 		"email": email,
 		"password": password

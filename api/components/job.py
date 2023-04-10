@@ -1,6 +1,8 @@
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
 
+from components.user import User
+
 
 class Job:
 	def __init__(self, job_id):
@@ -28,4 +30,18 @@ class Job:
 	def update_short_listing(self, newShortListing):
 		from api import jobaiDB
 		update_response = jobaiDB.jobs.update_one({"_id":ObjectId(self.job_id)}, {"$set": {"shortListing":newShortListing}}, upsert=True)
+		return
+	
+	def mark_role_as_read(self, user: User, favourite: bool):
+		from api import jobaiDB
+		jobaiDB.user_jobs.update_one(
+			{
+				"job_id":ObjectId(self.job_id),
+				"user_id":ObjectId(user.user_id),
+			}, {
+				"$set": {
+					"read": True,
+					"favourite": favourite
+				}
+			}, upsert=True)
 		return

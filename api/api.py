@@ -1,17 +1,21 @@
+from anyio import sleep_forever
 import components.secrets as secrets
 secrets.init()
 
 import pymongo
+from time import sleep
 
-#Create DB Connection
-mClient = pymongo.MongoClient(secrets.secrets["database"]["credentials"])
-jobaiDB = mClient.jobai
-
-try:
-	print("Testing DB Connection")
-	mClient.admin.command('ping')
-except pymongo.errors.ConnectionFailure:
-	raise Exception("DB Server Cannot Connect")
+while True:
+    #Create DB Connection
+    mClient = pymongo.MongoClient(secrets.secrets["database"]["credentials"])
+    jobaiDB = mClient.jobai
+    try:
+        print("Testing DB Connection")
+        mClient.admin.command('ping')
+        break
+    except pymongo.errors.ConnectionFailure:
+        print("DB Server Cannot Connect, Retrying...")
+        sleep(4)
 
 
 # FAST API

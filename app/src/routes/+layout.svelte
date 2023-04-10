@@ -1,3 +1,17 @@
+<nav>
+	<header>
+		<h1>Job.Ai</h1>
+		<h2>Lorem Ispum Dolor Sat Amen</h2>
+	</header>
+	<ul>
+		<a href="/jobs">Jobs</a>
+		<a href="/profile">Profile</a>
+		<a href="/admin">Admin</a>
+	</ul>
+</nav>
+
+<slot></slot>
+
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300&family=Nunito&display=swap');
 
@@ -52,17 +66,3 @@
 		background-color: rgba(0, 0, 0, 0.15);
 	}
 </style>
-
-<nav>
-	<header>
-		<h1>Job.Ai</h1>
-		<h2>Lorem Ispum Dolor Sat Amen</h2>
-	</header>
-	<ul>
-		<a href="/jobs">Jobs</a>
-		<a href="/profile">Profile</a>
-		<a href="/admin">Admin</a>
-	</ul>
-</nav>
-
-<slot></slot>
