@@ -3,18 +3,17 @@
 	import { onMount } from 'svelte'
 
 	interface Job {
-		'job_id': string
-		'jobTitle': string
-		'company': string
-		'longListing': string
-		'shortListing'?: string
-		'location'?: string
-		'salary'?: string
-
+		job_id: string
+		jobTitle: string
+		company: string
+		longListing: string
+		shortListing?: string
+		location?: string
+		salary?: string
 	}
 
 	let jobs: Job[] = []
-	let test;
+	let test
 
 	onMount(() => {
 		get('http://localhost:8000/jobs').then((res) => {
@@ -22,7 +21,6 @@
 			console.log(jobs)
 		})
 	})
-
 </script>
 
 <div id="JobBoard">
@@ -32,12 +30,10 @@
 			<div class="jobCompany">{Job.company}</div>
 		</div>
 	{/each}
-
 </div>
 
 <style>
 	#JobBoard {
-
 	}
 
 	.jobListing {
@@ -51,6 +47,5 @@
 	}
 
 	.jobCompany {
-
 	}
 </style>

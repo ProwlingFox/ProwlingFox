@@ -1,6 +1,6 @@
 <div class="form">
 	<label for="nameInput">
 		Name
-		<input><br>
+		<input /><br />
 	</label>
 </div>
