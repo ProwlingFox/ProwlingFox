@@ -7,7 +7,7 @@ jobFilter = {
 
 }
 
-class workableJobsniffer:
+class workableJobsniffer():
 	ID = "workable"
 	jobsStack = []
 
