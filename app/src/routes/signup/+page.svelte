@@ -67,8 +67,7 @@
 			<div class="mt-20 mb-20">
 				<div class="bg-white rounded-lg">
 					<div
-						class="border-b border-gray-200 p-3 flex justify-center font-bold"
-					>
+						class="border-b border-gray-200 p-3 flex justify-center font-bold">
 						<h6>Sign Up</h6>
 					</div>
 					<div class="card-body p-6">
@@ -81,8 +80,7 @@
 									id="name"
 									placeholder="John Doe"
 									bind:value={user.name}
-									on:keyup|preventDefault={handleEnterKey}
-								/>
+									on:keyup|preventDefault={handleEnterKey} />
 							</div>
 							<div class="w-full">
 								<label for="username">Email Address</label>
@@ -92,8 +90,7 @@
 									id="email"
 									placeholder="name@example.com"
 									bind:value={user.email}
-									on:keyup|preventDefault={handleEnterKey}
-								/>
+									on:keyup|preventDefault={handleEnterKey} />
 							</div>
 							<div class="w-full">
 								<label for="password">Password</label>
@@ -104,8 +101,7 @@
 									name="password"
 									placeholder="Password"
 									bind:value={user.pass}
-									on:keyup|preventDefault={handleEnterKey}
-								/>
+									on:keyup|preventDefault={handleEnterKey} />
 							</div>
 							<div class="w-full">
 								<label for="password">Confirm Password</label>
@@ -116,17 +112,14 @@
 									name="password-confirm"
 									placeholder="Password"
 									bind:value={user.passConfirm}
-									on:keyup|preventDefault={handleEnterKey}
-								/>
+									on:keyup|preventDefault={handleEnterKey} />
 							</div>
 							<div
-								class="admin__button-group button-group d-flex pt-1 justify-content-md-start justify-content-center mt-5"
-							>
+								class="admin__button-group button-group d-flex pt-1 justify-content-md-start justify-content-center mt-5">
 								<button
 									on:click={createAccount}
 									class="bg-slate-300 hover:bg-slate-400 p-2 w-full rounded-lg"
-									>Create Account</button
-								>
+									>Create Account</button>
 							</div>
 						</div>
 					</div>

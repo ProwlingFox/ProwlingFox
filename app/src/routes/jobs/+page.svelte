@@ -1,16 +1,7 @@
 <script>
 	import { get } from '$lib/requestUtils'
 	import { onMount } from 'svelte'
-
-	interface Job {
-		job_id: string
-		jobTitle: string
-		company: string
-		longListing: string
-		shortListing?: string
-		location?: string
-		salary?: string
-	}
+	import type { Job } from '$interfaces/job'
 
 	let jobs: Job[] = []
 	let test
@@ -26,7 +17,7 @@
 <div id="JobBoard">
 	{#each jobs as Job}
 		<div class="jobListing">
-			<div class="jobTitle">{Job.jobTitle}</div>
+			<a href="/job/{Job.job_id}" class="jobTitle">{Job.jobTitle}</a>
 			<div class="jobCompany">{Job.company}</div>
 		</div>
 	{/each}
