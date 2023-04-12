@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from components import authentication
 
 from components.user import User
+from components.job import Job
 
 router = APIRouter(tags=["Jobs"])
 

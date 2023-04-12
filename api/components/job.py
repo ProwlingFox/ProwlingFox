@@ -12,7 +12,7 @@ class Job:
 
 	def get_details(self):
 		from api import jobaiDB
-		job_from_db = jobaiDB.jobs.find_one({"_id": ObjectId(self.job_id)})
+		job_from_db = jobaiDB.jobs.find_one({"_id": ObjectId(self.id)})
 	
 		job = Job( {
 			"job_id": str(job_from_db['_id']),
@@ -30,14 +30,14 @@ class Job:
 
 	def update_short_listing(self, newShortListing):
 		from api import jobaiDB
-		update_response = jobaiDB.jobs.update_one({"_id":ObjectId(self.job_id)}, {"$set": {"shortListing":newShortListing}}, upsert=True)
+		update_response = jobaiDB.jobs.update_one({"_id":ObjectId(self.id)}, {"$set": {"shortListing":newShortListing}}, upsert=True)
 		return
 	
 	def mark_role_as_read(self, user: User, favourite: bool):
 		from api import jobaiDB
 		jobaiDB.user_jobs.update_one(
 			{
-				"job_id":ObjectId(self.job_id),
+				"job_id":ObjectId(self.id),
 				"user_id":ObjectId(user.user_id),
 			}, {
 				"$set": {

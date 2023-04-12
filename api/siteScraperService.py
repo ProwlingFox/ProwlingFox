@@ -1,4 +1,3 @@
-from codecs import raw_unicode_escape_decode
 import json, argparse, asyncio
 from pymongo import MongoClient
 from pymongo import errors as MongoErrors
