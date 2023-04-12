@@ -46,7 +46,7 @@ class Job(BaseModel):
     last_updated_ts: int
     created_ts: int
     raw_data: Optional[Any] # Contains Any Data Required for Applying to a job, that doesn't fit anywhere else i.e. real types. Please don't dump here.
-    long_description: str # Should contain a full summary of the job listing. This is what the AI will use to analyse the Job
+    long_description: Optional[str] # Should contain a full summary of the job listing. This is what the AI will use to analyse the Job
     # Display Details
     role: str #Role i.e Production Engineer
     company: Company
@@ -56,5 +56,5 @@ class Job(BaseModel):
     salary_currency: Optional[str]
     remote: Optional[bool]
     role_category: str # Category i.e. IT from a preset selection (TBD), likely to be automated
-    skills: str # Skills i.e. Python, Swimming from a preset selection (TBD), likely to be automated
+    skills: List[str] # Skills i.e. Python, Swimming from a preset selection (TBD), likely to be automated
     status: Status

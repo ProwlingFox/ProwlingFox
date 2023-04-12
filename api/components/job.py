@@ -1,9 +1,9 @@
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
-
+from pydantic import ValidationError
 
 from components.user import User
-from components.schemas.job import *
+import components.schemas.job as JobSchema
 
 class Job:
 	def __init__(self, job_id):
@@ -14,14 +14,31 @@ class Job:
 		from api import jobaiDB
 		job_from_db = jobaiDB.jobs.find_one({"_id": ObjectId(self.id)})
 	
-		job = Job( {
-			"job_id": str(job_from_db['_id']),
-			"jobTitle": job_from_db['jobTitle'],
-			"company": job_from_db['company'],
-			"longListing": job_from_db['longListing'],
-			"shortListing": job_from_db.get('shortListing'),
-			"questions": job_from_db['questions']
-		} )
+		try:
+			company = JobSchema.Company (
+				name = job_from_db['company']
+			)
+
+			job = JobSchema.Job (
+				id = str(job_from_db['_id']),
+				role = job_from_db['jobTitle'],
+				source = job_from_db['source'],
+				ext_ID = job_from_db['exid'],
+				company = company,
+				longListing = job_from_db['longListing'],
+				short_description = job_from_db.get('shortListing'),
+				questions = job_from_db['questions'],
+				added_ts = 0,
+				last_updated_ts = 0,
+				created_ts = 0,
+				location = "Hell",
+				role_category = "Software",
+				skills = ["python", "Netscape Navigator"],
+				status = JobSchema.Status.ACTIVE
+			)
+		except ValidationError as e:
+			job = e.errors()
+
 
 		return job
 
