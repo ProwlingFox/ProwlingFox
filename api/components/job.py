@@ -15,7 +15,7 @@ class Job:
 		from api import jobaiDB
 		job_from_db = jobaiDB.jobs.find_one({"_id": ObjectId(self.id)})
 
-		if not job_from_db["shortListing"]:
+		if not job_from_db.get("shortListing"):
 			job_from_db["shortListing"] = AnsweringEngine.summarize_Job_Description(job_from_db["longListing"])
 			self.update_short_listing(job_from_db["shortListing"])
 
