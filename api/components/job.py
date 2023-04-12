@@ -4,6 +4,7 @@ from pydantic import ValidationError
 
 from components.user import User
 import components.schemas.job as JobSchema
+from components.answeringEngine import AnsweringEngine
 
 class Job:
 	def __init__(self, job_id):
@@ -13,7 +14,12 @@ class Job:
 	def get_details(self):
 		from api import jobaiDB
 		job_from_db = jobaiDB.jobs.find_one({"_id": ObjectId(self.id)})
-	
+
+		if not job_from_db["shortListing"]:
+			job_from_db["shortListing"] = AnsweringEngine.summarize_Job_Description(job_from_db["longListing"])
+			self.update_short_listing(job_from_db["shortListing"])
+
+
 		try:
 			company = JobSchema.Company (
 				name = job_from_db['company']
