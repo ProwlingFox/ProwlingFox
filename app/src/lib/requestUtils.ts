@@ -67,4 +67,4 @@ async function login(email: string, password: string) {
 	}
 }
 
-export { get, post, login, isJWTValid }
+export { get, post, login, getJWT, isJWTValid }

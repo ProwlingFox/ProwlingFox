@@ -16,6 +16,10 @@ const config = {
 
 	kit: {
 		adapter: adapter(),
+		alias: {
+			'$components/*': './src/components/*',
+			'$interfaces/*': './src/interfaces/*',
+		},
 	},
 }
 
