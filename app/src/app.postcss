@@ -4,5 +4,31 @@
 @tailwind utilities;
 
 html {
-	@apply bg-slate-100;
+	@apply bg-teal-50 h-full;
 }
+
+body {
+	@apply flex flex-col h-full overflow-hidden;
+}
+
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: #d0c5d3 #ffffff;
+  }
+
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: #ffffff;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #d0c5d3;
+    border-radius: 10px;
+    border: 1 solid #ffffff;
+  }

@@ -8,16 +8,21 @@ const publicPaths = ['/login', '/signup']
 export function load({ url, data }) {
 	setJWT(data.token)
 
+	if (isJWTValid()) {
+		if (publicPaths.includes(url.pathname)) {
+			throw redirect(301, '/jobs')
+		}
+		return {
+			authenticated: true
+		}
+	}
+
 	// always allow access to public pages
 	if (publicPaths.includes(url.pathname)) {
-		return {}
+		return {
+			authenticated: false
+		}
 	}
 
-	if (!isJWTValid()) {
-		throw redirect(301, '/login')
-	}
-
-	return {
-		// JWT: JWT
-	}
+	throw redirect(301, '/login')
 }

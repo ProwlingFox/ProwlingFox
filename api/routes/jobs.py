@@ -1,6 +1,9 @@
+from typing import Any, List
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
-from components import authentication
+from components.authentication import access_level
+
+import components.schemas.job as JobSchema
 
 from components.user import User
 from components.job import Job
@@ -9,16 +12,16 @@ router = APIRouter(tags=["Jobs"])
 
 # Get Summary Of Reccomended Jobs
 @router.get("/jobs")
-@authentication.access_level("Candidate")
-def get_job_reccomendations(req: Request):
+@access_level("Candidate")
+def get_job_reccomendations(req: Request) -> List[JobSchema.JobSimplified]:
 	u = User(req.state.user_id)
 	return u.get_job_reccomendations()
 
 
 # Get Specific Job Details
 @router.get("/jobs/{job_id}")
-@authentication.access_level("Candidate")
-def get_job_details(job_id: str):
+@access_level("Candidate")
+def get_job_details(job_id: str) -> JobSchema.Job:
 	j = Job(job_id)
 	return j.get_details()
 
@@ -28,7 +31,7 @@ class mark_as_read(BaseModel):
 	favourite: bool
 
 @router.get("/jobs/{job_id}/mark")
-@authentication.access_level("Candidate")
+@access_level("Candidate")
 def mark_as_read(req: Request, job_id: str, m: mark_as_read):
 	u = User(req.state.user_id)
 	j = Job(job_id)
@@ -36,8 +39,15 @@ def mark_as_read(req: Request, job_id: str, m: mark_as_read):
 
 
 # Apply To A Job
-@router.get("/jobs/{job_id}/apply")
-@authentication.access_level("Candidate")
-def get_job_details(job_id: str):
+class Response(BaseModel):
+    id: str
+    response: Any
+    
+class apply_to_job(BaseModel):
+	responses: List[Response]
+
+@router.post("/jobs/{job_id}/apply")
+@access_level("Candidate")
+def get_job_details(job_id: str, a: apply_to_job):
 	j = Job(job_id)
-	return j.get_details()
+	return j.apply_to_role(a.responses)

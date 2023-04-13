@@ -2,6 +2,7 @@ import cookie from 'cookie'
 import { browser } from '$app/environment'
 import { readable, get as getStore } from 'svelte/store'
 import type { Readable } from 'svelte/store'
+import jwt_decode from "jwt-decode";
 
 const apiUrl = "http://127.0.0.1:8000"
 let JWTStore: Readable<string>;
@@ -59,12 +60,25 @@ function getJWT() {
 	}
 }
 
-function isJWTValid() {
-	let JWT = getJWT()
+interface DecodedJWT {
+	expiry: number,
+	permission: string,
+	user_id: string
+}
 
-	if (!JWT) {
-		return false
-	}
+function parseJWT(): DecodedJWT | null {
+	let JWT = getJWT()
+	if (!JWT) { return null }
+	var decoded = jwt_decode<DecodedJWT>(JWT)
+	return decoded
+}
+
+function isJWTValid(): Boolean {
+	let JWT = parseJWT()
+
+	if (!JWT) return false
+	if (new Date(JWT.expiry * 1000) < new Date()) return false
+
 	return true
 }
 
@@ -87,4 +101,4 @@ async function login(email: string, password: string) {
 	}
 }
 
-export { get, post, login, getJWT, setJWT, isJWTValid }
+export { get, post, login, getJWT, setJWT, parseJWT, isJWTValid }

@@ -30,6 +30,11 @@ class Job:
 		return job
 
 	def apply_to_role(self, questionResponses):
+		print(questionResponses)
+		# Validate Responses
+		
+		# Save Application To DB
+		
 		return 
 
 	def update_short_listing(self, newShortListing):
@@ -39,7 +44,7 @@ class Job:
 	
 	def mark_role_as_read(self, user: User, favourite: bool):
 		from api import jobaiDB
-		jobaiDB.user_jobs.update_one(
+		jobaiDB.applications.update_one(
 			{
 				"job_id":ObjectId(self.id),
 				"user_id":ObjectId(user.user_id),

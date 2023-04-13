@@ -1,6 +1,11 @@
 <script>
 	import '../app.postcss'
-	const authenticated = true
+	import { parseJWT } from '$lib/requestUtils'
+
+	export let data
+	
+	const JWT = parseJWT()
+	const role = JWT?.permission
 </script>
 
 <nav>
@@ -8,16 +13,20 @@
 		<h1>Job.Ai</h1>
 		<h2>Lorem Ispum Dolor Sat Amen</h2>
 	</header>
-	{#if authenticated}
+	{#if data.authenticated}
 		<ul>
 			<a href="/jobs">Jobs</a>
 			<a href="/profile">Profile</a>
-			<a href="/admin">Admin</a>
+			{#if role == "Admin"}
+				<a href="/admin">Admin</a>
+			{/if}
 		</ul>
 	{/if}
 </nav>
 
-<slot />
+<main class="overflow-auto">
+	<slot />
+</main>
 
 <style>
 	@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300&family=Nunito&display=swap');

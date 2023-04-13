@@ -1,12 +1,15 @@
 <script>
 	import { login } from '$lib/requestUtils'
-	import { goto } from '$app/navigation'
+	import { invalidateAll } from '$app/navigation'
 
 	let email: string, password: string
 
 	async function loginClickHandler() {
 		const loggedIn = await login(email, password)
-		if (loggedIn) goto('/jobs')
+
+		if (loggedIn) {
+			invalidateAll()
+		}
 	}
 
 	function handleEnterKey(e: KeyboardEvent): void {

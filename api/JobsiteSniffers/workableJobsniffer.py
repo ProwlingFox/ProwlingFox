@@ -33,7 +33,10 @@ class workableJobsniffer(baseJobsniffer):
 
 
 		company = JobSchema.Company (
-			name = rawJob["company"]["title"]
+			name = rawJob["company"]["title"],
+			logo = rawJob["company"]["image"],
+			website = rawJob["company"]["url"],
+			tagline = rawJob["company"]["socialSharingDescription"]
 		)
 
 		return JobSchema.Job (
