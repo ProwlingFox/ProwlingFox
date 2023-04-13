@@ -1,14 +1,18 @@
 import cookie from 'cookie'
+import { browser } from '$app/environment';
 
-function get(uri: string) {
-	return makeRequest('GET', uri)
+
+const apiUrl = "http://localhost:8000"
+
+function get(path: string) {
+	return makeRequest('GET', path)
 }
 
-function post(uri: string, body: object) {
-	return makeRequest('POST', uri, body)
+function post(path: string, body: object) {
+	return makeRequest('POST', path, body)
 }
 
-async function makeRequest(method: string, uri: string, body?: object) {
+async function makeRequest(method: string, path: string, body?: object) {
 	let headers: Headers = new Headers({
 		'Content-Type': 'application/json',
 	})
@@ -17,6 +21,8 @@ async function makeRequest(method: string, uri: string, body?: object) {
 	if (JWT) {
 		headers.append('Authorization', 'Bearer ' + JWT)
 	}
+
+	let uri = apiUrl + path
 
 	try {
 		var response = await fetch(uri, {
@@ -32,12 +38,16 @@ async function makeRequest(method: string, uri: string, body?: object) {
 }
 
 function getJWT() {
-	if (typeof document == 'undefined') {
-		return undefined
+	// Code is different on server vs client
+	if (browser) {
+		console.log("JWT", "BR")
+		let cookies = cookie.parse(document.cookie)
+		return cookies.token
 	}
 
-	let cookies = cookie.parse(document.cookie)
-	return cookies.token
+	console.log("JWT", "SS")
+	return undefined
+	
 }
 
 function isJWTValid() {
@@ -54,7 +64,7 @@ async function login(email: string, password: string) {
 		password: password,
 	}
 
-	const response = await post('http://localhost:8000/user/login', body)
+	const response = await post('/user/login', body)
 
 	if (response.success) {
 		document.cookie = `token=${response.Token}; expires=${new Date(

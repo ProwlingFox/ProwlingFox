@@ -13,7 +13,7 @@ def init():
         try:
             print("Testing DB Connection")
             mClient.admin.command('ping')
-            break
+            return
         except pymongo.errors.ConnectionFailure:
             print("DB Server Cannot Connect, Retrying...")
             sleep(4)

@@ -19,7 +19,7 @@
 	let job: Job
 
 	onMount(() => {
-		get('http://localhost:8000/jobs/' + jobId).then((res) => {
+		get('/jobs/' + jobId).then((res) => {
 			job = res
 
 			const min = 50000

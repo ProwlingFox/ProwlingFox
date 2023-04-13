@@ -1,5 +1,6 @@
 <script>
 	import '../app.postcss'
+	const authenticated = true
 </script>
 
 <nav>
@@ -7,11 +8,13 @@
 		<h1>Job.Ai</h1>
 		<h2>Lorem Ispum Dolor Sat Amen</h2>
 	</header>
-	<ul>
-		<a href="/jobs">Jobs</a>
-		<a href="/profile">Profile</a>
-		<a href="/admin">Admin</a>
-	</ul>
+	{#if authenticated}
+		<ul>
+			<a href="/jobs">Jobs</a>
+			<a href="/profile">Profile</a>
+			<a href="/admin">Admin</a>
+		</ul>
+	{/if}
 </nav>
 
 <slot />

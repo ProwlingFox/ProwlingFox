@@ -39,7 +39,7 @@
 			password: user.pass,
 		}
 
-		const response = await fetch('http://localhost:8000/user/create', {
+		const response = await fetch('/user/create', {
 			method: 'POST',
 			body: JSON.stringify(body),
 			headers: {

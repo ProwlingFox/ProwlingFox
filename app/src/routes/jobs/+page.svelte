@@ -7,7 +7,7 @@
 	let test
 
 	onMount(() => {
-		get('http://localhost:8000/jobs').then((res) => {
+		get('/jobs').then((res) => {
 			jobs = res.data
 			console.log(jobs)
 		})

@@ -73,7 +73,7 @@
 						</div>
 					</div>
 					<!-- End: .card-body -->
-					<div class="px-5">
+					<!-- <div class="px-5">
 						<p
 							class="social-connector text-center before:bg-gray-200 before:h-[1px] before:inline-block before:w-1/3 before:align-middle before:mr-3 after:bg-gray-200 after:h-[1px] after:inline-block after:w-1/3 after:align-middle after:ml-3">
 							<span>Or</span>
@@ -84,7 +84,7 @@
 								src="/btn_google_signin_light_normal_web@2x.png"
 								alt="" />
 						</div>
-					</div>
+					</div> -->
 					<div class="bg-slate-200 p-5 mt-2 flex justify-center">
 						<p class="mb-0">
 							Don't have an account?
