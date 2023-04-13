@@ -3,15 +3,11 @@
 	import { onMount } from 'svelte'
 	import type { Job } from '$interfaces/job'
 
-	let jobs: Job[] = []
-	let test
+	import type { PageData } from './$types';
+	export let data: PageData
 
-	onMount(() => {
-		get('/jobs').then((res) => {
-			jobs = res.data
-			console.log(jobs)
-		})
-	})
+	let jobs: Job[] = data.jobs.data
+	console.log(jobs)
 </script>
 
 <div id="JobBoard">

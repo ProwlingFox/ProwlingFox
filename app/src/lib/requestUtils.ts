@@ -1,8 +1,10 @@
 import cookie from 'cookie'
-import { browser } from '$app/environment';
+import { browser } from '$app/environment'
+import { readable, get as getStore } from 'svelte/store'
+import type { Readable } from 'svelte/store'
 
-
-const apiUrl = "http://localhost:8000"
+const apiUrl = "http://127.0.0.1:8000"
+let JWTStore: Readable<string>;
 
 function get(path: string) {
 	return makeRequest('GET', path)
@@ -33,25 +35,33 @@ async function makeRequest(method: string, path: string, body?: object) {
 		return response.json()
 	} catch (error) {
 		console.error('Fetch Request Failed', error)
-		return undefined
+		return {}
 	}
+}
+
+function setJWT(JWT: string) {
+	// For Setting The JWT
+	if (browser) {	//Don't Set On Browser
+		return null;
+	}
+
+	JWTStore = readable(JWT)
+
 }
 
 function getJWT() {
 	// Code is different on server vs client
-	if (browser) {
-		console.log("JWT", "BR")
+	if (browser){
 		let cookies = cookie.parse(document.cookie)
 		return cookies.token
+	} else {
+		return getStore(JWTStore)
 	}
-
-	console.log("JWT", "SS")
-	return undefined
-	
 }
 
 function isJWTValid() {
 	let JWT = getJWT()
+
 	if (!JWT) {
 		return false
 	}
@@ -77,4 +87,4 @@ async function login(email: string, password: string) {
 	}
 }
 
-export { get, post, login, getJWT, isJWTValid }
+export { get, post, login, getJWT, setJWT, isJWTValid }

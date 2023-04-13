@@ -1,22 +1,23 @@
-import { isJWTValid, getJWT } from '$lib/requestUtils'
+import { isJWTValid, setJWT, getJWT} from '$lib/requestUtils'
 import { redirect } from '@sveltejs/kit'
-import { page } from '$app/stores'
 
 const publicPaths = ['/login', '/signup']
 
-/** @type { import('./$types').LayoutLoad } */
-export function load({ url }) {
+
+/** @type {import('./$types').LayoutServerLoad} */
+export function load({ url, data }) {
+	setJWT(data.token)
+
 	// always allow access to public pages
 	if (publicPaths.includes(url.pathname)) {
 		return {}
 	}
 
-	console.log(getJWT(), isJWTValid())
-
 	if (!isJWTValid()) {
-		// console.log('hi')
-		// 	throw redirect(301, '/login')
+		throw redirect(301, '/login')
 	}
 
-	return {}
+	return {
+		// JWT: JWT
+	}
 }
