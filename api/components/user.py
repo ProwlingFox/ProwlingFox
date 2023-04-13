@@ -65,7 +65,7 @@ class User:
 		jobs_from_db = jobaiDB.jobs.aggregate([
 			{
 				'$lookup': {
-					'from': 'user_jobs', 
+					'from': 'applications', 
 					'localField': '_id', 
 					'foreignField': 'job_id', 
 					'as': 'matched_docs'
@@ -80,13 +80,14 @@ class User:
 						}
 					}
 				}
-			}
+			},
+			{ "$limit" : 10 }
 		])
 
 		jobs = [];
 
 		for job in jobs_from_db:
-			jobs.append(JobSchema.Job.parse_obj(job))
+			jobs.append(JobSchema.JobSimplified.parse_obj(job))
 			jobs[-1].id = str(job["_id"])
 		return jobs
 
