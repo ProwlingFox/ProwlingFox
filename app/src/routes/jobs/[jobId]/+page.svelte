@@ -22,19 +22,21 @@
 		get('/jobs/' + jobId).then((res) => {
 			job = res
 
+			console.log(job)
+
 			const min = 50000
 			const max = 200000
 			const randomNum = Math.floor(Math.random() * (max - min + 1)) + min
-			job.salary = '$' + randomNum
+			job.salary ||= '$' + randomNum
 
-			const locations = [
-				'Remote',
-				'New York, New York',
-				'London, England',
-				'Atlanta, Georgia',
-			]
-			job.location =
-				locations[Math.floor(Math.random() * locations.length)]
+			// const locations = [
+			// 	'Remote',
+			// 	'New York, New York',
+			// 	'London, England',
+			// 	'Atlanta, Georgia',
+			// ]
+			// job.location =
+			// 	locations[Math.floor(Math.random() * locations.length)]
 
 			const experienceLevels = [
 				'Junior Level',
@@ -65,8 +67,8 @@
 	<div class="w-full sm:p-5">
 		<div class="bg-white w-full p-4 sm:rounded-xl">
 			<div class="mb-2">
-				<h1 class="inline">{job.jobTitle},</h1>
-				<a class="inline underline" href="#">{job.company}</a>
+				<h1 class="inline">{job.role},</h1>
+				<a class="inline underline" href="#">{job.company.name}</a>
 			</div>
 			{#if job.location}
 				<div>
