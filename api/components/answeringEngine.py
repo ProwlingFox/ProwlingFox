@@ -24,14 +24,14 @@ class AnsweringEngine:
 			"question": next((obj["question"] for obj in jobDetails["questions"] if obj["id"] == quesitionID), None)
 		} )
 
-		response = AnsweringEngine.sendCompletionPrompt(prompt)
+		response = AnsweringEngine.sendSimpleChatPrompt(prompt)
 
 		return response
 
 	@staticmethod
 	def summarize_Job_Description(fullDescription):
 		prompt = promptGenerator("summarizeJobDescription", {"fullDescription": fullDescription})
-		response = AnsweringEngine.sendCompletionPrompt(prompt, 300)
+		response = AnsweringEngine.sendSimpleChatPrompt(prompt, tokens = 300)
 		return response
 
 	@staticmethod
@@ -41,7 +41,18 @@ class AnsweringEngine:
 			prompt=prompt,
 			max_tokens=tokens,
 		)
-
-		print(response)
 		answer = response["choices"][0]["text"].lstrip('\n')
+		return answer
+	
+	@staticmethod
+	def sendSimpleChatPrompt(prompt, system = 'You Are A Job Application Engine', tokens = 1024):
+		response = openai.ChatCompletion.create(
+			model="gpt-3.5-turbo",
+			messages = [
+				{"role": "system", "content": system},
+				{"role": "user", "content": prompt}
+			],
+			max_tokens=tokens,
+		)
+		answer = response["choices"][0]["message"]["content"]
 		return answer

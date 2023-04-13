@@ -1,5 +1,8 @@
+from typing import List
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
+import components.schemas.job as JobSchema
+
 
 MIN_PASSWORD_LENGTH = 8
 
@@ -83,14 +86,9 @@ class User:
 		jobs = [];
 
 		for job in jobs_from_db:
-			jobs.append({
-				"job_id": str(job['_id']),
-				"jobTitle": job['jobTitle'],
-				"company": job['company'],
-				"longListing": job['longListing']
-			})
-
-		return {'success': True, 'data': jobs}
+			jobs.append(JobSchema.Job.parse_obj(job))
+			jobs[-1].id = str(job["_id"])
+		return jobs
 
 	@staticmethod
 	def authenticate_by_JWT(JWT: str):

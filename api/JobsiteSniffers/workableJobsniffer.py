@@ -1,20 +1,18 @@
-import json, requests, traceback
+import requests
+from datetime import datetime
 import html2text
+from JobsiteSniffers.baseJobsniffer import baseJobsniffer
+import components.schemas.job as JobSchema
 
 workableAPI = "https://jobs.workable.com/api/v1/"
 
-jobFilter = {
-
-}
-
-class workableJobsniffer():
-	ID = "workable"
+class workableJobsniffer(baseJobsniffer):
 	jobsStack = []
+	jobOffset = 0
+	searchFilter = "Software"
 
-	def __init__(self, secrets):
-		self.secrets = secrets["sniffers"]["workableJobsniffer"]
-		# self.applicantName = secrets["userInfo"]["firstname"]
-		self.jobOffset = 10
+	def __init__(self, config):
+		super().__init__(config)
 		return
 
 	def __iter__(self):
@@ -25,24 +23,101 @@ class workableJobsniffer():
 		if not self.jobsStack:
 			if not self.refillStack():
 				raise StopIteration
+			
+		#Return a Job From The Stack In Expected Format
 		return self.formatJob( self.jobsStack.pop() )
 
-
 	def formatJob(self, rawJob):
-		return {
-			"exid": rawJob["id"],
-			"company": rawJob["company"]["title"],
-			"position": rawJob["title"],
-			"listing": self.generateJobListing(rawJob),
-			"questions": self.getQuestions(rawJob),
-			"apply": self.apply
-		}
+		datetime_obj = datetime.fromisoformat(rawJob["created"][:-1])
+		epoch_time = int(datetime_obj.timestamp())
+
+
+		company = JobSchema.Company (
+			name = rawJob["company"]["title"]
+		)
+
+		return JobSchema.Job (
+			source = self.__class__.__name__ ,
+			ext_ID = rawJob["id"],
+			added_ts=0,
+			last_updated_ts=0,
+			long_description=self.generateJobListing(rawJob),
+			created_ts= epoch_time,
+			company = company,
+			role = rawJob["title"],
+			role_category = "Software",
+			remote = "TELECOMMUTE" in rawJob["locations"],
+			skills = ["Python"],
+			status = JobSchema.Status.ACTIVE,
+			location = "{city}, {subregion}, {countryName}".format(**rawJob["location"]),
+			listing = self.generateJobListing(rawJob),
+			# questions = []
+			questions = self.getQuestions(rawJob),
+		)
+		
+	questionTypeTranslation = {
+		"paragraph": JobSchema.FieldType.TEXT,
+		"boolean": JobSchema.FieldType.CHECKBOX,
+		"text": JobSchema.FieldType.TEXT,
+		"number": JobSchema.FieldType.NUMBER,
+		"email": JobSchema.FieldType.TEXT,
+		"phone": JobSchema.FieldType.TEXT,
+		"multiple": JobSchema.FieldType.MULTIPLE_CHOICE,
+		"dropdown": JobSchema.FieldType.MULTIPLE_CHOICE,
+		"date": JobSchema.FieldType.DATE,
+		"group": None,
+		"file": JobSchema.FieldType.FILE
+	}
+
+	def getQuestions(self, rawJob):
+			questionsURL = workableAPI + "jobs/" + rawJob["id"] + "/form"
+			response = requests.request("GET", questionsURL)
+			responseJson = response.json()
+
+			questions = []
+
+			for section in responseJson:
+				for question in section["fields"]:
+					qresponse = None
+					if question["id"] == "summary":
+						question["label"] = "Create a first person personalised summary of a person who is applying to this position."
+					if question["id"] == "cover_letter":
+						question["label"] = "Create a cover letter for this position."
+					if "onlyTrueAllowed" in question:
+						qresponse = True
+
+					if not self.questionTypeTranslation[question["type"]] :
+						continue
+
+					formattedQuestion = JobSchema.Question(
+						id = question["id"],
+						content = question["label"] if "label" in question else "Missing Question",
+						type = self.questionTypeTranslation[question["type"]],
+						required = question["required"],
+						raw_data= {
+							'raw_question_type': question["type"]
+						}
+					)
+
+					if 'options' in question:
+						formattedQuestion.choices = []
+						for c in question["options"]:
+							formattedQuestion.choices.append(
+								JobSchema.Choice(
+									id = c["name"],
+									content = c["value"]
+							))
+
+
+					questions.append(formattedQuestion)
+
+			return questions
 
 	def refillStack(self):
 		querystring = {
-			"remote": True,
+			"remote": False,
 			"offset":self.jobOffset,
-			"query":"",
+			"query":self.searchFilter,
 			"location": ""
 			}
 		response = requests.request("GET", workableAPI + "jobs", params=querystring)
@@ -102,49 +177,6 @@ class workableJobsniffer():
 		headers = {"Content-Type": "application/json"}
 		response = requests.request("POST", applicationURL, headers=headers, json=body)
 		return True
-
-	questionTypeTranslation = {
-		"paragraph": "string",
-		"boolean": "bool",
-		"text": "string",
-		"number": "int",
-		"email": "string",
-		"phone": "string",
-		"multiple": "multiple choice",
-		"dropdown": "multiple choice",
-		"date": None,
-		"group": None,
-		"file": None
-	}
-
-	def getQuestions(self, rawJob):
-		questionsURL = workableAPI + "jobs/" + rawJob["id"] + "/form"
-		response = requests.request("GET", questionsURL)
-		responseJson = response.json()
-
-		questions = []
-
-		for section in responseJson:
-			for question in section["fields"]:
-				qresponse = None
-				if question["id"] == "summary":
-					question["label"] = "Create a first person personalised summary of a person who is applying to this position."
-				if question["id"] == "cover_letter":
-					question["label"] = "Create a cover letter for this position."
-				if "onlyTrueAllowed" in question:
-					qresponse = True
-				questions.append({
-					"id": question["id"],
-					"question": question["label"] if "label" in question else None,
-					"choices": list(map(lambda x: x["value"], question["options"])) if "options" in question else None,
-					"rawChoices": question["options"] if "options" in question else None,
-					"type": self.questionTypeTranslation[question["type"]],
-					"rawtype": question["type"],
-					"response": qresponse,
-					"required": question["required"]
-				})
-
-		return questions
 
 	def generateJobListing(self, rawJob):
 		h = html2text.HTML2Text()

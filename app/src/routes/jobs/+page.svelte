@@ -6,22 +6,22 @@
 	import type { PageData } from './$types';
 	export let data: PageData
 
-	let jobs: Job[] = data.jobs.data
-	console.log(jobs)
+	let jobs: Job[] = data.jobs
 </script>
 
 <div id="JobBoard">
 	{#each jobs as Job}
-		<div class="jobListing">
-			<a href="/job/{Job.job_id}" class="jobTitle">{Job.jobTitle}</a>
-			<div class="jobCompany">{Job.company}</div>
-		</div>
+		<a href="/jobs/{Job.id}" >
+			<div class="jobListing">
+				<div class="jobTitle">{Job.role}</div>
+				<div class="jobCompany">{Job.company.name}</div>	
+			</div>
+		</a>
 	{/each}
 </div>
 
 <style>
-	#JobBoard {
-	}
+
 
 	.jobListing {
 		margin: 1em;
@@ -31,8 +31,5 @@
 
 	.jobTitle {
 		font-size: 1.5em;
-	}
-
-	.jobCompany {
 	}
 </style>

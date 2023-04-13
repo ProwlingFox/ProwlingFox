@@ -1,12 +1,13 @@
+from token import OP
 from pydantic import BaseModel
 from typing import Type, List, Any, Optional
 from enum import Enum
 
-class Status(Enum):
+class Status(str, Enum):
     ACTIVE = "Active"
     INACTIVE = "Inactive"
 
-class FieldType(Enum):
+class FieldType(str, Enum):
     TEXT = "Text"
     LONG_TEXT = "LongText"
     NUMBER = "Number"
@@ -19,6 +20,7 @@ class FieldType(Enum):
 class Choice(BaseModel):
     id: str
     content: str
+    raw_data: Optional[Any]
 
 class Question(BaseModel):
     id: str
@@ -50,7 +52,7 @@ class Job(BaseModel):
     # Display Details
     role: str #Role i.e Production Engineer
     company: Company
-    short_description: str # A Short Description Generated automatically if it doesn't exist <200 words
+    short_description: Optional[str] # A Short Description Generated automatically if it doesn't exist <200 words
     location: str # Location, If Possible in "City, State, Country" format, more accurate location can be discarded or moved to raw data
     salary: Optional[str] # A Salary If Possible, Either one number or a range ( min - max ) i.e "10000 - 14000"
     salary_currency: Optional[str]

@@ -1,6 +1,9 @@
 import json, argparse, asyncio
+from pprint import pprint
+import traceback
 from pymongo import MongoClient
 from pymongo import errors as MongoErrors
+import components.schemas.job as JobSchema
 
 #Load Secret keys
 fSecrets = open("secrets.json", "r")
@@ -24,9 +27,10 @@ def loadJobSniffer(jobSnifferName, forceLoad=False):
 	try:
 		jsPlugin = __import__("JobsiteSniffers.%s" % jobSnifferName, globals(), locals(), [jobSnifferName], 0)
 		js = getattr(jsPlugin, jobSnifferName)
-		return js(secrets)
+		return js(secrets["sniffers"][jobSnifferName])
 	except Exception as e:
 		print("Error with %s Plugin" % (jobSnifferName))
+		print(traceback.format_exc())
 		return False
 
 
@@ -54,16 +58,18 @@ def updateJobs(sniffer):
 
 	for job in sniffer:
 		try:
-			insertJobIntoDB({
-				"source": sniffer.ID,
-				"exid": job["exid"],
-				"jobTitle": job["position"],
-				"company": job["company"],
-				"longListing": job["listing"],
-				"questions": job["questions"]
-			})
+			# insertJobIntoDB({
+			# 	"source": sniffer.ID,
+			# 	"exid": job["exid"],
+			# 	"jobTitle": job["position"],
+			# 	"company": job["company"],
+			# 	"longListing": job["listing"],
+			# 	"questions": job["questions"]
+			# })
+
+			insertJobIntoDB(job)
 			jobCounter += 1
-			print(f"Inserted Job From {job['company']} Into DB | Inserted {jobCounter}")
+			print(f"Inserted Job From {job.company.name} Into DB | Inserted {jobCounter}")
 		except MongoErrors.DuplicateKeyError:
 			print("Job Allready Existed")
 			continue;
@@ -73,9 +79,9 @@ def updateJobs(sniffer):
 		# Classify The Job's Question Types
 	return
 
-def insertJobIntoDB(job):
+def insertJobIntoDB(job: JobSchema.Job):
 	jobsCollection = jobaiDB.jobs
-	jobsCollection.insert_one(job)
+	jobsCollection.insert_one(json.loads(job.json()))
 
 if __name__ == "__main__":
 	parseArgs()
