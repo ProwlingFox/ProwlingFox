@@ -25,7 +25,7 @@ class Question(BaseModel):
     content: str
     type: FieldType
     required: bool
-    choices: List[Choice]
+    choices: Optional[List[Choice]]
     response: Optional[Any]
     raw_data: Optional[Any] # Contains Any Data Required for Applying to a job, For individual questions. Please don't dump here.
 
@@ -58,3 +58,4 @@ class Job(BaseModel):
     role_category: str # Category i.e. IT from a preset selection (TBD), likely to be automated
     skills: List[str] # Skills i.e. Python, Swimming from a preset selection (TBD), likely to be automated
     status: Status
+    questions: List[Question]

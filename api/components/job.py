@@ -21,6 +21,16 @@ class Job:
 
 
 		try:
+			questions = []
+			for q in job_from_db['questions']:
+				print(q["question"])
+				questions.append(JobSchema.Question(
+					id = q["id"],
+					content = q["question"],
+					type = q["type"],
+					required = q["required"],
+				))
+
 			company = JobSchema.Company (
 				name = job_from_db['company']
 			)
@@ -33,7 +43,7 @@ class Job:
 				company = company,
 				longListing = job_from_db['longListing'],
 				short_description = job_from_db.get('shortListing'),
-				questions = job_from_db['questions'],
+				questions = questions,
 				added_ts = 0,
 				last_updated_ts = 0,
 				created_ts = 0,
