@@ -6,12 +6,10 @@ interface LoadParams {
 
 
 export async function load({ params }: { params: LoadParams }) {
-	// const jobId = params.jobId
-	return { jobId: params.jobId }
+	const jobId = params.jobId
+	let job = await get('/jobs/' + jobId)
 
-	// let job
-	// get('/jobs/' + jobId).then((res) => {
-	// 	job = res
-	// 	console.log(job)
-	// })
+	return {
+		job: job
+	}
 }

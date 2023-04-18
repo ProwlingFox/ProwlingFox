@@ -1,5 +1,5 @@
 export interface Job {
-	_id: string
+	id: string
 	source: string
 	ext_ID: string
 	added_ts: number
@@ -10,6 +10,7 @@ export interface Job {
 	role: string
 	company: {
 		name: string
+		short_description?: string
 		logo?: string
 		website?: string
 		tagline?: string

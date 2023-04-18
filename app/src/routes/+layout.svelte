@@ -1,6 +1,7 @@
 <script>
 	import '../app.postcss'
 	import { parseJWT } from '$lib/requestUtils'
+	import MyJobs from '$components/MyJobs.svelte'
 
 	export let data
 	
@@ -24,15 +25,21 @@
 	{/if}
 </nav>
 
-<main class="overflow-auto">
-	<slot />
+<main class="overflow-auto flex flex-grow">
+	{#if data.authenticated}
+		<MyJobs></MyJobs>
+	{/if}
+	<div class="flex-grow">
+		<slot />
+	</div>
 </main>
 
-<style>
+<style type="postcss">
 	@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300&family=Nunito&display=swap');
+	@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
 
 	:global(:root) {
-		font-family: 'Nunito', sans-serif;
+		font-family: 'Inter', sans-serif;
 	}
 
 	:global(body) {
@@ -40,7 +47,7 @@
 	}
 
 	nav {
-		background-color: #bbb;
+		@apply bg-cyan-900 text-white;
 		display: flex;
 		flex-direction: row;
 	}
