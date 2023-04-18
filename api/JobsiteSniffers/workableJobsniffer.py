@@ -31,12 +31,15 @@ class workableJobsniffer(baseJobsniffer):
 		datetime_obj = datetime.fromisoformat(rawJob["created"][:-1])
 		epoch_time = int(datetime_obj.timestamp())
 
+		logo = rawJob["company"]["image"] if "image" in rawJob["company"] else None
+		tagline = rawJob["company"]["socialSharingDescription"] if "socialSharingDescription" in rawJob["company"] else None
+		website = rawJob["company"]["url"] if "url" in rawJob["company"] else None
 
 		company = JobSchema.Company (
 			name = rawJob["company"]["title"],
-			logo = rawJob["company"]["image"],
-			website = rawJob["company"]["url"],
-			tagline = rawJob["company"]["socialSharingDescription"]
+			logo = logo,
+			website = website,
+			tagline = tagline
 		)
 
 		return JobSchema.Job (

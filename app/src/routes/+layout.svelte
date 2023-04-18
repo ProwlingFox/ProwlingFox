@@ -17,7 +17,7 @@
 		<ul>
 			<a href="/jobs">Jobs</a>
 			<a href="/profile">Profile</a>
-			{#if role == "Admin"}
+			{#if role == "admin"}
 				<a href="/admin">Admin</a>
 			{/if}
 		</ul>
