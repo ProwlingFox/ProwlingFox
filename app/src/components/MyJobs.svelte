@@ -12,8 +12,8 @@
     <ul>
         {#each $as.applications as app (app.id)}
             <li in:receive="{{key: app.id}}">
-                <div class="text-lg font-bold">{app.companyName}</div>
-                <div class="text-sm font-light">{app.role}</div>
+                <div class="text-lg font-bold">{app.job.company.name}</div>
+                <div class="text-sm font-light">{app.job.role}</div>
             </li>
         {/each}
     </ul>

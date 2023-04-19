@@ -33,7 +33,10 @@ async function makeRequest(method: string, path: string, body?: object) {
 			body: body ? JSON.stringify(body) : undefined,
 			headers: headers,
 		})
-		return response.json()
+		if (response.ok)
+			return response.json()
+		else 
+			throw response
 	} catch (error) {
 		console.error('Fetch Request Failed', error)
 		return {}

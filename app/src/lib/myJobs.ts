@@ -6,9 +6,14 @@ import type { Job } from '$interfaces/job';
 const [send, receive] = svelteCrossfade({duration: 400});
 
 interface Application {
-    id: string
-    companyName: string
-    role: string
+    id: string,
+    user_id: string,
+    job_id: string,
+    job: Job,
+    application_read: boolean,
+    application_requested: boolean,
+    application_processing: boolean,
+    application_processed: boolean
 }
 
 interface ApplicationStore {
@@ -33,6 +38,21 @@ export async function popNextJobID() {
     }
 }
 
+
+
+get('/user/applications').then((res) => {
+    console.log("response", res)
+    applications.update((a) => {
+        return {
+            "applications": [
+                ...res,
+                ...a.applications
+            ],
+            "send": send, 
+            "receive": receive
+        }
+    })
+})
 
 export const applications = writable<ApplicationStore>({
     applications: [],
