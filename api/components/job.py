@@ -48,10 +48,12 @@ class Job:
 			{
 				"job_id":ObjectId(self.id),
 				"user_id":ObjectId(user.user_id),
+				"application_processing": False,
+				"application_processed": False
 			}, {
 				"$set": {
-					"read": True,
-					"requestApply": requestApply
+					"application_read": True,
+					"application_requested": requestApply,
 				}
 			}, upsert=True)
 		return True

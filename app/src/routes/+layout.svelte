@@ -35,7 +35,7 @@
 </main>
 
 <style type="postcss">
-	@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@300&family=Nunito&display=swap');
+	@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@300&family=Nunito&display=swap');
 	@import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,500;1,600;1,700;1,800&display=swap');
 
 	:global(:root) {
@@ -61,16 +61,18 @@
 	}
 
 	h1 {
-		font-family: 'IBM Plex Sans Condensed', sans-serif;
+		font-family: 'Fredoka', sans-serif;
 		font-weight: 300;
 		font-size: 2rem;
 		margin: 0px;
 	}
 
 	h2 {
-		font-size: 0.75rem;
+		font-family: 'Fredoka', sans-serif;
+		font-size: 0.825rem;
 		font-weight: 400;
 		margin: 0px;
+		line-height: 0.5em;
 	}
 
 	ul {

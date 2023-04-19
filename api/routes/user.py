@@ -65,3 +65,9 @@ class user_details(BaseModel):
 def update_user_details(req: Request, ud: user_details):
 	u = User(req.state.user_id)
 	return u.update_details(ud)
+
+@router.get("/user/applications")
+@authentication.access_level("Authenticated")
+def update_user_details(req: Request):
+	u = User(req.state.user_id)
+	return u.get_applications()

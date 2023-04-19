@@ -63,3 +63,13 @@ class Job(JobSimplified):
     long_description: Optional[str] # Should contain a full summary of the job listing. This is what the AI will use to analyse the Job
     raw_data: Optional[Any] # Contains Any Data Required for Applying to a job, that doesn't fit anywhere else i.e. real types. Please don't dump here.
     questions: List[Question]
+
+class Application(BaseModel):
+    id: str
+    user_id: str
+    job_id: str
+    job: Optional[JobSimplified]
+    application_read: bool
+    application_requested: Optional[bool]
+    application_processing: Optional[bool]
+    application_processed: Optional[bool]

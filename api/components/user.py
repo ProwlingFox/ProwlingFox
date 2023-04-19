@@ -1,3 +1,5 @@
+from pprint import pprint
+from tkinter import N
 from typing import List
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
@@ -90,6 +92,54 @@ class User:
 			jobs.append(JobSchema.JobSimplified.parse_obj(job))
 			jobs[-1].id = str(job["_id"])
 		return jobs
+
+
+
+	def get_applications(self, getCompleted = False):
+		from api import jobaiDB
+
+		matchCriteria = {
+			'user_id': self.user_id,
+		}
+
+		if not getCompleted:
+			matchCriteria['application_processed'] = False
+
+		applications_from_db = jobaiDB.applications.aggregate([
+			{
+				'$match': matchCriteria
+			},
+			{
+				'$lookup': {
+					'from': 'jobs', 
+					'localField': 'job_id', 
+					'foreignField': '_id', 
+					'as': 'job'
+				}
+			},
+			{"$unwind": {
+                    "path": "$job",
+                    "preserveNullAndEmptyArrays": False
+                }
+            },
+		])
+
+		applications = [];
+
+		for application in applications_from_db:
+			# pprint(application)
+			application["id"] = str(application["_id"])
+			application["user_id"] = str(application["user_id"])
+			application["job_id"] = str(application["job_id"])
+
+
+			# jobs.id = str(job["_id"])
+			try:
+				applications.append(JobSchema.Application.parse_obj(application))
+			except Exception as e:
+				print("Issue with jobID " + application["job_id"])
+			
+		return applications
 
 	@staticmethod
 	def authenticate_by_JWT(JWT: str):
