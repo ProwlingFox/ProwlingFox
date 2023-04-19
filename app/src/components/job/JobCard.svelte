@@ -2,15 +2,22 @@
 	import { goto } from '$app/navigation'
     import type { Job } from '$interfaces/job'
 
-    import { applications as as } from '$lib/myJobs'
+    import { applications as as, popNextJobID, jobQueue } from '$lib/myJobs'
+	import { get, post } from '$lib/requestUtils'
+	import { get as getStore } from 'svelte/store'
 
     export let srcJob: Job
 
     const { send } = $as
 
-    let visible = true
+    // let nextId: Promise<string>
+    let nextId: string
 
-    function apply() {      
+    let visible = true
+    post(`/jobs/${srcJob.id}/mark`, {"requestApply": true})
+
+    async function apply() {    
+        post(`/jobs/${srcJob.id}/mark`, {"requestApply": true})
         as.update((a) => {
             return {
                 "applications": [
@@ -28,17 +35,24 @@
         visible = false
     }
 
-    function loadNext() {
-        goto("/jobs/643849330f589f940289359b")
+    async function preLoadNext() {
+        nextId = await popNextJobID()
+        get("/jobs/" + nextId)
+    }
+
+    async function loadNext() {
+        await goto("/jobs/" + await nextId)
         visible = true
+        preLoadNext()
     }
 
     function reject() {
-        //Send Read acknowlage to server
         //Discard Animation
         //Load New
+        visible = false
     }
 
+    preLoadNext()
 </script>
 
 {#if visible}
@@ -50,7 +64,7 @@
         <h1 class="mt-4">
             {srcJob.role}
         </h1>
-        <div class="mb-4 text-slate-600">
+        <div class="mb-4 text-slate-600 before:">
             {#if !srcJob.remote}
                 Remote |
             {/if}

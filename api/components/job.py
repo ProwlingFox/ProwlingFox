@@ -42,7 +42,7 @@ class Job:
 		update_response = jobaiDB.jobs.update_one({"_id":ObjectId(self.id)}, {"$set": {"short_description":newShortListing}}, upsert=True)
 		return
 	
-	def mark_role_as_read(self, user: User, favourite: bool):
+	def mark_role_as_read(self, user: User, requestApply: bool = False):
 		from api import jobaiDB
 		jobaiDB.applications.update_one(
 			{
@@ -51,10 +51,10 @@ class Job:
 			}, {
 				"$set": {
 					"read": True,
-					"favourite": favourite
+					"requestApply": requestApply
 				}
 			}, upsert=True)
-		return
+		return True
 	
 class Question:
 	def __init__(self):

@@ -10,7 +10,7 @@ export function load({ url, data }) {
 
 	if (isJWTValid()) {
 		if (publicPaths.includes(url.pathname)) {
-			throw redirect(301, '/jobs')
+			throw redirect(301, '/')
 		}
 		return {
 			authenticated: true

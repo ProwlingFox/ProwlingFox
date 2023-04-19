@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
 from components.authentication import access_level
@@ -28,14 +28,15 @@ def get_job_details(job_id: str) -> JobSchema.Job:
 
 # Mark A Job As Read
 class mark_as_read(BaseModel):
-	favourite: bool
+	requestApply: bool
+	
 
-@router.get("/jobs/{job_id}/mark")
+@router.post("/jobs/{job_id}/mark")
 @access_level("Candidate")
 def mark_as_read(req: Request, job_id: str, m: mark_as_read):
 	u = User(req.state.user_id)
 	j = Job(job_id)
-	return j.mark_role_as_read(u, m.favourite)
+	return j.mark_role_as_read(u, m.requestApply)
 
 
 # Apply To A Job

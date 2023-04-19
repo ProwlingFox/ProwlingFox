@@ -25,11 +25,11 @@
 	{/if}
 </nav>
 
-<main class="overflow-auto flex flex-grow">
+<main class="flex flex-grow">
 	{#if data.authenticated}
 		<MyJobs></MyJobs>
 	{/if}
-	<div class="flex-grow">
+	<div class="flex-grow h-full overflow-hidden">
 		<slot />
 	</div>
 </main>
@@ -44,6 +44,10 @@
 
 	:global(body) {
 		margin: 0px;
+	}
+
+	main {
+		@apply overflow-hidden;
 	}
 
 	nav {

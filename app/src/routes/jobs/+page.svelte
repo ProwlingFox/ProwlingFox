@@ -9,7 +9,7 @@
 	let jobs: Job[] = data.jobs
 </script>
 
-<div id="JobBoard">
+<div id="JobBoard" class="h-full overflow-auto">
 	{#each jobs as Job}
 		<a href="/jobs/{Job.id}" >
 			<div class="jobListing">
