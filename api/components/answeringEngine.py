@@ -36,13 +36,15 @@ class AnsweringEngine:
 
 	@staticmethod
 	def sendCompletionPrompt(prompt, tokens = 1024):
-		response = openai.Completion.create(
-			model="text-davinci-003",
-			prompt=prompt,
-			max_tokens=tokens,
-		)
-		answer = response["choices"][0]["text"].lstrip('\n')
-		return answer
+		# try:
+			response = openai.Completion.create(
+				model="text-davinci-003",
+				prompt=prompt,
+				max_tokens=tokens,
+			)
+			answer = response["choices"][0]["text"].lstrip('\n')
+			return answer
+		# except openai.:
 	
 	@staticmethod
 	def sendSimpleChatPrompt(prompt, system = 'You Are A Job Application Engine', tokens = 1024):

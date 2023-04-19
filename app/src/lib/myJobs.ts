@@ -41,13 +41,9 @@ export async function popNextJobID() {
 
 
 get('/user/applications').then((res) => {
-    console.log("response", res)
     applications.update((a) => {
         return {
-            "applications": [
-                ...res,
-                ...a.applications
-            ],
+            "applications": res,
             "send": send, 
             "receive": receive
         }

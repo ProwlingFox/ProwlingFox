@@ -1,7 +1,6 @@
 <script>
 	import '../app.postcss'
 	import { parseJWT } from '$lib/requestUtils'
-	import MyJobs from '$components/MyJobs.svelte'
 
 	export let data
 	
@@ -26,12 +25,7 @@
 </nav>
 
 <main class="flex flex-grow">
-	{#if data.authenticated}
-		<MyJobs></MyJobs>
-	{/if}
-	<div class="flex-grow h-full overflow-hidden">
-		<slot />
-	</div>
+	<slot />
 </main>
 
 <style type="postcss">
