@@ -23,8 +23,12 @@
                 "applications": [
                     {
                         id: srcJob.id,
-                        companyName: srcJob.company.name,
-                        role : srcJob.role
+                        job_id: srcJob.id,
+                        job: srcJob,
+                        application_read: true,
+                        application_requested: true,
+                        application_processing: false,
+                        application_processed: false
                     },
                     ...a.applications
                 ],

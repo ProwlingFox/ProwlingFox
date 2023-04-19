@@ -7,7 +7,7 @@ const [send, receive] = svelteCrossfade({duration: 400});
 
 interface Application {
     id: string,
-    user_id: string,
+    user_id?: string,
     job_id: string,
     job: Job,
     application_read: boolean,
