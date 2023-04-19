@@ -4,5 +4,6 @@
 	"semi": false,
 	"singleQuote": true,
 	"useTabs": true,
-	"bracketSameLine": true
+	"bracketSameLine": true,
+	"quoteProps": "consistent"
 }
