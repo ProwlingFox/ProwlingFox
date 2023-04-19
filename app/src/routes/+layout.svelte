@@ -11,8 +11,8 @@
 
 <nav>
 	<header>
-		<h1>Job.Ai</h1>
-		<h2>Lorem Ispum Dolor Sat Amen</h2>
+		<h1>ProwlingFox</h1>
+		<h2>Helping you catch the career you're looking for.</h2>
 	</header>
 	{#if data.authenticated}
 		<ul>
@@ -51,7 +51,7 @@
 	}
 
 	nav {
-		@apply bg-cyan-900 text-white;
+		@apply bg-orange-800 text-white;
 		display: flex;
 		flex-direction: row;
 	}

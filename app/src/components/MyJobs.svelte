@@ -5,7 +5,7 @@
 
 </script>
 
-<div class="w-1/5 h-100% bg-cyan-700">
+<div class="w-1/5 h-100% bg-[#cb642c]">
     <div class="text-center p-4 text-xl font-medium text-white border-b-2 border-cyan-950">
         My Applications
     </div>
