@@ -50,6 +50,7 @@ def login_user_using_pass(u: pw_login_user):
 # Update User Details
 class user_job_preferences(BaseModel):
 	roles: List[str] = None
+	sector: str = None
 	locations: List[str] = None
 	remote: bool = None
 	salary: int = None
@@ -60,7 +61,7 @@ class user_details(BaseModel):
 	pronouns: str = None
 	job_preferences: user_job_preferences = None
 
-@router.put("/user/update")
+@router.post("/user/update")
 @authentication.access_level("Authenticated")
 def update_user_details(req: Request, ud: user_details):
 	u = User(req.state.user_id)
