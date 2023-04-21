@@ -3,6 +3,9 @@ import components.secrets as secrets
 from prompts.promptParser import promptGenerator
 openai.api_key = secrets.secrets["OpenAISecret"]
 
+from datetime import datetime
+import bson
+
 class AnsweringEngine:
 
 	@staticmethod
@@ -36,26 +39,60 @@ class AnsweringEngine:
 
 	@staticmethod
 	def sendCompletionPrompt(prompt, tokens = 1024):
-		# try:
+		model = "text-davinci-003"
+		try:
+			sent_timestamp_ms = datetime.now()
 			response = openai.Completion.create(
-				model="text-davinci-003",
+				model=model,
 				prompt=prompt,
 				max_tokens=tokens,
 			)
 			answer = response["choices"][0]["text"].lstrip('\n')
+
+			from components.db import jobaiDB
+			jobaiDB.request_log.insert_one({
+				"sent_ts": sent_timestamp_ms,
+				"model": model,
+				"success": True,
+				"prompt_tokens": response["usage"]["prompt_tokens"],
+				"completion_tokens": response["usage"]["completion_tokens"],
+				"total_tokens": response["usage"]["total_tokens"]
+			})
+
 			return answer
-		# except openai.:
+		except openai.OpenAIError as e:
+			print("I actually got to the error c:")
+			print(e)
+			raise e
+			
 	
 	@staticmethod
 	def sendSimpleChatPrompt(prompt, system = 'You Are A Job Application Engine', tokens = 1024):
-		response = openai.ChatCompletion.create(
-			model="gpt-3.5-turbo",
-			messages = [
-				{"role": "system", "content": system},
-				{"role": "user", "content": prompt}
-			],
-			max_tokens=tokens,
-		)
-		answer = response["choices"][0]["message"]["content"]
-		return answer
-	
+		model = "gpt-3.5-turbo"
+		try:
+			sent_timestamp_ms = datetime.now()
+			response = openai.ChatCompletion.create(
+				model=model,
+				messages = [
+					{"role": "system", "content": system},
+					{"role": "user", "content": prompt}
+				],
+				max_tokens=tokens,
+			)
+			answer = response["choices"][0]["message"]["content"]
+
+			from components.db import jobaiDB
+			jobaiDB.openai_request_log.insert_one({
+				"sent_ts": sent_timestamp_ms,
+				"model": model,
+				"success": True,
+				"prompt_tokens": response["usage"]["prompt_tokens"],
+				"completion_tokens": response["usage"]["completion_tokens"],
+				"total_tokens": response["usage"]["total_tokens"]
+			})
+
+			return answer
+		except openai.OpenAIError as e:
+			print("I actually got to the chat error c:")
+			print(e)
+			raise e

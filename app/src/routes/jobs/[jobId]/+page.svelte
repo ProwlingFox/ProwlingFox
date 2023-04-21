@@ -5,7 +5,6 @@
 	export let data
 	let job: Job
 	$: job = data.job
-	// $: console.log(job)
 </script>
 
 <div class="flex justify-center">

@@ -4,10 +4,8 @@ import { redirect } from '@sveltejs/kit'
 const publicPaths = ['/login', '/signup']
 
 
-/** @type {import('./$types').LayoutServerLoad} */
-export function load({ url, data }) {
-	setJWT(data.token)
-
+/** @type {import('./$types').LayoutLoad} */
+export async function load({ url, params }) {	
 	if (isJWTValid()) {
 		if (publicPaths.includes(url.pathname)) {
 			throw redirect(301, '/')
@@ -17,7 +15,7 @@ export function load({ url, data }) {
 		}
 	}
 
-	// always allow access to public pages
+	// // always allow access to public pages
 	if (publicPaths.includes(url.pathname)) {
 		return {
 			authenticated: false
