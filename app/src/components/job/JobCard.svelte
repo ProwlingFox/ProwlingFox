@@ -64,6 +64,7 @@
 		//Discard Animation
 		//Load New
 		visible = false
+		loadNext()
 	}
 
 	preLoadNext()

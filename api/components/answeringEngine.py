@@ -27,18 +27,18 @@ class AnsweringEngine:
 			"question": next((obj["question"] for obj in jobDetails["questions"] if obj["id"] == quesitionID), None)
 		} )
 
-		response = AnsweringEngine.sendSimpleChatPrompt(prompt)
+		response = AnsweringEngine.sendSimpleChatPrompt(prompt, "answerQuestion")
 
 		return response
 
 	@staticmethod
 	def summarize_Job_Description(fullDescription):
 		prompt = promptGenerator("summarizeJobDescription", {"fullDescription": fullDescription})
-		response = AnsweringEngine.sendSimpleChatPrompt(prompt, tokens = 300)
+		response = AnsweringEngine.sendSimpleChatPrompt(prompt, "summarizeJobDescription", tokens = 300)
 		return response
 
 	@staticmethod
-	def sendCompletionPrompt(prompt, tokens = 1024):
+	def sendCompletionPrompt(prompt, note=None, tokens = 1024):
 		model = "text-davinci-003"
 		try:
 			sent_timestamp_ms = datetime.now()
@@ -56,18 +56,18 @@ class AnsweringEngine:
 				"success": True,
 				"prompt_tokens": response["usage"]["prompt_tokens"],
 				"completion_tokens": response["usage"]["completion_tokens"],
-				"total_tokens": response["usage"]["total_tokens"]
+				"total_tokens": response["usage"]["total_tokens"],
+				"note": note
 			})
 
 			return answer
 		except openai.OpenAIError as e:
 			print("I actually got to the error c:")
 			print(e)
-			raise e
-			
+			raise e		
 	
 	@staticmethod
-	def sendSimpleChatPrompt(prompt, system = 'You Are A Job Application Engine', tokens = 1024):
+	def sendSimpleChatPrompt(prompt, note=None, system = 'You Are A Job Application Engine', tokens = 1024):
 		model = "gpt-3.5-turbo"
 		try:
 			sent_timestamp_ms = datetime.now()
@@ -88,7 +88,8 @@ class AnsweringEngine:
 				"success": True,
 				"prompt_tokens": response["usage"]["prompt_tokens"],
 				"completion_tokens": response["usage"]["completion_tokens"],
-				"total_tokens": response["usage"]["total_tokens"]
+				"total_tokens": response["usage"]["total_tokens"],
+				"note": note
 			})
 
 			return answer
