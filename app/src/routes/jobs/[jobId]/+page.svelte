@@ -1,5 +1,5 @@
 <script>
-	import JobCard from '$components/job/JobCard.svelte'
+	import JobCard from '$components/JobCard.svelte'
 	import type { Job } from '$interfaces/job'
 
 	export let data

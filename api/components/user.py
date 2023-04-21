@@ -102,7 +102,7 @@ class User:
 		}
 
 		if not getCompleted:
-			matchCriteria['application_processed'] = False
+			matchCriteria['application_sent'] = False
 
 		applications_from_db = jobaiDB.applications.aggregate([
 			{

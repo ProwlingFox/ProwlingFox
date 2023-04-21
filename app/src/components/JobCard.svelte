@@ -14,7 +14,6 @@
 	let nextId: string
 
 	let visible = true
-	post(`/jobs/${srcJob.id}/mark`, { requestApply: false })
 
 	async function apply() {
 		post(`/jobs/${srcJob.id}/mark`, { requestApply: true })
@@ -56,11 +55,11 @@
 	async function loadNext() {
 		await goto('/jobs/' + (await nextId))
 		visible = true
-		post(`/jobs/${srcJob.id}/mark`, { requestApply: false })
 		preLoadNext()
 	}
 
 	function reject() {
+		post(`/jobs/${srcJob.id}/mark`, { requestApply: false })
 		//Discard Animation
 		//Load New
 		visible = false

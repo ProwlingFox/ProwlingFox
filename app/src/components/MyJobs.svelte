@@ -7,6 +7,8 @@
 
 	const { receive } = $as
 
+	console.log($as)
+
 	function getApplicationStatus(app: Application): ApplicationStatus {
 		if (app.application_processed) {
 			return {
@@ -51,22 +53,24 @@
 	</div>
 	<ul>
 		{#each $as.applications as app (app.id)}
-			<li in:receive={{ key: app.id }}>
-				<div class="text-lg font-bold">{app.job.company.name}</div>
-				<div class="text-sm font-light">{app.job.role}</div>
-				<div class="flex items-center">
-					{#if app.progress}
-						<div class="h-3 w-3/5 border-2 rounded-full">
-							<div
-								class="{app.progress.color} h-full rounded-full"
-								style="width: {app.progress.percent}%" />
-						</div>
-						<div class="text-sm w-2/5 ml-1">
-							{app.progress.label}
-						</div>
-					{/if}
-				</div>
-			</li>
+			<a href={"/jobs/" + app.job_id}>
+				<li in:receive={{ key: app.id }}>
+					<div class="text-lg font-bold">{app.job.company.name}</div>
+					<div class="text-sm font-light">{app.job.role}</div>
+					<div class="flex items-center">
+						{#if app.progress}
+							<div class="h-3 w-3/5 border-2 rounded-full">
+								<div
+									class="{app.progress.color} h-full rounded-full"
+									style="width: {app.progress.percent}%" />
+							</div>
+							<div class="text-sm w-2/5 ml-1">
+								{app.progress.label}
+							</div>
+						{/if}
+					</div>
+				</li>
+			</a>
 		{/each}
 	</ul>
 </div>
