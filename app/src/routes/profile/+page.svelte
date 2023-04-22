@@ -2,16 +2,32 @@
 	import { parseJWT, post } from '$lib/requestUtils'
 	import { tweened } from 'svelte/motion'
 	import { cubicOut } from 'svelte/easing'
-	// import { Button } from 'flowbite-svelte'
+	import PersonalInfoForm from '$components/SignupFlow/PersonalInfoForm.svelte'
+	import JobSelectionForm from '$components/SignupFlow/JobSelectionForm.svelte'
+	import JobPreferencesForm from '$components/SignupFlow/JobPreferencesForm.svelte'
+	import type { User } from '$interfaces/user'
 
 	let carousel: HTMLElement
+
+	let user: User = {
+		name: '',
+		tel: '',
+		pronouns: '',
+		job_preferences: {
+			roles: [''],
+			sector: '',
+			locations: [''],
+			remote: false,
+			salary: 0,
+		},
+	}
 
 	let carouselPosition = tweened(0, {
 		duration: 600,
 		easing: cubicOut,
 	})
 
-	function carouselNext() {
+	function carouselNext(): void {
 		let { scrollWidth, clientWidth } = carousel
 		let maxScrollLeft = scrollWidth - clientWidth
 
@@ -50,75 +66,9 @@
 <!-- <Button>hi</Button> -->
 
 <div class="carousel flex" bind:this={carousel}>
-	<div class="bg-orange-300 h-full">
-		<div class="h-full w-full flex items-center justify-center">
-			<div class="flex flex-col">
-				<div class="m-2 flex flex-col">
-					<label for="name" class="">Name</label>
-					<input type="text" class="" />
-				</div>
-				<div class="m-2 flex flex-col">
-					<label for="name" class="">Phone number</label>
-					<input type="text" class="" />
-				</div>
-				<div class="m-2 flex flex-col">
-					<label for="name" class="">Pronouns</label>
-					<input type="text" class="" />
-				</div>
-				<button
-					on:click={carouselNext}
-					class="ml-auto p-2 bg-orange-500 rounded">Next</button>
-			</div>
-		</div>
-	</div>
-	<div class="bg-orange-200 h-full">
-		<div class="h-full w-full flex items-center justify-center">
-			<div class="flex flex-col">
-				<div class="m-2 flex flex-col">
-					<label for="name" class="">Name</label>
-					<input type="text" class="" />
-				</div>
-				<div class="m-2 flex flex-col">
-					<label for="name" class="">Phone number</label>
-					<input type="text" class="" />
-				</div>
-				<div class="m-2 flex flex-col">
-					<label for="name" class="">Pronouns</label>
-					<input type="text" class="" />
-				</div>
-				<button
-					on:click={carouselNext}
-					class="ml-auto p-2 bg-orange-500 rounded">Next</button>
-			</div>
-		</div>
-	</div>
-	<div class="bg-orange-100 h-full">
-		<div class="h-full w-full flex items-center justify-center">
-			<div class="flex flex-col">
-				<div class="m-2 flex flex-col">
-					<label for="name" class="">Name</label>
-					<input type="text" class="" />
-				</div>
-				<div class="m-2 flex flex-col">
-					<label for="name" class="">Phone number</label>
-					<input type="text" class="" />
-				</div>
-				<div class="m-2 flex flex-col">
-					<label for="name" class="">Pronouns</label>
-					<input type="text" class="" />
-				</div>
-				<button
-					on:click={carouselNext}
-					class="ml-auto p-2 bg-orange-500 rounded">Next</button>
-			</div>
-		</div>
-	</div>
-	<!-- <div class="form">
-		<label for="nameInput">
-			Name
-			<input /><br />
-		</label>
-	</div> -->
+	<PersonalInfoForm bind:user {carouselNext} />
+	<JobSelectionForm bind:user {carouselNext} />
+	<JobPreferencesForm bind:user {carouselNext} />
 </div>
 
 <style>
