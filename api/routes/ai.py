@@ -13,9 +13,9 @@ class get_ai_response(BaseModel):
 	questionID: str
 
 # Get AI Generated Responses for a specific question.
-@router.post("/ai/respond")
-@authentication.access_level("Candidate")
-def get_ai_response(req: Request, r: get_ai_response):
-	u = User(req.state.user_id)
-	j = Job(r.jobID)
-	return AnsweringEngine.answer_question(j, u, r.questionID)
+# @router.post("/ai/respond")
+# @authentication.access_level("Candidate")
+# def get_ai_response(req: Request, r: get_ai_response):
+# 	u = User(req.state.user_id)
+# 	j = Job(r.jobID)
+# 	return AnsweringEngine.answer_question(j, u, r.questionID)

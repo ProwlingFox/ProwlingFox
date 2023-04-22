@@ -69,7 +69,9 @@ class Application(BaseModel):
     user_id: str
     job_id: str
     job: Optional[JobSimplified]
+    responses: Optional[object]
     application_read: bool
     application_requested: Optional[bool]
     application_processing: Optional[bool]
     application_processed: Optional[bool]
+    application_sent: Optional[bool]

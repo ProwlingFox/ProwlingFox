@@ -9,10 +9,12 @@
 </script>
 
 <nav>
-	<header>
-		<h1>ProwlingFox</h1>
-		<h2>Helping you catch the career you're looking for.</h2>
-	</header>
+	<a href="/">
+		<header>
+			<h1>ProwlingFox</h1>
+			<h2>Helping you catch the career you're looking for.</h2>
+		</header>
+	</a>
 	{#if data.authenticated}
 		<ul>
 			<a href="/jobs">Jobs</a>

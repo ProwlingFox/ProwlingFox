@@ -13,6 +13,7 @@ class metrics:
         userCount = jobaiDB.users.count_documents({})
         return userCount
     
+    @staticmethod
     def count_applications() -> int:
         userCount = jobaiDB.applications.count_documents({ "applied": True })
         return userCount

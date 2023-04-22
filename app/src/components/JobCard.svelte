@@ -14,7 +14,6 @@
 	let nextId: string
 
 	let visible = true
-	post(`/jobs/${srcJob.id}/mark`, { requestApply: false })
 
 	async function apply() {
 		post(`/jobs/${srcJob.id}/mark`, { requestApply: true })
@@ -42,31 +41,36 @@
 			}
 		})
 		visible = false
+
+		//Rlly ugly solution this code should actually preload, the next job in the background like it's allready doing and then fade it in,
+		// using goto just to officially change the url like the whole thing is supposed to work in the first place
+		setTimeout(loadNext, 2001)
 	}
 
 	async function preLoadNext() {
 		nextId = await popNextJobID()
-		get('/jobs/' + nextId)
+		get('/jobs/' + nextId) // Fix so it doesn't duplicate this request lol :3
 	}
 
 	async function loadNext() {
 		await goto('/jobs/' + (await nextId))
 		visible = true
-		post(`/jobs/${srcJob.id}/mark`, { requestApply: false })
 		preLoadNext()
 	}
 
 	function reject() {
+		post(`/jobs/${srcJob.id}/mark`, { requestApply: false })
 		//Discard Animation
 		//Load New
 		visible = false
+		loadNext()
 	}
 
 	preLoadNext()
 </script>
 
 {#if visible}
-	<div id="card" on:outroend={loadNext} out:send={{ key: srcJob.id }}>
+	<div id="card" out:send={{ key: srcJob.id }}>
 		<div class="flex justify-center">
 			<img src={srcJob.company.logo} alt="" />
 		</div>

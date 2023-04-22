@@ -1,17 +1,19 @@
+from email.policy import strict
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
 from pydantic import ValidationError
 
+import asyncio
 from components.user import User
 import components.schemas.job as JobSchema
 from components.answeringEngine import AnsweringEngine
 
 class Job:
-	def __init__(self, job_id):
+	def __init__(self, job_id: str):
 		self.id = job_id
 		return
 
-	def get_details(self):
+	def get_details(self) -> JobSchema.Job:
 		from api import jobaiDB
 
 		try:
@@ -41,7 +43,7 @@ class Job:
 		from api import jobaiDB
 		update_response = jobaiDB.jobs.update_one({"_id":ObjectId(self.id)}, {"$set": {"short_description":newShortListing}}, upsert=True)
 		return
-	
+
 	def mark_role_as_read(self, user: User, requestApply: bool = False):
 		from api import jobaiDB
 		jobaiDB.applications.update_one(
@@ -49,7 +51,8 @@ class Job:
 				"job_id":ObjectId(self.id),
 				"user_id":ObjectId(user.user_id),
 				"application_processing": False,
-				"application_processed": False
+				"application_processed": False,
+				"application_sent": False
 			}, {
 				"$set": {
 					"application_read": True,
@@ -57,7 +60,3 @@ class Job:
 				}
 			}, upsert=True)
 		return True
-	
-class Question:
-	def __init__(self):
-		pass

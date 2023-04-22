@@ -13,32 +13,29 @@
     let metrics: Metrics = data.metrics
 </script>
 
-<main>
+<div>
     <div class="card">
         <h2>Active Jobs</h2>
         <p class="metric">{metrics.activeJobsCount}</p>
     </div>
-
+    
     <div class="card">
         <h2>Users</h2>
         <p class="metric">{metrics.userCount}</p>
     </div>
-
+    
     <div class="card">
         <h2>Job Applications</h2>
         <p class="metric">{metrics.jobApplicationCount}</p>
     </div>
-
+    
     <div class="card">
         <h2>Job Applications Per User Avg.</h2>
         <p class="metric">{metrics.jobApplicationCount / metrics.userCount}</p>
-    </div>
-</main>
+    </div>    
+</div>
 
 <style type="postcss">
-    main {
-        @apply flex flex-wrap;
-    }
 
     .card {
         @apply bg-white p-8 m-4 flex items-center gap-4 shadow-md;

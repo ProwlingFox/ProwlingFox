@@ -94,17 +94,16 @@ class User:
 			jobs[-1].id = str(job["_id"])
 		return jobs
 
-
-
 	def get_applications(self, getCompleted = False):
 		from api import jobaiDB
 
 		matchCriteria = {
 			'user_id': self.user_id,
+			'application_requested': True
 		}
 
 		if not getCompleted:
-			matchCriteria['application_processed'] = False
+			matchCriteria['application_sent'] = False
 
 		applications_from_db = jobaiDB.applications.aggregate([
 			{
