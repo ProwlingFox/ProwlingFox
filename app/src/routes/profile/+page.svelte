@@ -27,12 +27,11 @@
 		easing: cubicOut,
 	})
 
-	function carouselNext(): void {
-		let { scrollWidth, clientWidth } = carousel
-		let maxScrollLeft = scrollWidth - clientWidth
+	function carouselMove(next: boolean): void {
+		let { clientWidth } = carousel
 
 		carouselPosition.update((current) =>
-			Math.min(current + clientWidth, maxScrollLeft)
+			Math.min(current + (next ? clientWidth : -clientWidth))
 		)
 
 		carouselPosition.subscribe((value) => {
@@ -63,12 +62,10 @@
 	// setUserData()
 </script>
 
-<!-- <Button>hi</Button> -->
-
 <div class="carousel flex" bind:this={carousel}>
-	<PersonalInfoForm bind:user {carouselNext} />
-	<JobSelectionForm bind:user {carouselNext} />
-	<JobPreferencesForm bind:user {carouselNext} />
+	<PersonalInfoForm bind:user {carouselMove} />
+	<JobSelectionForm bind:user {carouselMove} />
+	<JobPreferencesForm bind:user {carouselMove} />
 </div>
 
 <style>
@@ -76,10 +73,5 @@
 		width: 300vw;
 		height: 100%;
 		overflow-x: hidden;
-	}
-
-	.carousel > div {
-		width: 100vw;
-		flex-shrink: 0;
 	}
 </style>
