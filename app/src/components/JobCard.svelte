@@ -16,13 +16,13 @@
 	let visible = true
 
 	async function apply() {
-		post(`/jobs/${srcJob.id}/mark`, { requestApply: true })
+		post(`/jobs/${srcJob._id}/mark`, { requestApply: true })
 		as.update((a) => {
 			return {
 				applications: [
 					{
-						id: srcJob.id,
-						job_id: srcJob.id,
+						_id: srcJob._id,
+						job_id: srcJob._id,
 						job: srcJob,
 						application_read: true,
 						application_requested: true,
@@ -59,7 +59,7 @@
 	}
 
 	function reject() {
-		post(`/jobs/${srcJob.id}/mark`, { requestApply: false })
+		post(`/jobs/${srcJob._id}/mark`, { requestApply: false })
 		//Discard Animation
 		//Load New
 		visible = false
@@ -70,7 +70,7 @@
 </script>
 
 {#if visible}
-	<div id="card" out:send={{ key: srcJob.id }}>
+	<div id="card" out:send={{ key: srcJob._id }}>
 		<div class="flex justify-center">
 			<img src={srcJob.company.logo} alt="" />
 		</div>

@@ -1,7 +1,7 @@
 import type { Job } from '$interfaces/job'
 
 export interface Application {
-	id: string
+	_id: string
 	user_id?: string
 	job_id: string
 	job: Job

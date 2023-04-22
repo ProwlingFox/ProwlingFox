@@ -1,4 +1,5 @@
 from email.policy import strict
+from fastapi import HTTPException
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
 from pydantic import ValidationError
@@ -9,25 +10,20 @@ import components.schemas.job as JobSchema
 from components.answeringEngine import AnsweringEngine
 
 class Job:
-	def __init__(self, job_id: str):
-		self.id = job_id
+	def __init__(self, job_id: str | ObjectId):
+		self.id = ObjectId(job_id) if type(job_id) is str else job_id
 		return
 
 	def get_details(self) -> JobSchema.Job:
 		from api import jobaiDB
 
-		try:
-			job_from_db = jobaiDB.jobs.find_one({"_id": ObjectId(self.id)})
-			job = JobSchema.Job.parse_obj(job_from_db)
-			
-			job.id = str(job_from_db["_id"])
+		
+		job_from_db = jobaiDB.jobs.find_one({"_id": self.id})
+		job = JobSchema.Job.parse_obj(job_from_db)
 
-			if not job.short_description:
-				job.short_description = AnsweringEngine.summarize_Job_Description(job.long_description)
-				self.update_short_listing(job.short_description)
-
-		except ValidationError as e:
-			job = e.errors()
+		if not job.short_description:
+			job.short_description = AnsweringEngine.summarize_Job_Description(job.long_description)
+			self.update_short_listing(job.short_description)
 
 		return job
 
@@ -41,14 +37,14 @@ class Job:
 
 	def update_short_listing(self, newShortListing):
 		from api import jobaiDB
-		update_response = jobaiDB.jobs.update_one({"_id":ObjectId(self.id)}, {"$set": {"short_description":newShortListing}}, upsert=True)
+		update_response = jobaiDB.jobs.update_one({"_id":self.id}, {"$set": {"short_description":newShortListing}}, upsert=True)
 		return
 
 	def mark_role_as_read(self, user: User, requestApply: bool = False):
 		from api import jobaiDB
 		jobaiDB.applications.update_one(
 			{
-				"job_id":ObjectId(self.id),
+				"job_id":self.id,
 				"user_id":ObjectId(user.user_id),
 				"application_processing": False,
 				"application_processed": False,
@@ -60,3 +56,5 @@ class Job:
 				}
 			}, upsert=True)
 		return True
+	
+	

@@ -13,8 +13,6 @@ jobaiDB = db.jobaiDB
 job_from_db = jobaiDB.jobs.find_one({"short_description": None})
 job = JobSchema.Job.parse_obj(job_from_db)
 
-job.id = str(job_from_db["_id"])
-
 job.short_description = AnsweringEngine.summarize_Job_Description(job.long_description)
 self.update_short_listing(job.short_description)
 

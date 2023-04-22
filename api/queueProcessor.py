@@ -1,8 +1,7 @@
-from pprint import pprint
-from time import sleep
 import components.secrets as secrets
 secrets.init()
 
+from time import sleep
 
 from components.answeringEngine import AnsweringEngine
 from components.job import Job
@@ -22,36 +21,9 @@ jobaiDB.applications.update_many({
     '$set': {'application_processing': False}
 })
 
-while True:
-    # Work Out What Tasks to do
-    # Tasks Include:
-    # - Loading More Jobs into the system
-    # - Pre-Resolving said jobs
-    # - Answering Applications
-    application_to_process = jobaiDB.applications.find_one_and_update({
-        "application_requested": True,
-        "application_processing": False,
-        "application_processed": False,
-        "application_sent": False
-    },
-    {
-        '$set': {'application_processing': True}
-    })
-
-    if not application_to_process:
-        sleep(0.5)
-        print("No More Applications")
-        continue
-
-    pprint(application_to_process)
-    application_id = application_to_process["_id"]
-
-    job = Job(application_to_process["job_id"]).get_details()
-    user = User(application_to_process["user_id"]).get_info()
-    
-    pprint(job)
-    pprint(user)
-    # Preform Task
+def solve_application(application: JobSchema.Application):
+    job = Job(application.job_id).get_details()
+    user = User(application.user_id).get_info()
 
     answered_questions = {}
 
@@ -62,12 +34,11 @@ while True:
             print(answer)
         else:
             answer = None
-            
 
         answered_questions[question.id] = answer
 
     jobaiDB.applications.update_one({
-        "_id": application_id,
+        "_id": application.id,
         "application_requested": True,
         "application_processing": True,
         "application_processed": False
@@ -79,4 +50,34 @@ while True:
             "application_processed": True
         }
     })
+    return
+
+while True:
+    # Work Out What Tasks to do
+    # Tasks Include:
+    # - Loading More Jobs into the system
+    # - Pre-Resolving said jobs
+    # - Answering Applications
+    application_from_db = jobaiDB.applications.find_one_and_update({
+        "application_requested": True,
+        "application_processing": False,
+        "application_processed": False,
+        "application_sent": False
+    },
+    {
+        '$set': {'application_processing': True}
+    })
+
+    if not application_from_db:
+        sleep(0.5)
+        print("No More Applications")
+        continue
+
+    application = JobSchema.Application.parse_obj(application_from_db)
+    # Preform Task
+
+    
+
+    
+
     

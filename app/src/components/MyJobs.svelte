@@ -7,7 +7,7 @@
 
 	const { receive } = $as
 
-	console.log($as)
+	$: console.log($as)
 
 	function getApplicationStatus(app: Application): ApplicationStatus {
 		if (app.application_processed) {
@@ -52,9 +52,9 @@
 		My Applications
 	</div>
 	<ul>
-		{#each $as.applications as app (app.id)}
+		{#each $as.applications as app (app._id)}
 			<a href={"/jobs/" + app.job_id}>
-				<li in:receive={{ key: app.id }}>
+				<li in:receive={{ key: app._id }}>
 					<div class="text-lg font-bold">{app.job.company.name}</div>
 					<div class="text-sm font-light">{app.job.role}</div>
 					<div class="flex items-center">

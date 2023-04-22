@@ -1,6 +1,6 @@
 import { writable, get as getStore } from 'svelte/store'
 import { crossfade as svelteCrossfade } from 'svelte/transition'
-import { get } from './requestUtils'
+import { get, getJWT } from './requestUtils'
 import type { Job } from '$interfaces/job'
 import type { ApplicationStore } from '$interfaces/application'
 
@@ -15,7 +15,7 @@ export async function popNextJobID() {
 		return id
 	} else {
 		const newJobs: Job[] = await get('/jobs')
-		jobQueue.set(newJobs.map((j) => j.id))
+		jobQueue.set(newJobs.map((j) => j._id))
 		const id = getStore(jobQueue)[0]
 		jobQueue.update((x) => x.splice(1))
 		return id

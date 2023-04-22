@@ -11,7 +11,7 @@
 
 <div id="JobBoard" class="h-full overflow-auto">
 	{#each jobs as Job}
-		<a href="/jobs/{Job.id}" >
+		<a href="/jobs/{Job._id}" >
 			<div class="jobListing">
 				<div class="jobTitle">{Job.role}</div>
 				<div class="jobCompany">{Job.company.name}</div>	

@@ -1,6 +1,5 @@
-import asyncio
 from typing import Any, List, Optional
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from components.authentication import access_level
 
@@ -25,7 +24,7 @@ def get_job_reccomendations(req: Request) -> List[JobSchema.JobSimplified]:
 def get_job_details(job_id: str) -> JobSchema.Job:
 	j = Job(job_id)
 	return j.get_details()
-
+	
 
 # Mark A Job As Read
 class mark_as_read(BaseModel):
@@ -38,7 +37,6 @@ def mark_as_read(req: Request, job_id: str, m: mark_as_read):
 	u = User(req.state.user_id)
 	j = Job(job_id)
 	return j.mark_role_as_read(u, m.requestApply)
-	# j.testBasic() 
 
 
 # Apply To A Job

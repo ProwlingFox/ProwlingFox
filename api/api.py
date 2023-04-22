@@ -13,7 +13,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routes import user, jobs, admin, ai
 
-app = FastAPI()
+app = FastAPI(
+    title="ProwlingFox",
+    version="0.0.1",
+    debug=True
+)
 
 # Middleware to allow working on multiple points, needs adjusted for production
 app.add_middleware(

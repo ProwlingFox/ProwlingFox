@@ -91,7 +91,6 @@ class User:
 
 		for job in jobs_from_db:
 			jobs.append(JobSchema.JobSimplified.parse_obj(job))
-			jobs[-1].id = str(job["_id"])
 		return jobs
 
 	def get_applications(self, getCompleted = False):
@@ -133,7 +132,6 @@ class User:
 			application["job_id"] = str(application["job_id"])
 
 
-			# jobs.id = str(job["_id"])
 			try:
 				applications.append(JobSchema.Application.parse_obj(application))
 			except Exception as e:
