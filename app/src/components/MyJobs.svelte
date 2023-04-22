@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { applications as as } from '$lib/myJobs'
 	import type {
 		Application,

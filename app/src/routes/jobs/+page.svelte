@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { get } from '$lib/requestUtils'
 	import { onMount } from 'svelte'
 	import type { Job } from '$interfaces/job'

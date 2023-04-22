@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { login } from '$lib/requestUtils'
 
 	interface User {
