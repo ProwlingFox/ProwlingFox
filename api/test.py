@@ -1,21 +1,21 @@
-import pprint
-from importlib import reload
-import traceback
-import JobsiteSniffers.workableJobsniffer as w
+from pprint import pprint
+import components.secrets as secrets
+import components.schemas.job as JobSchema
+from components.answeringEngine import AnsweringEngine
+from bson.objectid import ObjectId
 
-while True:
-    try:
-        reload(w)
-        workableJobsniffer = w.workableJobsniffer({
-            "enabled": True,
-            "fakeApply": True
-        })
-        for job in workableJobsniffer:
-            pprint.pprint(job)
-            
-            break
-    except Exception as e:
-        print("Error", e)
-        print(traceback.format_exc())
+secrets.init()
 
-    input("?????????????getNext???????????????")
+import components.db as db
+db.init()
+jobaiDB = db.jobaiDB
+
+job_from_db = jobaiDB.jobs.find_one({"short_description": None})
+job = JobSchema.Job.parse_obj(job_from_db)
+
+job.id = str(job_from_db["_id"])
+
+job.short_description = AnsweringEngine.summarize_Job_Description(job.long_description)
+self.update_short_listing(job.short_description)
+
+pprint(job_from_db)

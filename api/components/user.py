@@ -49,6 +49,7 @@ class User:
 			"pronouns": details.pronouns,
 			"jobPreferences": {
 				"roles": details.job_preferences.roles,
+				"sector": details.job_preferences.sector,
 				"locations": details.job_preferences.locations,
 				"remote": details.job_preferences.remote,
 				"salary": details.job_preferences.salary
@@ -67,9 +68,9 @@ class User:
 		jobs_from_db = jobaiDB.jobs.aggregate([
 			{
 				'$lookup': {
-					'from': 'applications', 
-					'localField': '_id', 
-					'foreignField': 'job_id', 
+					'from': 'applications',
+					'localField': '_id',
+					'foreignField': 'job_id',
 					'as': 'matched_docs'
 				}
 			}, {
@@ -110,9 +111,9 @@ class User:
 			},
 			{
 				'$lookup': {
-					'from': 'jobs', 
-					'localField': 'job_id', 
-					'foreignField': '_id', 
+					'from': 'jobs',
+					'localField': 'job_id',
+					'foreignField': '_id',
 					'as': 'job'
 				}
 			},
@@ -137,7 +138,7 @@ class User:
 				applications.append(JobSchema.Application.parse_obj(application))
 			except Exception as e:
 				print("Issue with jobID " + application["job_id"])
-			
+
 		return applications
 
 	@staticmethod
