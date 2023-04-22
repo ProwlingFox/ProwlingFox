@@ -31,7 +31,11 @@
 	"dependencies": {
 		"@fortawesome/free-brands-svg-icons": "^6.4.0",
 		"@fortawesome/free-solid-svg-icons": "^6.4.0",
+		"@popperjs/core": "^2.11.7",
+		"classnames": "^2.3.2",
 		"cookie": "^0.5.0",
+		"flowbite": "^1.6.5",
+		"flowbite-svelte": "^0.34.9",
 		"jwt-decode": "^3.1.2",
 		"svelte-fa": "^3.0.3"
 	}

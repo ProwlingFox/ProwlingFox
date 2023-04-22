@@ -1,9 +1,12 @@
-<script>
+<script lang="ts">
 	import type { User } from '$interfaces/user'
 	import FormContainer from './FormContainer.svelte'
 	export let carouselNext: Function
 	export let user: User
+	
 </script>
+
+
 
 <FormContainer {carouselNext}>
 	<div class="m-2 flex flex-col">

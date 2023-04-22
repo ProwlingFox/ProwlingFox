@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { parseJWT, post } from '$lib/requestUtils'
 	import { tweened } from 'svelte/motion'
 	import { cubicOut } from 'svelte/easing'
