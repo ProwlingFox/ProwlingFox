@@ -24,6 +24,10 @@ jobaiDB.applications.update_many({
 
 while True:
     # Work Out What Tasks to do
+    # Tasks Include:
+    # - Loading More Jobs into the system
+    # - Pre-Resolving said jobs
+    # - Answering Applications
     application_to_process = jobaiDB.applications.find_one_and_update({
         "application_requested": True,
         "application_processing": False,
