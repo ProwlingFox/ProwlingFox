@@ -62,7 +62,6 @@
 		post(`/jobs/${srcJob._id}/mark`, { requestApply: false })
 		//Discard Animation
 		//Load New
-		visible = false
 		loadNext()
 	}
 

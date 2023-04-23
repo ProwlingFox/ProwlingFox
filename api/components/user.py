@@ -67,6 +67,13 @@ class User:
 		# jobs_from_db = jobaiDB.jobs.find({}, limit=10)
 		jobs_from_db = jobaiDB.jobs.aggregate([
 			{
+				'$match': {
+					'short_description': {
+						"$ne": None
+					}
+				}
+			},
+			{
 				'$lookup': {
 					'from': 'applications',
 					'localField': '_id',
@@ -121,6 +128,7 @@ class User:
                     "preserveNullAndEmptyArrays": False
                 }
             },
+	    	{ "$sort": { "_id": -1 }}
 		])
 
 		applications = [];

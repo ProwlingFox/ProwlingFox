@@ -7,7 +7,7 @@
 
 	const { receive } = $as
 
-	$: console.log($as)
+	console.log($as)
 
 	function getApplicationStatus(app: Application): ApplicationStatus {
 		if (app.application_processed) {

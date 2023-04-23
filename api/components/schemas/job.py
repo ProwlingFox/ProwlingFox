@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Type, List, Any, Optional
 from enum import Enum
 
-from components.schemas.mongo import MongoBaseModel
+from components.schemas.mongo import MongoBaseModel, ObjectId
 
 class Status(str, Enum):
     ACTIVE = "Active"
@@ -68,8 +68,8 @@ class Job(JobSimplified):
     questions: List[Question]
 
 class Application(MongoBaseModel):
-    user_id: str
-    job_id: str
+    user_id: ObjectId
+    job_id: ObjectId
     job: Optional[JobSimplified]
     responses: Optional[object]
     application_read: bool
