@@ -5,7 +5,7 @@
 	export let user: User
 </script>
 
-<FormContainer {carouselMove}>
+<FormContainer {carouselMove} back={true} submit={true} {user}>
 	<div class="m-2 flex flex-col">
 		<label for="name" class="">Name</label>
 		<input type="text" class="" bind:value={user.name} />

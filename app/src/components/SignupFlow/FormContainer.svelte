@@ -1,6 +1,20 @@
 <script lang="ts">
-	export let carouselMove: Function
 	import Button from '$components/common/Button.svelte'
+	import { post } from '$lib/requestUtils'
+	import type { User } from '$interfaces/user'
+
+	export let carouselMove: Function
+	export let back: boolean
+	export let submit: boolean
+	export let user: User | null = null
+
+	async function setUserData(): Promise<void> {
+		if (!user) return
+		const response = await post('/user/update', user)
+		if (response.success) {
+			console.log('hi')
+		}
+	}
 
 	function carouselNext() {
 		carouselMove(true)
@@ -16,8 +30,15 @@
 		<div class="flex flex-col">
 			<slot />
 			<div class="flex justify-between">
-				<Button color="orange" label="Back" on:click={carouselBack} />
-				<Button color="orange" label="Next" on:click={carouselNext} />
+				<Button
+					color="orange"
+					label="Back"
+					on:click={carouselBack}
+					classList={back ? '' : 'invisible'} />
+				<Button
+					color="orange"
+					label={submit ? 'Submit' : 'Next'}
+					on:click={submit ? setUserData : carouselNext} />
 			</div>
 		</div>
 	</div>

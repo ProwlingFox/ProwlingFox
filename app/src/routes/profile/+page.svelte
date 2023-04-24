@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { parseJWT, post } from '$lib/requestUtils'
 	import { tweened } from 'svelte/motion'
 	import { cubicOut } from 'svelte/easing'
 	import PersonalInfoForm from '$components/SignupFlow/PersonalInfoForm.svelte'
@@ -30,6 +29,9 @@
 	function carouselMove(next: boolean): void {
 		let { clientWidth } = carousel
 
+		if (next && carousel.scrollLeft > clientWidth) return
+		if (!next && carousel.scrollLeft == 0) return
+
 		carouselPosition.update((current) =>
 			Math.min(current + (next ? clientWidth : -clientWidth))
 		)
@@ -39,27 +41,29 @@
 		})
 	}
 
-	async function setUserData(): Promise<void> {
-		const body = {
-			name: 'Liaaaaaa',
-			tel: '123-456-7890',
-			pronouns: 'she/her',
-			job_preferences: {
-				roles: ['Frontend', 'Backend'],
-				sector: 'IT',
-				locations: ['New York, New York'],
-				remote: true,
-				salary: 100000,
-			},
-		}
+	// async function setUserData(): Promise<void> {
+	// 	const body = {
+	// 		name: 'Liaaaaaa',
+	// 		tel: '123-456-7890',
+	// 		pronouns: 'she/her',
+	// 		job_preferences: {
+	// 			roles: ['Frontend', 'Backend'],
+	// 			sector: 'IT',
+	// 			locations: ['New York, New York'],
+	// 			remote: true,
+	// 			salary: 100000,
+	// 		},
+	// 	}
 
-		const response = await post('/user/update', body)
-		if (response.success) {
-			console.log('hi')
-		}
-	}
+	// 	const response = await post('/user/update', body)
+	// 	if (response.success) {
+	// 		console.log('hi')
+	// 	}
+	// }
 
-	// setUserData()
+	// onMount(async () => {
+	// 	export const scrollLeft = writable(carousel.scrollLeft)
+	// })
 </script>
 
 <div class="carousel flex" bind:this={carousel}>
