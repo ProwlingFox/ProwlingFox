@@ -4,6 +4,7 @@ from typing import Type, List
 
 from components import authentication
 from components.user import User
+import components.schemas.user as UserSchema
 
 router = APIRouter(tags=["User"])
 
@@ -20,7 +21,7 @@ def get_current_user_data(req: Request):
 class update_password(BaseModel):
     password: str
 
-@router.put("/user/password")
+@router.post("/user/password")
 @authentication.access_level("Authenticated")
 def update_password(req: Request, p: update_password):
 	u = User(req.state.user_id)
@@ -48,22 +49,11 @@ def login_user_using_pass(u: pw_login_user):
 
 
 # Update User Details
-class user_job_preferences(BaseModel):
-	roles: List[str] = None
-	sector: str = None
-	locations: List[str] = None
-	remote: bool = None
-	salary: int = None
 
-class user_details(BaseModel):
-	name: str
-	tel: str = None
-	pronouns: str = None
-	job_preferences: user_job_preferences = None
 
 @router.post("/user/update")
 @authentication.access_level("Authenticated")
-def update_user_details(req: Request, ud: user_details):
+def update_user_details(req: Request, ud: UserSchema.UpdateUserDetails):
 	u = User(req.state.user_id)
 	return u.update_details(ud)
 

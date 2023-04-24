@@ -4,7 +4,6 @@
 
 	import { applications as as, popNextJobID, jobQueue } from '$lib/myJobs'
 	import { get, post } from '$lib/requestUtils'
-	import { get as getStore } from 'svelte/store'
 
 	export let srcJob: Job
 
@@ -84,8 +83,20 @@
 			{srcJob.location}
 		</div>
 		<div>
-			{srcJob.short_description}
+			{srcJob.role_description}
 		</div>
+		<h2 class="text-xl font-semibold">Requirements</h2>
+		<ul class="list-disc">
+			{#each srcJob.requirements as requirement}
+				<li>{requirement}</li>
+			{/each}
+		</ul>
+		<h2 class="text-xl font-semibold">Opportunities</h2>
+		<ul class="list-disc">
+			{#each srcJob.key_points as key_point}
+				<li>{key_point}</li>
+			{/each}
+		</ul>
 		<div class="flex justify-evenly mt-4">
 			<button class="bg-red-400" on:click={reject}>Reject</button>
 			<button class="bg-green-400" on:click={apply}>Apply</button>
@@ -96,7 +107,7 @@
 
 <style type="postcss">
 	#card {
-		@apply bg-white max-w-xl m-4 p-12 rounded-xl shadow-md;
+		@apply bg-white max-w-2xl m-4 p-12 rounded-xl shadow-md;
 	}
 
 	h1 {

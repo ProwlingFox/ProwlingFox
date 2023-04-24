@@ -1,9 +1,13 @@
+from os import name
 from pprint import pprint
+from shutil import ExecError
 from tkinter import N
 from typing import List
+from uu import Error
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
 import components.schemas.job as JobSchema
+import components.schemas.user as UserSchema
 
 
 MIN_PASSWORD_LENGTH = 8
@@ -20,14 +24,7 @@ class User:
 		if not user_from_db:
 			raise Exception("User Could Not Be Found In DB")
 
-		user_data = {
-			"user_id": str(user_from_db['_id']),
-			"name": user_from_db['name'],
-			"email": user_from_db['email'],
-			"permission": user_from_db['permission'],
-		}
-
-		return user_data
+		return UserSchema.User.parse_obj(user_from_db)
 
 	def set_password(self, newpassword):
 		if not User.validatePassword(newpassword):
@@ -42,24 +39,16 @@ class User:
 		return {'success': True}
 
 	def update_details(self, details):
-		print(details)
-		userDetails = {
-			"name": details.name,
-			"tel": details.tel,
-			"pronouns": details.pronouns,
-			"jobPreferences": {
-				"roles": details.job_preferences.roles,
-				"sector": details.job_preferences.sector,
-				"locations": details.job_preferences.locations,
-				"remote": details.job_preferences.remote,
-				"salary": details.job_preferences.salary
-			}
-		}
+		u = UserSchema.UpdateUserDetails.parse_obj(details)
 
-		from api import jobaiDB
-		update_response = jobaiDB.users.update_one({"_id":self.user_id}, {"$set": userDetails})
+		print(u)
 
-		return {'success': True}
+		from components.db import jobaiDB
+		try:
+			update_response = jobaiDB.users.update_one({"_id":self.user_id}, {"$set": u.flatten_dict()})
+			return {'success': True}
+		except Exception as e:
+			raise
 
 	def get_job_reccomendations(self):
 		# Right Now Just Gets 10 Jobs at random essentially, filtering out those marked as read
@@ -90,6 +79,8 @@ class User:
 						}
 					}
 				}
+			}, {
+				"$sort": {"_id": -1}
 			},
 			{ "$limit" : 10 }
 		])
@@ -97,7 +88,10 @@ class User:
 		jobs = [];
 
 		for job in jobs_from_db:
-			jobs.append(JobSchema.JobSimplified.parse_obj(job))
+			try:
+				jobs.append(JobSchema.JobSimplified.parse_obj(job))
+			except Exception as e:
+				print("Issue With Job ID:", job["_id"])
 		return jobs
 
 	def get_applications(self, getCompleted = False):
@@ -202,7 +196,6 @@ class User:
 			"name": name,
 			"email": email,
 			"password": hashedPassword,
-			"type": "user",
 			"permission": "candidate"
 		}
 

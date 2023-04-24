@@ -8,6 +8,9 @@ export interface Job {
 	raw_data?: any
 	long_description: any
 	role: string
+	role_description: string
+	requirements: string[]
+	key_points: string[]
 	company: {
 		name: string
 		short_description?: string

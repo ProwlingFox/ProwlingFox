@@ -113,7 +113,6 @@ while True:
         typed_process_queue = process_queue[process_type]
         if (len(typed_process_queue) > 0):
             process_functions[process_type](typed_process_queue.pop(0))
-
             
     sleep(0.5)
     print("Done One Round")

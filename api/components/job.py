@@ -46,6 +46,8 @@ class Job:
 		for bullet_point in response.splitlines():
 			job.key_points.append(bullet_point.removeprefix("- "))
 		
+
+
 		self.upsert_job({
 			"short_description": job.short_description,
 			"role_description": job.role_description,
@@ -55,12 +57,20 @@ class Job:
 		})
 		return
 
+	def preprocess_questions(self, question):
+
+
+		return
+
 	def get_details(self) -> JobSchema.Job:
+		if self.job_data:
+			return self.job_data
+		
 		from api import jobaiDB
 		
 		job_from_db = jobaiDB.jobs.find_one({"_id": self.id})
 		job = JobSchema.Job.parse_obj(job_from_db)
-		job_data = job
+		self.job_data = job
 
 		return job
 

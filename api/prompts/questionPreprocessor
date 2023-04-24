@@ -1,0 +1,8 @@
+{{available_variables}}
+
+Answer the following question using the above variables enclosed in {}, if it's not possible respond with an empty string.
+
+What is your name?
+{firstname} {surname}
+
+{{question}}
