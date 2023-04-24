@@ -57,7 +57,6 @@ class workableJobsniffer(baseJobsniffer):
 			status = JobSchema.Status.ACTIVE,
 			location = "{city}, {subregion}, {countryName}".format(**rawJob["location"]),
 			listing = self.generateJobListing(rawJob),
-			# questions = []
 			questions = self.getQuestions(rawJob),
 		)
 		
@@ -190,7 +189,9 @@ class workableJobsniffer(baseJobsniffer):
 
 		return f"""
 {rawJob["title"]} at {rawJob["company"]["title"]}
-==============================================================================
+
+{h.handle(rawJob["company"]["description"])}
+
 {h.handle(rawJob["description"])}
 
 {('REQUIREMENTS:' + h.handle(rawJob["requirementsSection"])) if rawJob["requirementsSection"] else ""}
