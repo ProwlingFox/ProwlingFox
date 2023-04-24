@@ -23,7 +23,7 @@
 	<div class="flex justify-center">
 		<div class="md:w-1/2">
 			<div class="mt-20 mb-20">
-				<div class="bg-white rounded-lg">
+				<div class=" rounded-lg">
 					<div
 						class="border-b border-gray-200 p-3 flex justify-center font-bold">
 						<h6>Sign in</h6>
@@ -34,7 +34,7 @@
 								<label for="username">Email Address</label>
 								<input
 									type="text"
-									class="block w-full p-3 m-1 rounded-lg bg-slate-200"
+									class="block w-full p-3 m-1 rounded-lg bg-slate-50"
 									id="email"
 									placeholder="name@example.com"
 									bind:value={email}
@@ -45,7 +45,7 @@
 								<input
 									id="password"
 									type="password"
-									class="block w-full p-3 m-1 rounded-lg bg-slate-200"
+									class="block w-full p-3 m-1 rounded-lg bg-slate-50"
 									name="password"
 									placeholder="Password"
 									bind:value={password}
@@ -70,7 +70,7 @@
 								class="admin__button-group button-group d-flex pt-1 justify-content-md-start justify-content-center">
 								<button
 									on:click={loginClickHandler}
-									class="bg-slate-300 hover:bg-slate-400 p-2 w-full rounded-lg"
+									class="bg-slate-200 hover:bg-slate-300 p-2 w-full rounded-lg"
 									>Sign In</button>
 							</div>
 						</div>
