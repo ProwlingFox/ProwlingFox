@@ -1,18 +1,28 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
+	import type { Application as JobApplication } from '$interfaces/application'
 	import type { Job } from '$interfaces/job'
 
 	import { applications as as, popNextJobID, jobQueue } from '$lib/myJobs'
 	import { get, post } from '$lib/requestUtils'
+	import JobApplicationForm from './JobApplicationForm.svelte'
 
 	export let srcJob: Job
 
 	const { send } = $as
+	let relatedApplication: JobApplication | undefined
 
-	// let nextId: Promise<string>
+	$: relatedApplication = $as.applications.find(x => x.job_id == srcJob._id)
+
+	$: console.log(relatedApplication)
+
+	$: console.log(srcJob)
+
 	let nextId: string
 
 	let visible = true
+
+
 
 	async function apply() {
 		post(`/jobs/${srcJob._id}/mark`, { requestApply: true })
@@ -68,7 +78,21 @@
 </script>
 
 {#if visible}
+<div class="flex relative {"left-2"}">
 	<div id="card" out:send={{ key: srcJob._id }}>
+		{#if relatedApplication?.application_processed}
+			<div id="banner" class="bg-green-400">
+				Application Ready For Review
+			</div>
+		{:else if relatedApplication?.application_processing}
+			<div id="banner" class="bg-orange-400">
+				Application Processing
+			</div>
+		{:else if relatedApplication?.application_requested}
+			<div id="banner" class="bg-orange-400">
+				Application in Queue
+			</div>
+		{/if}
 		<div class="flex justify-center">
 			<img src={srcJob.company.logo} alt="" />
 		</div>
@@ -97,24 +121,31 @@
 				<li>{key_point}</li>
 			{/each}
 		</ul>
-		<div class="flex justify-evenly mt-4">
-			<button class="bg-red-400" on:click={reject}>Reject</button>
-			<button class="bg-green-400" on:click={apply}>Apply</button>
-		</div>
+		{#if !relatedApplication}
+			<div class="flex justify-evenly mt-4">
+				<button class="bg-red-400" on:click={reject}>Reject</button>
+				<button class="bg-green-400" on:click={apply}>Apply</button>
+			</div>
+		{/if}
 		<div />
 	</div>
+	{#if relatedApplication?.application_processed}
+		<JobApplicationForm {srcJob} srcApplication={relatedApplication} />
+	{/if}
+</div>
 {/if}
+
 
 <style type="postcss">
 	#card {
-		@apply bg-white max-w-2xl m-4 p-12 rounded-xl shadow-md;
+		@apply bg-white max-w-2xl my-4 p-12 rounded-xl shadow-md relative z-10;
 	}
 
 	h1 {
-		@apply text-4xl font-medium;
+		@apply text-2xl font-medium;
 	}
 
-	button {
-		@apply p-2 w-40 rounded-xl drop-shadow;
+	#banner {
+		@apply  text-white text-center p-1 absolute top-0 left-0 right-0 rounded-t-xl;
 	}
 </style>

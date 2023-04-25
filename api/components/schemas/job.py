@@ -26,6 +26,7 @@ class Choice(BaseModel):
 class Question(BaseModel):
     id: str
     content: str
+    ai_prompt: Optional[str]
     type: FieldType
     required: bool
     choices: Optional[List[Choice]]

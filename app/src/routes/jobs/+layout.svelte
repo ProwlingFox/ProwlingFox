@@ -6,6 +6,6 @@
 {#if isJWTValid()}
     <MyJobs></MyJobs>
 {/if}
-<div class="flex-grow h-full overflow-hidden">
+<div class="flex-grow h-full overflow-auto p-0">
     <slot />
 </div>

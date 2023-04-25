@@ -61,7 +61,7 @@ class workableJobsniffer(baseJobsniffer):
 		)
 		
 	questionTypeTranslation = {
-		"paragraph": JobSchema.FieldType.TEXT,
+		"paragraph": JobSchema.FieldType.LONG_TEXT,
 		"boolean": JobSchema.FieldType.CHECKBOX,
 		"text": JobSchema.FieldType.TEXT,
 		"number": JobSchema.FieldType.NUMBER,
@@ -85,9 +85,11 @@ class workableJobsniffer(baseJobsniffer):
 				for question in section["fields"]:
 					qresponse = None
 					if question["id"] == "summary":
-						question["label"] = "Create a first person personalised summary of a person who is applying to this position."
+						question["ai"] = "Create a first person personalised summary of a person who is applying to this position."
 					if question["id"] == "cover_letter":
-						question["label"] = "Create a cover letter for this position."
+						question["ai"] = "Create a cover letter for this position."
+					if question["id"] == "gdpr":
+						question["label"] = "I have read, understand and accept the content of this Privacy Notice and consent to the processing of my data as part of this application."
 					if "onlyTrueAllowed" in question:
 						qresponse = True
 
@@ -97,6 +99,7 @@ class workableJobsniffer(baseJobsniffer):
 					formattedQuestion = JobSchema.Question(
 						id = question["id"],
 						content = question["label"] if "label" in question else "Missing Question",
+						ai_prompt = question["ai"] if "ai" in question else None,
 						type = self.questionTypeTranslation[question["type"]],
 						required = question["required"],
 						raw_data= {

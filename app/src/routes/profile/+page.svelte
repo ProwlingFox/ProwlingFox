@@ -57,7 +57,6 @@
 
 	// 	const response = await post('/user/update', body)
 	// 	if (response.success) {
-	// 		console.log('hi')
 	// 	}
 	// }
 

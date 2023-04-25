@@ -10,6 +10,9 @@ export interface Application {
 	application_processing: boolean
 	application_processed: boolean
 	progress: ApplicationStatus
+	responses: {
+		[key: string]: any;
+	}
 }
 
 export interface ApplicationStore {

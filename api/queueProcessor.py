@@ -37,8 +37,8 @@ def solve_application(application: JobSchema.Application):
 
     for question in job.questions:
         print("answering question:", question.id)
-        if question.type == JobSchema.FieldType.TEXT:
-            answer = AnsweringEngine.answer_question(job, user, question.content)
+        if question.type == JobSchema.FieldType.TEXT or question.type == JobSchema.FieldType.LONG_TEXT:
+            answer = AnsweringEngine.answer_question(job, user, question.ai_prompt or question.content)
             print(answer)
         else:
             answer = None

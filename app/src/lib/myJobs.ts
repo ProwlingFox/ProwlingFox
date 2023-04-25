@@ -23,17 +23,16 @@ export async function popNextJobID() {
 	}
 }
 
-function refreshApplications(buypassCheck: boolean = false) {
+async function refreshApplications(buypassCheck: boolean = false) {
 	if (!buypassCheck) {
-		let moveableStates = getStore(applications).applications.some(x => !x.application_processed
-			)
-		console.log(moveableStates)
+		// Checks to see if applications could change state, if not doesn't send a needless web request
+		let moveableStates = getStore(applications).applications.some(x => !x.application_processed)
 		if (!moveableStates) {
 			return
 		}
 	}
 
-	get('/user/applications').then((res) => {
+	await get('/user/applications').then((res) => {
 		applications.update((a) => {
 			return {
 				applications: res,
@@ -47,10 +46,12 @@ function refreshApplications(buypassCheck: boolean = false) {
 if(browser) {
 	var intervalId = window.setInterval(refreshApplications, 10000);
 }
-refreshApplications(true)
+
 
 export const applications = writable<ApplicationStore>({
 	applications: [],
 	send,
 	receive,
 })
+
+await refreshApplications(true)

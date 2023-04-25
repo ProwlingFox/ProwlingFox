@@ -28,4 +28,21 @@ export interface Job {
 	role_category: string
 	skills: string[]
 	status: 'Active' | 'Inactive'
+	questions: Question[]
 }
+
+interface Question {
+	id: string
+    content: string
+    type: string
+    required: boolean
+    choices?: Choice[]
+    response?: any
+}
+
+interface Choice{
+	id: string
+    content: string
+    raw_data?: any
+}
+    
