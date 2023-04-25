@@ -24,11 +24,14 @@ class AnsweringEngine:
 		return text
 
 	@staticmethod
-	def answer_question(job: JobSchema.Job, user: UserSchema.User, question: str):
+	def answer_question(job: JobSchema.Job, user: UserSchema.User, question: JobSchema.Question):
 
 		# If this job has no short summary freak out
 		if not job.short_description:
 			raise "No Short Description :c"
+		
+		if question.response:
+			return AnsweringEngine.generate_prefilled_response(user, question)
 
 		prompt = AnsweringEngine.promptGenerator("answerJobQuestionPrompt", {
 			"role": job.role,
@@ -36,12 +39,23 @@ class AnsweringEngine:
 			"jobDescription": job.short_description,
 			"FullName": user.name,
 			"Email": user.email,
-			"question": question
+			"question": question.ai_prompt or question.content
 		} )
 
 		response = AnsweringEngine.sendSimpleChatPrompt(prompt, "answerQuestion")
 
 		return response
+
+	@staticmethod
+	def generate_prefilled_response(user: UserSchema.User, question: JobSchema.Question):
+		string = question.response
+		
+		for key, value in user.data:
+			string = string.replace("{" + key + "}", str(value))
+
+		# Email is a special case, Potentially replaced later as an email aggregator
+		string = string.replace("{email}", str(user.email))
+		return string
 
 	@staticmethod
 	def sendCompletionPrompt(prompt, note=None, tokens = 1024)-> str:

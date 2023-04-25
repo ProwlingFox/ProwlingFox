@@ -44,12 +44,12 @@
 	})
 </script>
 
-<div class="w-1/5 h-100% bg-[#cb642c]">
+<div id="container" class="hidden md:flex">
 	<div
-		class="text-center p-4 text-xl font-medium text-white border-b-2 border-cyan-950">
+		class="text-center p-2 text-xl font-medium text-white bg-amber-800">
 		My Applications
 	</div>
-	<ul>
+	<ul class="overflow-y-auto overflow-x-hidden flex-grow p-0">
 		{#each $as.applications as app (app._id)}
 			<a href={"/jobs/" + app.job_id}>
 				<li in:receive={{ key: app._id }}>
@@ -74,6 +74,10 @@
 </div>
 
 <style type="postcss">
+	#container {
+		@apply w-80 bg-[#cb642c] rounded-lg shadow-lg m-2 overflow-hidden flex-col;
+	}
+
 	li {
 		@apply bg-white p-2 m-2 rounded-md shadow;
 	}

@@ -78,7 +78,7 @@
 </script>
 
 {#if visible}
-<div class="flex relative {"left-2"}">
+<div class="flex md:left-2 bg-white max-w-2xl md:my-4 p-4 md:px-12 md:py-8 md:rounded-xl shadow-md relative z-10">
 	<div id="card" out:send={{ key: srcJob._id }}>
 		{#if relatedApplication?.application_processed}
 			<div id="banner" class="bg-green-400">
@@ -110,21 +110,21 @@
 			{srcJob.role_description}
 		</div>
 		<h2 class="text-xl font-semibold">Requirements</h2>
-		<ul class="list-disc">
+		<ul class="list-disc pl-4">
 			{#each srcJob.requirements as requirement}
 				<li>{requirement}</li>
 			{/each}
 		</ul>
 		<h2 class="text-xl font-semibold">Opportunities</h2>
-		<ul class="list-disc">
+		<ul class="list-disc pl-4">
 			{#each srcJob.key_points as key_point}
 				<li>{key_point}</li>
 			{/each}
 		</ul>
 		{#if !relatedApplication}
-			<div class="flex justify-evenly mt-4">
-				<button class="bg-red-400" on:click={reject}>Reject</button>
-				<button class="bg-green-400" on:click={apply}>Apply</button>
+			<div class="fade md:shadow-black fixed w-[100vw] bottom-4 md:static md:shadow md:left-auto md:bottom-auto md:w-auto left-0 flex justify-evenly mt-4 ">
+				<button class="bg-red-500 " on:click={reject}>Reject</button>
+				<button class="bg-green-500 " on:click={apply}>Apply</button>
 			</div>
 		{/if}
 		<div />
@@ -137,12 +137,13 @@
 
 
 <style type="postcss">
-	#card {
-		@apply bg-white max-w-2xl my-4 p-12 rounded-xl shadow-md relative z-10;
-	}
-
 	h1 {
 		@apply text-2xl font-medium;
+	}
+
+	.fade {
+		box-shadow: 0px 0px 20px 20px white;
+		background-color: rgba(255, 255, 255, 1)
 	}
 
 	#banner {

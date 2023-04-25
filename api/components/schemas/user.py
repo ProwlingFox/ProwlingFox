@@ -17,9 +17,10 @@ class UserDataFields(BaseModel, extra=Extra.forbid):
     linkedIn: Optional[str]
     phone_number: Optional[str]
     pronouns: Optional[str]
-    notice: Optional[str]
+    notice_period: Optional[str]
     expected_sallary: Optional[int]
     location: Optional[str]
+    address: Optional[str]
     
 class UserJobPreferences(BaseModel, extra=Extra.forbid):
     roles: list[str]

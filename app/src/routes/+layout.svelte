@@ -17,10 +17,10 @@
 	</a>
 	{#if data.authenticated}
 		<ul>
-			<a href="/jobs">Jobs</a>
-			<a href="/profile">Profile</a>
+			<a href="/jobs"><p>Jobs</p></a>
+			<a href="/profile"><p>Profile</p></a>
 			{#if role == "admin"}
-				<a href="/admin">Admin</a>
+				<a href="/admin"><p>Admin</p></a>
 			{/if}
 		</ul>
 	{/if}
@@ -36,28 +36,25 @@
 	}
 
 	nav {
-		@apply bg-orange-800 text-white;
-		display: flex;
-		flex-direction: row;
+		@apply bg-orange-800 text-white flex;
 	}
 
 	header {
-		margin: 0.25em 1em;
+		@apply m-2 ml-4;
 	}
 
 	h1 {
+		@apply leading-none m-0 mb-0.5;
 		font-family: 'Fredoka', sans-serif;
 		font-weight: 300;
 		font-size: 2rem;
-		margin: 0px;
 	}
 
 	h2 {
+		@apply leading-none m-0;
 		font-family: 'Fredoka', sans-serif;
 		font-size: 0.825rem;
 		font-weight: 400;
-		margin: 0px;
-		line-height: 0.5em;
 	}
 
 	ul {
@@ -71,7 +68,7 @@
 	}
 
 	ul > a {
-		padding: 1.2em 1em;
+		@apply h-full flex items-center px-2;
 		text-decoration: none;
 		color: inherit;
 	}

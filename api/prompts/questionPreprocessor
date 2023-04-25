@@ -1,6 +1,6 @@
 {{available_variables}}
 
-Answer the following question using the above variables enclosed in {}, if it's not possible respond with an empty string.
+If possible answer the following questions with the variables above enclosed in {}, if it's not possible respond with N/A.
 
 What is your name?
 {firstname} {surname}

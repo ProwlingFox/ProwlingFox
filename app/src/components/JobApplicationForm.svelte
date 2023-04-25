@@ -19,9 +19,14 @@
         {:else if question.type == "Number"}
             <label for={question.id}>{question.content}</label>
             <input id={question.id} type="number" value={srcApplication?.responses[question.id] || ''}/>
-        {:else if question.type == "MultipleChoice"}
+        {:else if question.type == "MultipleChoice" && question.choices}
             <label for={question.id}>{question.content}</label>
-            <input id={question.id} value={srcApplication?.responses[question.id] || ''}/>
+            <select id={question.id}>
+                {#each question.choices as choice}
+                    <option value={choice.id}>{choice.content}</option>
+                {/each}
+            </select>
+            <!-- <input  value={srcApplication?.responses[question.id] || ''}/> -->
         {:else if question.type == "Date"}
             <label for={question.id}>{question.content}</label>
             <input id={question.id} type="date" value={srcApplication?.responses[question.id] || ''}/>
@@ -32,7 +37,7 @@
             <label for={question.id}>{question.content}</label>
             <input id={question.id} type="checkbox" value={srcApplication?.responses[question.id] || ''}/>
         {:else if question.type == "Radio"}
-            <label for={question.id}>{question.content}</label>
+            <label for={question.id}>{question.content} (Radio)</label>
             <input id={question.id} value={srcApplication?.responses[question.id] || ''}/>
         {/if}
     {/each}
@@ -44,7 +49,11 @@
         @apply bg-white max-w-2xl my-4 p-12 rounded-xl shadow-md relative right-4 flex flex-col;
     }
 
-    input, textarea {
-        @apply border-solid border-2 rounded-lg mb-2;
+    input, textarea, select{
+        @apply border-solid border-2 border-gray-300 rounded-lg mb-2 pl-2;
+    }
+
+    input:focus, textarea:focus, select:focus{
+        @apply border-gray-900;
     }
 </style>

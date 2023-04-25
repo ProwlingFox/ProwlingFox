@@ -1,3 +1,4 @@
+import asyncio
 from multiprocessing import process
 import components.secrets as secrets
 secrets.init()
@@ -38,7 +39,7 @@ def solve_application(application: JobSchema.Application):
     for question in job.questions:
         print("answering question:", question.id)
         if question.type == JobSchema.FieldType.TEXT or question.type == JobSchema.FieldType.LONG_TEXT:
-            answer = AnsweringEngine.answer_question(job, user, question.ai_prompt or question.content)
+            answer = AnsweringEngine.answer_question(job, user, question)
             print(answer)
         else:
             answer = None
@@ -67,15 +68,14 @@ def preprocess_job(job: JobSchema.Job):
     return
 
 process_queue = {
-    "job_preprocessor": [],
-    "application_processor": []
+    "application_processor": [],
+    "job_preprocessor": []
 }
 
 process_functions = {
     "job_preprocessor": preprocess_job,
     "application_processor": solve_application
 }
-
 
 reset_processing()
 while True:
@@ -108,12 +108,13 @@ while True:
     if application_from_db:
         process_queue["application_processor"].append( JobSchema.Application.parse_obj(application_from_db) )
 
-    # For now, just round robin things in the queue, rlly needs a balancer 
+    # For now, just round robin things in the queue, rlly needs a balancer and to be made asyncio lol, tho rn we're being rate limited
     for process_type in process_queue:
         typed_process_queue = process_queue[process_type]
         if (len(typed_process_queue) > 0):
             process_functions[process_type](typed_process_queue.pop(0))
-            
+
+
     sleep(0.5)
     print("Done One Round")
     continue

@@ -22,6 +22,7 @@ button {
   @apply p-2 w-40 rounded-xl drop-shadow bg-amber-500 text-white;
 }
 
+
 /* ===== Scrollbar CSS ===== */
   /* Firefox */
   * {
@@ -35,11 +36,23 @@ button {
   }
 
   *::-webkit-scrollbar-track {
-    background: #ffffff;
+    background: transparent;
   }
 
   *::-webkit-scrollbar-thumb {
     background-color: #d0c5d3;
     border-radius: 10px;
     border: 1 solid #ffffff;
+  }
+
+  @media (pointer: coarse) {
+    /* Firefox */
+    * {
+      scrollbar-width: none;
+    }
+
+    /* Chrome, Edge, and Safari */
+    *::-webkit-scrollbar {
+      display: none;
+    }
   }

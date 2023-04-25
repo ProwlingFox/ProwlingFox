@@ -1,5 +1,7 @@
 from email.policy import strict
 import re
+import sys
+from typing import List
 from urllib import response
 from fastapi import HTTPException
 from pymongo import errors as Mongoerrors
@@ -9,6 +11,7 @@ from pydantic import ValidationError
 import asyncio
 from components.user import User
 import components.schemas.job as JobSchema
+import components.schemas.user as UserSchema
 from components.answeringEngine import AnsweringEngine
 
 class Job:
@@ -23,6 +26,8 @@ class Job:
 
 		if job.short_description:
 			print("It looks like this job has allready been processed. JobID:", self.id)
+
+		job.questions = self.preprocess_questions(job.questions)
 
 		prompt_vars =  {"full_description": job.long_description}
 
@@ -53,14 +58,38 @@ class Job:
 			"role_description": job.role_description,
 			"requirements": job.requirements,
 			"key_points": job.key_points,
+			"questions": list(map(lambda x: x.dict(), job.questions)),
 			"job_processing": False
 		})
 		return
 
-	def preprocess_questions(self, question):
+	def preprocess_questions(self, questions: List[JobSchema.Question]):
+		special_case_fields = ["email"]
 
 
-		return
+		for question in questions:
+			# This Allows JobSniffers to prefil questions too
+			if question.response:
+				continue
+
+			if question.type == JobSchema.FieldType.TEXT:
+				prompt_vars = {
+					"question": question.ai_prompt or question.content,
+					"available_variables": ",".join(UserSchema.UserDataFields.__fields__.keys()) + "," + ",".join(special_case_fields)
+				}
+				print("Question:", question.content)
+				prompt = AnsweringEngine.promptGenerator("questionPreprocessor", prompt_vars)
+				instructions = "You Are Matching Questions To Variables, Do not use more than 5 additional words"
+				response = AnsweringEngine.sendSimpleChatPrompt(prompt, "questionPreprocessor",system=instructions,  force_single_line=True, tokens = 10)
+				# TODO: Add better code here to validate the response can be parsed
+				if "N/A" in response.upper():
+					print("Cant Be Substituded")
+					continue
+				if "{" in response and "}" in response:
+					question.response = response
+					print("Can Be Substituded with", response)
+				continue
+		return questions
 
 	def get_details(self) -> JobSchema.Job:
 		if self.job_data:
