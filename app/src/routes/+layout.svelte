@@ -1,11 +1,19 @@
 <script lang="ts">
 	import '../app.postcss'
 	import { parseJWT } from '$lib/requestUtils'
+	import {Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider} from 'flowbite-svelte'
+	import { goto } from '$app/navigation'
 
 	export let data
 	
 	const JWT = parseJWT()
+
 	const role = JWT?.permission
+
+	function signOut() {
+		document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT"
+		goto("/login")
+	}
 </script>
 
 <nav>
@@ -15,14 +23,21 @@
 			<h2>Helping you catch the career you're looking for.</h2>
 		</header>
 	</a>
-	{#if data.authenticated}
-		<ul>
-			<a href="/jobs"><p>Jobs</p></a>
-			<a href="/profile"><p>Profile</p></a>
-			{#if role == "admin"}
-				<a href="/admin"><p>Admin</p></a>
-			{/if}
-		</ul>
+	{#if JWT}
+	<div class="mr-4 ml-auto self-center z-50">
+		<Avatar id="user-drop" src="/default-avatar.jpg" dot={{color:'green'}} />
+		<Dropdown triggeredBy="#user-drop">
+			<DropdownHeader>
+			<span class="block text-sm"> {JWT.name} </span>
+			<span class="block truncate text-sm font-medium"> {JWT.email} </span>
+			</DropdownHeader>
+			<DropdownItem href="/jobs">Jobs</DropdownItem>
+			<DropdownItem href="/profile">Profile</DropdownItem>
+			<DropdownItem href="/admin">Admin</DropdownItem>
+			<DropdownDivider />
+			<DropdownItem on:click={signOut}>Sign out</DropdownItem>
+		</Dropdown>
+	</div>
 	{/if}
 </nav>
 

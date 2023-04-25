@@ -174,7 +174,9 @@ class User:
 		payload = {
 			"expiry": int(time.time()) + 86400,
 			"user_id": str(user_from_db['_id']),
-			"permission": user_from_db['permission']
+			"permission": user_from_db['permission'],
+			"name": user_from_db['name'],
+			"email": user_from_db['email']
 		}
 
 		token = jwt.encode(payload, secrets["JWT"]["Secret"], algorithm=secrets["JWT"]["Algorithm"])

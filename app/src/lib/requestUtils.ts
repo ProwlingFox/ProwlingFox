@@ -4,7 +4,7 @@ import { readable, get as getStore } from 'svelte/store'
 import type { Readable } from 'svelte/store'
 import jwt_decode from "jwt-decode";
 
-const apiUrl = "http://127.0.0.1:8000"
+const apiUrl = "http://192.168.1.14:8000"
 let JWTStore: Readable<string>;
 
 function get(path: string) {
@@ -66,7 +66,9 @@ function getJWT() {
 interface DecodedJWT {
 	expiry: number,
 	permission: string,
-	user_id: string
+	user_id: string,
+	name: string,
+	email: string
 }
 
 function parseJWT(): DecodedJWT | null {
