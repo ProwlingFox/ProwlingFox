@@ -52,21 +52,6 @@
 									on:keyup|preventDefault={handleEnterKey} />
 							</div>
 							<div
-								class="flex items-center justify-between mt-5 mb-5">
-								<div class="checkbox">
-									<input
-										class="checkbox"
-										type="checkbox"
-										id="check-1" />
-									<label for="check-1">
-										<span class="checkbox-text"
-											>Keep me logged in</span>
-									</label>
-								</div>
-								<a href="forget-password.html"
-									>Forgot password?</a>
-							</div>
-							<div
 								class="admin__button-group button-group d-flex pt-1 justify-content-md-start justify-content-center">
 								<button
 									on:click={loginClickHandler}
@@ -75,19 +60,6 @@
 							</div>
 						</div>
 					</div>
-					<!-- End: .card-body -->
-					<!-- <div class="px-5">
-						<p
-							class="social-connector text-center before:bg-gray-200 before:h-[1px] before:inline-block before:w-1/3 before:align-middle before:mr-3 after:bg-gray-200 after:h-[1px] after:inline-block after:w-1/3 after:align-middle after:ml-3">
-							<span>Or</span>
-						</p>
-						<div class="flex justify-center">
-							<img
-								class="h-14 hover:cursor-pointer"
-								src="/btn_google_signin_light_normal_web@2x.png"
-								alt="" />
-						</div>
-					</div> -->
 					<div class="bg-slate-200 p-5 mt-2 flex justify-center">
 						<p class="mb-0">
 							Don't have an account?

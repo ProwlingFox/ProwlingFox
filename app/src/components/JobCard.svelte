@@ -3,7 +3,7 @@
 	import type { Application as JobApplication } from '$interfaces/application'
 	import type { Job } from '$interfaces/job'
 
-	import { applications as as, popNextJobID, jobQueue } from '$lib/myJobs'
+	import { applications as as, popNextJobID } from '$lib/myJobs'
 	import { get, post } from '$lib/requestUtils'
 	import JobApplicationForm from './JobApplicationForm.svelte'
 
@@ -78,22 +78,22 @@
 </script>
 
 {#if visible}
-<div class="flex md:left-2 bg-white max-w-2xl md:my-4 p-4 md:px-12 md:py-8 md:rounded-xl shadow-md relative z-10">
-	<div id="card" out:send={{ key: srcJob._id }}>
+<div class="flex flex-col xl:flex-row w-full lg:w-auto">
+	<div class="bg-white p-4 md:px-12 sm:rounded-xl lg:left-2 sm:mx-4 lg:mx-0 lg:max-w-2xl sm:my-4 md:py-8 shadow-md relative z-10" out:send={{ key: srcJob._id }}>
 		{#if relatedApplication?.application_processed}
-			<div id="banner" class="bg-green-400">
+			<div id="banner" class="bg-green-400 sm:rounded-t-xl">
 				Application Ready For Review
 			</div>
 		{:else if relatedApplication?.application_processing}
-			<div id="banner" class="bg-orange-400">
+			<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
 				Application Processing
 			</div>
 		{:else if relatedApplication?.application_requested}
-			<div id="banner" class="bg-orange-400">
+			<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
 				Application in Queue
 			</div>
 		{/if}
-		<div class="flex justify-center">
+		<div class="flex justify-center mt-6">
 			<img src={srcJob.company.logo} alt="" />
 		</div>
 
@@ -123,8 +123,8 @@
 		</ul>
 		{#if !relatedApplication}
 			<div class="fade md:shadow-black fixed w-[100vw] bottom-4 md:static md:shadow md:left-auto md:bottom-auto md:w-auto left-0 flex justify-evenly mt-4 ">
-				<button class="bg-red-500 " on:click={reject}>Reject</button>
-				<button class="bg-green-500 " on:click={apply}>Apply</button>
+				<button class="bg-red-500" on:click={reject}>Reject</button>
+				<button class="bg-green-500" on:click={apply}>Apply</button>
 			</div>
 		{/if}
 		<div />
@@ -146,7 +146,11 @@
 		background-color: rgba(255, 255, 255, 1)
 	}
 
+	button {
+		@apply p-2 w-40 rounded-xl drop-shadow text-white;
+	}
+
 	#banner {
-		@apply  text-white text-center p-1 absolute top-0 left-0 right-0 rounded-t-xl;
+		@apply  text-white text-center p-1 absolute top-0 left-0 right-0;
 	}
 </style>

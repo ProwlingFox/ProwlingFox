@@ -44,7 +44,7 @@
 	})
 </script>
 
-<div id="container" class="hidden md:flex">
+<div id="container" class="hidden md:flex min-w-[20rem]">
 	<div
 		class="text-center p-2 text-xl font-medium text-white bg-amber-800">
 		My Applications

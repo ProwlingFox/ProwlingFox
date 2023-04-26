@@ -7,7 +7,7 @@
 
 </script>
 
-<div id="questions">
+<div class=" md:mx-4 lg:mx-0 lg:max-w-2xl bg-white my-4 sm:p-12 sm:rounded-xl shadow-xl relative lg:right-4 flex flex-col">
     <h2 class="w-full absolute top-0 text-center right-0 text-xl rounded-t-xl font-semibold p-4">Application Review</h2>
     {#each srcJob.questions as question }
         {#if question.type == "Text"}
@@ -45,13 +45,13 @@
 </div>
 
 <style lang="postcss">
-    #questions {
-        @apply bg-white max-w-2xl my-4 p-12 rounded-xl shadow-md relative right-4 flex flex-col;
-    }
-
     input, textarea, select{
         @apply border-solid border-2 border-gray-300 rounded-lg mb-2 pl-2;
     }
+
+    button {
+        @apply p-2 w-40 rounded-xl drop-shadow text-white;
+    } 
 
     input:focus, textarea:focus, select:focus{
         @apply border-gray-900;
