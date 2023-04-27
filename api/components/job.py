@@ -1,12 +1,5 @@
-from email.policy import strict
-import re
-import sys
 from typing import List
-from urllib import response
-from fastapi import HTTPException
-from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
-from pydantic import ValidationError
 
 import asyncio
 from components.user import User
@@ -109,6 +102,7 @@ class Job:
 		
 		# Save Application To DB
 		
+		
 		return 
 
 	def upsert_job(self, fieldsToUpdate):
@@ -135,5 +129,4 @@ class Job:
 				}
 			}, upsert=True)
 		return True
-	
 	

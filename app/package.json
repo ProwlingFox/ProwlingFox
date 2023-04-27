@@ -22,11 +22,11 @@
 		"prettier-plugin-svelte": "^2.10.0",
 		"svelte": "^3.44.0",
 		"svelte-check": "^2.7.1",
+		"svelte-multiselect": "^8.6.0",
 		"tailwindcss": "^3.1.5",
 		"tslib": "^2.3.1",
 		"typescript": "^4.9.5",
-		"vite": "^4.3.1",
-		"svelte-multiselect": "^8.6.0"
+		"vite": "^4.3.1"
 	},
 	"type": "module",
 	"dependencies": {
@@ -38,6 +38,7 @@
 		"flowbite": "^1.6.5",
 		"flowbite-svelte": "^0.34.9",
 		"jwt-decode": "^3.1.2",
-		"svelte-fa": "^3.0.3"
+		"svelte-fa": "^3.0.3",
+		"svelte-kit": "^1.2.0"
 	}
 }

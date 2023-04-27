@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Type, List, Any, Optional
+from typing import List, Any, Optional
 from enum import Enum
 
 from components.schemas.mongo import MongoBaseModel, ObjectId

@@ -22,12 +22,30 @@ class UserDataFields(BaseModel, extra=Extra.forbid):
     location: Optional[str]
     address: Optional[str]
     
-class UserJobPreferences(BaseModel, extra=Extra.forbid):
-    roles: list[str]
+class city(BaseModel):
+    city: str
+    region: Optional[str]
+    country: str
+
+class LocationCriteria(BaseModel):
+    can_relocate: bool
+    distance_km: int
+
+    remote_only: bool
+    allowed_countries: list[str]
+    city_preferences: Optional[list[city]]
+    strict_preferences: bool
+
+class Role(BaseModel):
+    role: str
     sector: str
-    locations: list[str]
-    remote: bool
-    salary: int
+
+# Todo: Add Blacklists
+class UserJobPreferences(BaseModel, extra=Extra.forbid):
+    roles: list[Role]
+    location: Optional[LocationCriteria]
+    min_salary: int
+
 
 class User(MongoBaseModel):
     name: str

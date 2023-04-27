@@ -10,6 +10,7 @@ class workableJobsniffer(baseJobsniffer):
 	jobsStack = []
 	jobOffset = 0
 	searchFilter = "Software"
+	locationFilter = "UK"
 
 	def __init__(self, config):
 		super().__init__(config)
@@ -126,7 +127,7 @@ class workableJobsniffer(baseJobsniffer):
 			"remote": False,
 			"offset":self.jobOffset,
 			"query":self.searchFilter,
-			"location": ""
+			"location": self.locationFilter
 			}
 		response = requests.request("GET", workableAPI + "jobs", params=querystring)
 		json = response.json()

@@ -1,5 +1,6 @@
-import asyncio
-from multiprocessing import process
+import json
+from pymongo import errors as MongoErrors
+
 import components.secrets as secrets
 secrets.init()
 
@@ -67,6 +68,34 @@ def preprocess_job(job: JobSchema.Job):
     j.preprocess_job()
     return
 
+def loadJobSniffer(jobSnifferName, forceLoad=False):
+	snifferData = secrets["sniffers"][jobSnifferName]
+
+	if not (forceLoad or snifferData["enabled"]) :
+		return False
+
+	try:
+		jsPlugin = __import__("JobsiteSniffers.%s" % jobSnifferName, globals(), locals(), [jobSnifferName], 0)
+		js = getattr(jsPlugin, jobSnifferName)
+		return js(secrets["sniffers"][jobSnifferName])
+	except Exception as e:
+		print("Error with %s Plugin" % (jobSnifferName))
+		return False
+
+def updateJobs(sniffer):
+    jobCounter = 0;
+
+    for job in sniffer:
+        try:
+            jobaiDB.jobs.insert_one(json.loads(job.json()))
+            jobCounter += 1
+            print(f"Inserted Job From {job.company.name} Into DB | Inserted {jobCounter}")
+        except MongoErrors.DuplicateKeyError:
+            print("Job Allready Existed")
+            continue;
+    return
+
+
 process_queue = {
     "application_processor": [],
     "job_preprocessor": []
@@ -78,49 +107,62 @@ process_functions = {
 }
 
 reset_processing()
-while True:
-    # Work Out What Tasks to do
-    # Tasks Include:
-    # - Loading More Jobs into the system
-    # - Pre-Resolving said jobs
-    job_to_preprocess_from_db = jobaiDB.jobs.find_one_and_update({
-        "job_processing": {"$ne": True},
-        "short_description": None
-    },{
-        '$set': {'job_processing': True}
-    })
 
-    if job_to_preprocess_from_db:
-        process_queue["job_preprocessor"].append( JobSchema.Job.parse_obj(job_to_preprocess_from_db) )
+jobSniiffers = [
+    loadJobSniffer("workableJobsniffer")
+]
+
+def main():
+    while True:
+        # Work Out What Tasks to do
+        # Tasks Include:
+        # - Loading More Jobs into the system
+
+        
+
+        # - Pre-Resolving said jobs
+        job_to_preprocess_from_db = jobaiDB.jobs.find_one_and_update({
+            "job_processing": {"$ne": True},
+            "short_description": None
+        },{
+            '$set': {'job_processing': True}
+        })
+
+        if job_to_preprocess_from_db:
+            process_queue["job_preprocessor"].append( JobSchema.Job.parse_obj(job_to_preprocess_from_db) )
+        
+
+        # - Answering Applications
+        application_from_db = jobaiDB.applications.find_one_and_update({
+            "application_requested": True,
+            "application_processing": False,
+            "application_processed": False,
+            "application_sent": False
+        },
+        {
+            '$set': {'application_processing': True}
+        })
+
+        if application_from_db:
+            process_queue["application_processor"].append( JobSchema.Application.parse_obj(application_from_db) )
+
+        # For now, just round robin things in the queue, rlly needs a balancer and to be made asyncio lol, tho rn we're being rate limited
+        for process_type in process_queue:
+            typed_process_queue = process_queue[process_type]
+            if (len(typed_process_queue) > 0):
+                process_functions[process_type](typed_process_queue.pop(0))
+
+
+        sleep(0.5)
+        print("Done One Round")
+        continue
+
     
 
-    # - Answering Applications
-    application_from_db = jobaiDB.applications.find_one_and_update({
-        "application_requested": True,
-        "application_processing": False,
-        "application_processed": False,
-        "application_sent": False
-    },
-    {
-        '$set': {'application_processing': True}
-    })
-
-    if application_from_db:
-        process_queue["application_processor"].append( JobSchema.Application.parse_obj(application_from_db) )
-
-    # For now, just round robin things in the queue, rlly needs a balancer and to be made asyncio lol, tho rn we're being rate limited
-    for process_type in process_queue:
-        typed_process_queue = process_queue[process_type]
-        if (len(typed_process_queue) > 0):
-            process_functions[process_type](typed_process_queue.pop(0))
-
-
-    sleep(0.5)
-    print("Done One Round")
-    continue
-
-    
-
-    
-
-    
+if __name__ == "__main__":
+	try:
+		main()
+	except KeyboardInterrupt:
+		print("Exiting Gracefully (Kbd Interrupt)...")
+	except Exception as e:
+		raise e

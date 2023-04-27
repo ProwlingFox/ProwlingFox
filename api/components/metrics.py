@@ -1,6 +1,5 @@
 from api import jobaiDB
 import components.schemas.job as JobSchema
-import openai
 
 class metrics:
     @staticmethod
