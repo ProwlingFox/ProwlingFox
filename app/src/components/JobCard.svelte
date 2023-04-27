@@ -79,7 +79,7 @@
 
 {#if visible}
 <div class="flex flex-col xl:flex-row w-full lg:w-auto">
-	<div class="bg-white p-4 md:px-12 sm:rounded-xl lg:left-2 sm:mx-4 lg:mx-0 lg:max-w-2xl sm:my-4 md:py-8 shadow-md relative z-10" out:send={{ key: srcJob._id }}>
+	<div class="bg-white pb-20 p-4 md:px-12 sm:rounded-xl lg:left-2 sm:mx-4 lg:mx-0 lg:max-w-2xl sm:my-4 md:py-8 shadow-md relative z-10" out:send={{ key: srcJob._id }}>
 		{#if relatedApplication?.application_processed}
 			<div id="banner" class="bg-green-400 sm:rounded-t-xl">
 				Application Ready For Review
