@@ -9,3 +9,5 @@ secrets.json
 logs/*
 __pycache__/
 resume.*
+
+test.py

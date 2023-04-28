@@ -25,6 +25,7 @@ openai.api_key = secrets["OpenAISecret"]
 # Schema/Typing Imports
 from typing import Iterator, List
 import schemas.job as JobSchema
+import schemas.user as UserSchema
 from schemas.configurations import Role
 
 def reset_processing():
@@ -128,6 +129,20 @@ def fillRoleEmbeddings():
             print("inserted", line)
     return
 
+def fillQuestionEmbeddings():
+    jobaiDB.predefinedQuestions.delete_many({})
+    predefined_variables = UserSchema.UserDataFields.__fields__.keys()
+
+    for predefined_variable in predefined_variables:
+        embeding = AnsweringEngine.getEmbedding(predefined_variable, "GeneratePredefinedVariableEmbedings")
+
+        jobaiDB.predefined_variables.insert_one({
+            "variable_name": predefined_variable,
+            "embeding": embeding
+        })
+        print("inserted", predefined_variable)
+    return
+
 def getRoleEmbeddings() -> List[Role]:
     return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
 
@@ -199,6 +214,7 @@ if __name__ == "__main__":
     try:
         reset_processing()
         # fillRoleEmbeddings()
+        # fillQuestionEmbeddings()
         main()
     except KeyboardInterrupt:
         print("Exiting Gracefully (Kbd Interrupt)...")
