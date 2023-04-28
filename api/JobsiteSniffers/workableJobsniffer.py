@@ -3,6 +3,8 @@ from datetime import datetime
 import html2text
 from JobsiteSniffers.baseJobsniffer import baseJobsniffer
 import schemas.job as JobSchema
+from schemas.configurations import City
+
 
 workableAPI = "https://jobs.workable.com/api/v1/"
 
@@ -56,7 +58,7 @@ class workableJobsniffer(baseJobsniffer):
 			remote = "TELECOMMUTE" in rawJob["locations"],
 			skills = ["Python"],
 			status = JobSchema.Status.ACTIVE,
-			location = "{city}, {subregion}, {countryName}".format(**rawJob["location"]),
+			location = City(city=rawJob["location"]["city"], region=rawJob["location"]["subregion"], country=rawJob["location"]["countryName"]),
 			listing = self.generateJobListing(rawJob),
 			questions = self.getQuestions(rawJob),
 		)

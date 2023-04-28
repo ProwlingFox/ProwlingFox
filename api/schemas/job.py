@@ -56,7 +56,7 @@ class JobSimplified(MongoBaseModel):
     role_description: Optional[str]
     requirements: Optional[List[str]]
     key_points: Optional[List[str]]
-    location: str # Location, If Possible in "City, State, Country" format, more accurate location can be discarded or moved to raw data
+    location: City # Location
     salary: Optional[str] # A Salary If Possible, Either one number or a range ( min - max ) i.e "10000 - 14000"
     salary_currency: Optional[str]
     remote: Optional[bool]
