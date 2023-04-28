@@ -79,4 +79,5 @@ class Application(MongoBaseModel):
     application_requested: Optional[bool]
     application_processing: Optional[bool]
     application_processed: Optional[bool]
+    application_reviewed: Optional[bool]
     application_sent: Optional[bool]

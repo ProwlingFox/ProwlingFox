@@ -9,6 +9,7 @@ workableAPI = "https://jobs.workable.com/api/v1/"
 class workableJobsniffer(baseJobsniffer):
 	jobsStack = []
 	jobOffset = 0
+	duplicate_entries = 0
 	searchFilter = "Software"
 	locationFilter = "UK"
 
@@ -200,6 +201,4 @@ class workableJobsniffer(baseJobsniffer):
 {('REQUIREMENTS:' + h.handle(rawJob["requirementsSection"])) if rawJob["requirementsSection"] else ""}
 
 {('BENIFITS:' + h.handle(rawJob["benefitsSection"])) if rawJob["benefitsSection"] else ""}
-
 """
-

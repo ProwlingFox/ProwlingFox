@@ -23,7 +23,7 @@ from components.user import User
 openai.api_key = secrets["OpenAISecret"]
 
 # Schema/Typing Imports
-from typing import List
+from typing import Iterator, List
 import schemas.job as JobSchema
 from schemas.configurations import Role
 
@@ -91,19 +91,15 @@ def loadJobSniffer(jobSnifferName, forceLoad=False):
 		return js(secrets["sniffers"][jobSnifferName])
 	except Exception as e:
 		print("Error with %s Plugin" % (jobSnifferName))
-		return False
+		raise
 
-def updateJobs(sniffer):
-    jobCounter = 0;
-
-    for job in sniffer:
-        try:
-            jobaiDB.jobs.insert_one(json.loads(job.json()))
-            jobCounter += 1
-            print(f"Inserted Job From {job.company.name} Into DB | Inserted {jobCounter}")
-        except MongoErrors.DuplicateKeyError:
-            print("Job Allready Existed")
-            continue;
+def updateOneJob(snifferIter: Iterator ):
+    try:
+        job = JobSchema.Job.parse_obj(next(snifferIter))
+        resp = jobaiDB.jobs.insert_one(job.dict())
+        print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
+    except MongoErrors.DuplicateKeyError:
+        print("Job Allready Existed")
     return
 
 def fillRoleEmbeddings():
@@ -135,6 +131,8 @@ def fillRoleEmbeddings():
 def getRoleEmbeddings() -> List[Role]:
     return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
 
+
+
 process_queue = {
     "application_processor": [],
     "job_preprocessor": []
@@ -145,8 +143,8 @@ process_functions = {
     "application_processor": solve_application
 }
 
-jobSniiffers = [
-    loadJobSniffer("workableJobsniffer")
+jobSniifferIters = [
+    iter(loadJobSniffer("workableJobsniffer"))
 ]
 
 # Load into memory to prevent expensive db calls, (Eventually lets implement a vector DB)
@@ -157,8 +155,8 @@ def main():
         # Work Out What Tasks to do
         # Tasks Include:
         # - Loading More Jobs into the system
-
-        
+        for jobSnifferIter in jobSniifferIters:
+            updateOneJob(jobSnifferIter)
 
         # - Pre-Resolving said jobs
         job_to_preprocess_from_db = jobaiDB.jobs.find_one_and_update({
