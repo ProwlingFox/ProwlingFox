@@ -16,6 +16,7 @@ export async function popNextJobID() {
 		return id
 	} else {
 		const newJobs: Job[] = await get('/jobs')
+		if (!newJobs.length) return null
 		jobQueue.set(newJobs.map((j) => j._id))
 		const id = getStore(jobQueue)[0]
 		jobQueue.update((x) => x.splice(1))
@@ -26,7 +27,9 @@ export async function popNextJobID() {
 async function refreshApplications(buypassCheck: boolean = false) {
 	if (!buypassCheck) {
 		// Checks to see if applications could change state, if not doesn't send a needless web request
-		let moveableStates = getStore(applications).applications.some(x => !x.application_processed)
+		let moveableStates = getStore(applications).applications.some(
+			(x) => !x.application_processed
+		)
 		if (!moveableStates) {
 			return
 		}
@@ -43,10 +46,9 @@ async function refreshApplications(buypassCheck: boolean = false) {
 	})
 }
 
-if(browser) {
-	var intervalId = window.setInterval(refreshApplications, 10000);
+if (browser) {
+	var intervalId = window.setInterval(refreshApplications, 10000)
 }
-
 
 export const applications = writable<ApplicationStore>({
 	applications: [],

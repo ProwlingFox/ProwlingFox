@@ -50,7 +50,7 @@ def solve_application():
 
     if not application_from_db:
          return
-    
+
     application = JobSchema.Application.parse_obj(application_from_db)
 
     job = Job(application.job_id).get_details()
@@ -129,7 +129,7 @@ def fillRoleEmbeddings():
     jobaiDB.roles.delete_many({})
     with open("roleslist.md") as roles_list:
         current_sector = "Misc."
-        
+
         while True:
             line = roles_list.readline().removesuffix('\n')
             if not line:
@@ -140,7 +140,7 @@ def fillRoleEmbeddings():
                 continue
 
             embeding = AnsweringEngine.getEmbedding(current_sector + " " + line, "GenerateRoleEmbedings")
-            
+
             role = Role(
                 role=line,
                 sector=current_sector,
@@ -189,7 +189,7 @@ def main():
         solve_application
     ]
 
-    while True:   
+    while True:
         # For now, just round robin things in the queue, rlly needs a balancer and to be made asyncio lol, tho rn we're being rate limited
         for process_function in process_functions:
             process_function()

@@ -25,12 +25,12 @@ def get_job_reccomendations(req: Request) -> List[JobSchema.JobSimplified]:
 def get_job_details(job_id: str) -> JobSchema.Job:
 	j = Job(job_id)
 	return j.get_details()
-	
+
 
 # Mark A Job As Read
 class mark_as_read(BaseModel):
 	requestApply: bool
-	
+
 
 @router.post("/jobs/{job_id}/mark")
 @access_level("Candidate")
@@ -41,18 +41,18 @@ def mark_as_read(req: Request, job_id: str, m: mark_as_read):
 
 
 # Apply To A Job
-    
+
 class apply_to_job(BaseModel):
 	responses: Any
 
 @router.post("/jobs/{job_id}/apply")
 @access_level("Candidate")
-def get_job_details(req: Request, job_id: str, a: apply_to_job):
+def apply_to_job(req: Request, job_id: str, a: apply_to_job):
 	j = Job(job_id)
 	u = User(req.state.user_id)
 	return j.apply_to_role(u, a.responses)
 
 @router.get("/roles")
 @access_level("Candidate")
-def get_job_details():
+def get_roles():
 	return metrics.getRoles()

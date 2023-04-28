@@ -32,6 +32,8 @@
 				highlightMatches={false}
 				liSelectedClass="hidden"
 				allowEmpty={true}
+				placeholder="Fullstack Developer"
+				createOptionMsg="Add role"
 				allowUserOptions="append" />
 		</Label>
 	</div>
@@ -57,7 +59,7 @@
 
 	:global(div.multiselect > ul > input::placeholder) {
 		padding: 0 !important;
-		color: rgb(17 24 39) !important;
+		color: #666 !important;
 	}
 
 	:global(div.multiselect > svg) {
