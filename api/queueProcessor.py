@@ -6,13 +6,8 @@ from time import sleep
 from pymongo import errors as MongoErrors
 
 # Initiialisation Imports
-import components.secrets as s
-s.init()
-secrets = s.secrets
-
-import components.db as db
-db.init()
-jobaiDB = db.jobaiDB
+from components.secrets import secrets
+from components.db import prowling_fox_db as jobaiDB
 
 # Class Imports
 from components.answeringEngine import AnsweringEngine
@@ -42,7 +37,22 @@ def reset_processing():
     })
     return
 
-def solve_application(application: JobSchema.Application):
+def solve_application():
+    application_from_db = jobaiDB.applications.find_one_and_update({
+        "application_requested": True,
+        "application_processing": False,
+        "application_processed": False,
+        "application_sent": False
+    },
+    {
+        '$set': {'application_processing': True}
+    })
+
+    if not application_from_db:
+         return
+    
+    application = JobSchema.Application.parse_obj(application_from_db)
+
     job = Job(application.job_id).get_details()
     user = User(application.user_id).get_info()
 
@@ -73,7 +83,19 @@ def solve_application(application: JobSchema.Application):
     })
     return
 
-def preprocess_job(job: JobSchema.Job):
+def preprocess_job():
+    job_to_preprocess_from_db = jobaiDB.jobs.find_one_and_update({
+        "job_processing": {"$ne": True},
+        "short_description": None
+    },{
+        '$set': {'job_processing': True}
+    })
+
+    if not job_to_preprocess_from_db:
+        return
+
+    job = JobSchema.Job.parse_obj(job_to_preprocess_from_db)
+
     global role_embeddings
     j = Job(job.id)
     print("preprocessing job: ", job.id)
@@ -146,17 +168,12 @@ def fillQuestionEmbeddings():
 def getRoleEmbeddings() -> List[Role]:
     return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
 
+def get_jobs():
+    for jobSnifferIter in jobSniifferIters:
+        updateOneJob(jobSnifferIter)
+    return
 
 
-process_queue = {
-    "application_processor": [],
-    "job_preprocessor": []
-}
-
-process_functions = {
-    "job_preprocessor": preprocess_job,
-    "application_processor": solve_application
-}
 
 jobSniifferIters = [
     iter(loadJobSniffer("workableJobsniffer"))
@@ -166,46 +183,16 @@ jobSniifferIters = [
 role_embeddings=getRoleEmbeddings()
 
 def main():
-    while True:
-        # Work Out What Tasks to do
-        # Tasks Include:
-        # - Loading More Jobs into the system
-        for jobSnifferIter in jobSniifferIters:
-            updateOneJob(jobSnifferIter)
+    process_functions = [
+        get_jobs,
+        preprocess_job,
+        solve_application
+    ]
 
-        # - Pre-Resolving said jobs
-        job_to_preprocess_from_db = jobaiDB.jobs.find_one_and_update({
-            "job_processing": {"$ne": True},
-            "short_description": None
-        },{
-            '$set': {'job_processing': True}
-        })
-
-        if job_to_preprocess_from_db:
-            process_queue["job_preprocessor"].append( JobSchema.Job.parse_obj(job_to_preprocess_from_db) )
-        
-
-        # - Answering Applications
-        application_from_db = jobaiDB.applications.find_one_and_update({
-            "application_requested": True,
-            "application_processing": False,
-            "application_processed": False,
-            "application_sent": False
-        },
-        {
-            '$set': {'application_processing': True}
-        })
-
-        if application_from_db:
-            process_queue["application_processor"].append( JobSchema.Application.parse_obj(application_from_db) )
-
+    while True:   
         # For now, just round robin things in the queue, rlly needs a balancer and to be made asyncio lol, tho rn we're being rate limited
-        for process_type in process_queue:
-            typed_process_queue = process_queue[process_type]
-            if (len(typed_process_queue) > 0):
-                process_functions[process_type](typed_process_queue.pop(0))
-
-
+        for process_function in process_functions:
+            process_function()
         sleep(0.5)
         print("Done One Round")
         continue

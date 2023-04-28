@@ -1,10 +1,4 @@
-import components.secrets as secrets
-secrets.init()
-
-# Initialise DB
-import components.db as db
-db.init()
-jobaiDB = db.jobaiDB
+from components.db import prowling_fox_db as jobaiDB
 
 # FAST API
 

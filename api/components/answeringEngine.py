@@ -3,8 +3,8 @@ from typing import List
 from numpy import dot, void
 from numpy.linalg import norm
 import openai
-import components.secrets as secrets
-openai.api_key = secrets.secrets["OpenAISecret"]
+from components.secrets import secrets
+openai.api_key = secrets["OpenAISecret"]
 
 import schemas.job as JobSchema
 import schemas.user as UserSchema
@@ -73,8 +73,8 @@ class AnsweringEngine:
 					model="text-embedding-ada-002"
 				)
 
-				from components.db import jobaiDB
-				jobaiDB.request_log.insert_one({
+				from components.db import prowling_fox_db as jobaiDB
+				jobaiDB.openai_request_log.insert_one({
 					"sent_ts": sent_timestamp_ms,
 					"model": model,
 					"success": True,
@@ -106,8 +106,8 @@ class AnsweringEngine:
 			)
 			answer = response["choices"][0]["text"].lstrip('\n')
 
-			from components.db import jobaiDB
-			jobaiDB.request_log.insert_one({
+			from components.db import prowling_fox_db as jobaiDB
+			jobaiDB.openai_request_log.insert_one({
 				"sent_ts": sent_timestamp_ms,
 				"model": model,
 				"success": True,
@@ -141,7 +141,7 @@ class AnsweringEngine:
 				)
 				answer = response["choices"][0]["message"]["content"]
 
-				from components.db import jobaiDB
+				from components.db import prowling_fox_db as jobaiDB
 				jobaiDB.openai_request_log.insert_one({
 					"sent_ts": sent_timestamp_ms,
 					"model": model,

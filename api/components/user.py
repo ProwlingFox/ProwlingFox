@@ -37,7 +37,7 @@ class User:
 
 		print(u)
 
-		from components.db import jobaiDB
+		from components.db import prowling_fox_db as jobaiDB
 		try:
 			update_response = jobaiDB.users.update_one({"_id":self.user_id}, {"$set": u.flatten_dict()})
 			return {'success': True}
