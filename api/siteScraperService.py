@@ -3,7 +3,7 @@ from pprint import pprint
 import traceback
 from pymongo import MongoClient
 from pymongo import errors as MongoErrors
-import components.schemas.job as JobSchema
+import schemas.job as JobSchema
 
 #Load Secret keys
 fSecrets = open("secrets.json", "r")

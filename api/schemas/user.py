@@ -2,8 +2,8 @@ from pydantic import BaseModel, Extra, validator
 from typing import Type, List, Any, Optional
 from enum import Enum
 
-from components.schemas.mongo import MongoBaseModel
-from components.schemas.configurations import City, Role
+from schemas.mongo import MongoBaseModel
+from schemas.configurations import City, Role
 
 class UserRoles(str, Enum):
     ADMIN = "admin"

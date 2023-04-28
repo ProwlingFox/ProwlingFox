@@ -1,5 +1,5 @@
 from api import jobaiDB
-import components.schemas.job as JobSchema
+import schemas.job as JobSchema
 
 class metrics:
     @staticmethod

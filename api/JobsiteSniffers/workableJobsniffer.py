@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 import html2text
 from JobsiteSniffers.baseJobsniffer import baseJobsniffer
-import components.schemas.job as JobSchema
+import schemas.job as JobSchema
 
 workableAPI = "https://jobs.workable.com/api/v1/"
 

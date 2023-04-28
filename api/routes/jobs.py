@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from components.authentication import access_level
 
-import components.schemas.job as JobSchema
+import schemas.job as JobSchema
 
 from components.user import User
 from components.job import Job

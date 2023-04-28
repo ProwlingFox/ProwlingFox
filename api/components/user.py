@@ -1,7 +1,7 @@
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
-import components.schemas.job as JobSchema
-import components.schemas.user as UserSchema
+import schemas.job as JobSchema
+import schemas.user as UserSchema
 
 
 MIN_PASSWORD_LENGTH = 8

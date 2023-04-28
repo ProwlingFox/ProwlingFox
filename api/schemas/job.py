@@ -2,8 +2,8 @@ from pydantic import BaseModel
 from typing import List, Any, Optional
 from enum import Enum
 
-from components.schemas.mongo import MongoBaseModel, ObjectId
-from components.schemas.configurations import City
+from schemas.mongo import MongoBaseModel, ObjectId
+from schemas.configurations import City
 
 class Status(str, Enum):
     ACTIVE = "Active"

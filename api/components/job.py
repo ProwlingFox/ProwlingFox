@@ -1,10 +1,10 @@
 from typing import List
 from bson.objectid import ObjectId
 
-from components.schemas.configurations import Role
+from schemas.configurations import Role
 from components.user import User
-import components.schemas.job as JobSchema
-import components.schemas.user as UserSchema
+import schemas.job as JobSchema
+import schemas.user as UserSchema
 from components.answeringEngine import AnsweringEngine
 
 class Job:

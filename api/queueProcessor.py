@@ -24,8 +24,8 @@ openai.api_key = secrets["OpenAISecret"]
 
 # Schema/Typing Imports
 from typing import List
-import components.schemas.job as JobSchema
-from components.schemas.configurations import Role
+import schemas.job as JobSchema
+from schemas.configurations import Role
 
 def reset_processing():
     # update all records, mark them as not currently being processed

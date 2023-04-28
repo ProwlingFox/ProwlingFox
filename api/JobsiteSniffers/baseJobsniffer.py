@@ -1,4 +1,4 @@
-from components.schemas.job import *
+from schemas.job import *
 
 # Must return an itterator when called for that returns a new job, defined above.
 # Must implement the apply function that takes a job and applys to it

@@ -6,8 +6,8 @@ import openai
 import components.secrets as secrets
 openai.api_key = secrets.secrets["OpenAISecret"]
 
-import components.schemas.job as JobSchema
-import components.schemas.user as UserSchema
+import schemas.job as JobSchema
+import schemas.user as UserSchema
 
 from datetime import datetime
 

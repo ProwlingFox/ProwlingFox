@@ -4,7 +4,7 @@ from typing import Type, List
 
 from components import authentication
 from components.user import User
-import components.schemas.user as UserSchema
+import schemas.user as UserSchema
 
 router = APIRouter(tags=["User"])
 
