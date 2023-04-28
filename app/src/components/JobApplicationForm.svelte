@@ -1,9 +1,18 @@
 <script lang="ts">
 	import type { Application as JobApplication } from "$interfaces/application"
 	import type { Job } from "$interfaces/job"
+	import { post } from "$lib/requestUtils"
 
-    export let srcApplication: JobApplication | undefined
+    export let srcApplication: JobApplication
     export let srcJob: Job
+
+    async function sendApplication() {
+        console.log(srcApplication.responses)
+        const resp = await post(`/jobs/${srcJob._id}/apply`, {
+            responses: srcApplication.responses
+        })
+        console.log(resp)
+    }
 
 </script>
 
@@ -12,16 +21,16 @@
     {#each srcJob.questions as question }
         {#if question.type == "Text"}
             <label for={question.id}>{question.content}</label>
-            <input id={question.id} value={ srcApplication?.responses[question.id] || '' }/>
+            <input id={question.id} bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "LongText"}
             <label for={question.id}>{question.content}</label>
-            <textarea id={question.id} rows="8" value={srcApplication?.responses[question.id] || ''}/>
+            <textarea id={question.id} rows="8" bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "Number"}
             <label for={question.id}>{question.content}</label>
-            <input id={question.id} type="number" value={srcApplication?.responses[question.id] || ''}/>
+            <input id={question.id} type="number" bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "MultipleChoice" && question.choices}
             <label for={question.id}>{question.content}</label>
-            <select id={question.id}>
+            <select id={question.id} bind:value={srcApplication.responses[question.id]}>
                 {#each question.choices as choice}
                     <option value={choice.id}>{choice.content}</option>
                 {/each}
@@ -29,19 +38,19 @@
             <!-- <input  value={srcApplication?.responses[question.id] || ''}/> -->
         {:else if question.type == "Date"}
             <label for={question.id}>{question.content}</label>
-            <input id={question.id} type="date" value={srcApplication?.responses[question.id] || ''}/>
+            <input id={question.id} type="date" bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "File"}
             <label for={question.id}>{question.content}</label>
-            <input id={question.id} type="file"/>
+            <input id={question.id} bind:value={srcApplication.responses[question.id]} type="file"/>
         {:else if question.type == "CheckBox"}
             <label for={question.id}>{question.content}</label>
-            <input id={question.id} type="checkbox" value={srcApplication?.responses[question.id] || ''}/>
+            <input id={question.id} type="checkbox" bind:checked={srcApplication.responses[question.id]}/>
         {:else if question.type == "Radio"}
             <label for={question.id}>{question.content} (Radio)</label>
-            <input id={question.id} value={srcApplication?.responses[question.id] || ''}/>
+            <input id={question.id} bind:value={srcApplication.responses[question.id]}/>
         {/if}
     {/each}
-    <button class="bg-green-400 self-end">Send Application</button>
+    <button on:click={sendApplication} class="bg-green-400 self-end">Send Application</button>
 </div>
 
 <style lang="postcss">

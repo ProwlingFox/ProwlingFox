@@ -40,15 +40,13 @@ def mark_as_read(req: Request, job_id: str, m: mark_as_read):
 
 
 # Apply To A Job
-class Response(BaseModel):
-    id: str
-    response: Any
     
 class apply_to_job(BaseModel):
-	responses: List[Response]
+	responses: Any
 
 @router.post("/jobs/{job_id}/apply")
 @access_level("Candidate")
-def get_job_details(job_id: str, a: apply_to_job):
+def get_job_details(req: Request, job_id: str, a: apply_to_job):
 	j = Job(job_id)
-	return j.apply_to_role(a.responses)
+	u = User(req.state.user_id)
+	return j.apply_to_role(u, a.responses)

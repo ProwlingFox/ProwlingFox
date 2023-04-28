@@ -6,6 +6,7 @@ from components.user import User
 import schemas.job as JobSchema
 import schemas.user as UserSchema
 from components.answeringEngine import AnsweringEngine
+from components.db import prowling_fox_db
 
 class Job:
 	job_data: JobSchema.Job = None
@@ -107,35 +108,51 @@ class Job:
 	def get_details(self) -> JobSchema.Job:
 		if self.job_data:
 			return self.job_data
-		
-		from api import jobaiDB
-		
-		job_from_db = jobaiDB.jobs.find_one({"_id": self.id})
+				
+		job_from_db = prowling_fox_db.jobs.find_one({"_id": self.id})
 		job = JobSchema.Job.parse_obj(job_from_db)
 		self.job_data = job
 
 		return job
 
-	def apply_to_role(self, questionResponses):
-		print(questionResponses)
+	def apply_to_role(self, user: UserSchema.User, raw_question_responses):
 		# Validate Responses
+		job = self.get_details()
 		
+		errors = {
+			"missingResponse": [],
+			"invalidType": []
+		}
+
+		question_responses = {}
+
+		for question in job.questions:
+			if question.required and (not raw_question_responses[question.id]):
+				errors["missingResponse"].append(question.id)
+
+			question_responses["responses." + question.id] = raw_question_responses[question.id]
+
+		question_responses["application_reviewed"] = True
+
 		# Save Application To DB
-		
+		prowling_fox_db.applications.update_one({
+			"job_id": job.id,
+			"user_id": user.user_id
+		},{
+			"$set": question_responses,
+		})
 		
 		return 
 
 	def upsert_job(self, fieldsToUpdate):
-		from api import jobaiDB
-		update_response = jobaiDB.jobs.update_one(
+		update_response = prowling_fox_db.jobs.update_one(
 			{"_id":self.id}, 
 			{"$set": fieldsToUpdate}
 		, upsert=True)
 		return
 
 	def mark_role_as_read(self, user: User, requestApply: bool = False):
-		from api import jobaiDB
-		jobaiDB.applications.update_one(
+		prowling_fox_db.applications.update_one(
 			{
 				"job_id":self.id,
 				"user_id":ObjectId(user.user_id),
