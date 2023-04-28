@@ -49,35 +49,69 @@ class User:
 		from api import jobaiDB
 		# jobs_from_db = jobaiDB.jobs.find({}, limit=10)
 		jobs_from_db = jobaiDB.jobs.aggregate([
-			{
-				'$match': {
-					'short_description': {
-						"$ne": None
-					}
-				}
-			},
-			{
-				'$lookup': {
-					'from': 'applications',
-					'localField': '_id',
-					'foreignField': 'job_id',
-					'as': 'matched_docs'
-				}
-			}, {
-				'$match': {
-					'matched_docs': {
-						'$not': {
-							'$elemMatch': {
-								'user_id': self.user_id
+		{
+			'$lookup': {
+				'from': 'users', 
+				'let': {
+					'user_id': ObjectId('6430601e2fe5a4859e58ce0e')
+				}, 
+				'pipeline': [
+					{
+						'$match': {
+							'$expr': {
+								'$eq': [
+									'$_id', '$$user_id'
+								]
 							}
 						}
+					}, {
+						'$project': {
+							'roles': '$job_preferences.roles.role'
+						}
 					}
+				], 
+				'as': 'user'
+			}
+		}, {
+			'$unwind': {
+				'path': '$user'
+			}
+		}, {
+			'$match': {
+				'$expr': {
+					'$in': [
+						'$role_category', '$user.roles'
+					]
 				}
-			}, {
-				"$sort": {"_id": -1}
-			},
-			{ "$limit" : 10 }
-		])
+			}
+		}, {
+			'$lookup': {
+				'from': 'applications', 
+				'localField': '_id', 
+				'foreignField': 'job_id', 
+				'as': 'matched_docs'
+			}
+		}, {
+			'$match': {
+				'matched_docs': {
+					'$not': {
+						'$elemMatch': {
+							'user_id': ObjectId('6430601e2fe5a4859e58ce0e')
+						}
+					}
+				}, 
+				'short_description': {
+					'$ne': None
+				}
+			}
+		}, {
+			'$sort': {
+				'_id': -1
+			}
+		}, {
+			'$limit': 10
+		}
+	])
 
 		jobs = [];
 
