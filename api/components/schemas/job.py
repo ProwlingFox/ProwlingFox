@@ -3,6 +3,7 @@ from typing import List, Any, Optional
 from enum import Enum
 
 from components.schemas.mongo import MongoBaseModel, ObjectId
+from components.schemas.configurations import City
 
 class Status(str, Enum):
     ACTIVE = "Active"
@@ -59,7 +60,8 @@ class JobSimplified(MongoBaseModel):
     salary: Optional[str] # A Salary If Possible, Either one number or a range ( min - max ) i.e "10000 - 14000"
     salary_currency: Optional[str]
     remote: Optional[bool]
-    role_category: str # Category i.e. IT from a preset selection (TBD), likely to be automated
+    role_category: Optional[str] # Role from a preset selection
+    sector_category: Optional[str] # Sector from a preset selection
     skills: List[str] # Skills i.e. Python, Swimming from a preset selection (TBD), likely to be automated
     status: Status
 

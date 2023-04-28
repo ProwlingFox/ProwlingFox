@@ -15,7 +15,7 @@
             <input id={question.id} value={ srcApplication?.responses[question.id] || '' }/>
         {:else if question.type == "LongText"}
             <label for={question.id}>{question.content}</label>
-            <textarea id={question.id} value={srcApplication?.responses[question.id] || ''}/>
+            <textarea id={question.id} rows="8" value={srcApplication?.responses[question.id] || ''}/>
         {:else if question.type == "Number"}
             <label for={question.id}>{question.content}</label>
             <input id={question.id} type="number" value={srcApplication?.responses[question.id] || ''}/>

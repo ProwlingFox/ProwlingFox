@@ -52,7 +52,6 @@ class workableJobsniffer(baseJobsniffer):
 			created_ts= epoch_time,
 			company = company,
 			role = rawJob["title"],
-			role_category = "Software",
 			remote = "TELECOMMUTE" in rawJob["locations"],
 			skills = ["Python"],
 			status = JobSchema.Status.ACTIVE,
@@ -200,7 +199,7 @@ class workableJobsniffer(baseJobsniffer):
 
 {('REQUIREMENTS:' + h.handle(rawJob["requirementsSection"])) if rawJob["requirementsSection"] else ""}
 
-Application
-============
+{('BENIFITS:' + h.handle(rawJob["benefitsSection"])) if rawJob["benefitsSection"] else ""}
+
 """
 

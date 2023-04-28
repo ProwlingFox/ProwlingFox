@@ -1,21 +1,31 @@
-import json
-from pymongo import errors as MongoErrors
-
-import components.secrets as secrets
-secrets.init()
-
+# 3rd Party Imports
+import json, openai
 from time import sleep
 
-from components.answeringEngine import AnsweringEngine
-from components.job import Job
-from components.user import User
+# Error Handling Imports
+from pymongo import errors as MongoErrors
 
-#initialise DB
+# Initiialisation Imports
+import components.secrets as s
+s.init()
+secrets = s.secrets
+
 import components.db as db
 db.init()
 jobaiDB = db.jobaiDB
 
+# Class Imports
+from components.answeringEngine import AnsweringEngine
+from components.job import Job
+from components.user import User
+
+# Configuration
+openai.api_key = secrets["OpenAISecret"]
+
+# Schema/Typing Imports
+from typing import List
 import components.schemas.job as JobSchema
+from components.schemas.configurations import Role
 
 def reset_processing():
     # update all records, mark them as not currently being processed
@@ -63,9 +73,10 @@ def solve_application(application: JobSchema.Application):
     return
 
 def preprocess_job(job: JobSchema.Job):
+    global role_embeddings
     j = Job(job.id)
     print("preprocessing job: ", job.id)
-    j.preprocess_job()
+    j.preprocess_job(role_embeddings)
     return
 
 def loadJobSniffer(jobSnifferName, forceLoad=False):
@@ -95,6 +106,34 @@ def updateJobs(sniffer):
             continue;
     return
 
+def fillRoleEmbeddings():
+    jobaiDB.roles.delete_many({})
+    with open("roleslist.md") as roles_list:
+        current_sector = "Misc."
+        
+        while True:
+            line = roles_list.readline().removesuffix('\n')
+            if not line:
+                break
+
+            if line.startswith("#"):
+                current_sector = line.removeprefix("# ")
+                continue
+
+            embeding = AnsweringEngine.getEmbedding(current_sector + " " + line, "GenerateRoleEmbedings")
+            
+            role = Role(
+                role=line,
+                sector=current_sector,
+                embedding=embeding
+            )
+
+            jobaiDB.roles.insert_one(role.dict())
+            print("inserted", line)
+    return
+
+def getRoleEmbeddings() -> List[Role]:
+    return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
 
 process_queue = {
     "application_processor": [],
@@ -106,11 +145,12 @@ process_functions = {
     "application_processor": solve_application
 }
 
-reset_processing()
-
 jobSniiffers = [
     loadJobSniffer("workableJobsniffer")
 ]
+
+# Load into memory to prevent expensive db calls, (Eventually lets implement a vector DB)
+role_embeddings=getRoleEmbeddings()
 
 def main():
     while True:
@@ -157,12 +197,12 @@ def main():
         print("Done One Round")
         continue
 
-    
-
 if __name__ == "__main__":
-	try:
-		main()
-	except KeyboardInterrupt:
-		print("Exiting Gracefully (Kbd Interrupt)...")
-	except Exception as e:
-		raise e
+    try:
+        reset_processing()
+        # fillRoleEmbeddings()
+        main()
+    except KeyboardInterrupt:
+        print("Exiting Gracefully (Kbd Interrupt)...")
+    except Exception as e:
+        raise e

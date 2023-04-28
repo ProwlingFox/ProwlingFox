@@ -3,6 +3,7 @@ from typing import Type, List, Any, Optional
 from enum import Enum
 
 from components.schemas.mongo import MongoBaseModel
+from components.schemas.configurations import City, Role
 
 class UserRoles(str, Enum):
     ADMIN = "admin"
@@ -21,11 +22,6 @@ class UserDataFields(BaseModel, extra=Extra.forbid):
     expected_sallary: Optional[int]
     location: Optional[str]
     address: Optional[str]
-    
-class city(BaseModel):
-    city: str
-    region: Optional[str]
-    country: str
 
 class LocationCriteria(BaseModel):
     can_relocate: bool
@@ -33,18 +29,14 @@ class LocationCriteria(BaseModel):
 
     remote_only: bool
     allowed_countries: list[str]
-    city_preferences: Optional[list[city]]
+    city_preferences: Optional[list[City]]
     strict_preferences: bool
-
-class Role(BaseModel):
-    role: str
-    sector: str
 
 # Todo: Add Blacklists
 class UserJobPreferences(BaseModel, extra=Extra.forbid):
-    roles: list[Role]
+    roles: Optional[list[Role]]
     location: Optional[LocationCriteria]
-    min_salary: int
+    min_salary: Optional[int]
 
 
 class User(MongoBaseModel):

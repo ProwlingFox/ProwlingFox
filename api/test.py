@@ -20,10 +20,6 @@ class Role(BaseModel):
     role: str
     embedding: List[float]
 
-class Sector(BaseModel):
-    sector: str
-    roles: List[Role]
-    embedding: List[float]
 
 
 # Warning, This will remove all existing embeds

@@ -1,4 +1,7 @@
 from time import sleep
+from typing import List
+from numpy import dot, void
+from numpy.linalg import norm
 import openai
 import components.secrets as secrets
 openai.api_key = secrets.secrets["OpenAISecret"]
@@ -10,19 +13,7 @@ from datetime import datetime
 
 class AnsweringEngine:
 
-	@staticmethod
-	def promptGenerator(promptName, variableDict):
-		with open('prompts/'+promptName, 'r') as f:
-			rawPrompt = f.read()
-
-		variableNames = set(var.split('}}')[0] for var in rawPrompt.split('{{') if '}}' in var)
-
-		text = rawPrompt
-		for variableName in variableNames:
-			if variableName in variableDict:
-				text = text.replace('{{' + variableName + '}}', variableDict[variableName])
-		return text
-
+	# Should Probable be moved out of this class
 	@staticmethod
 	def answer_question(job: JobSchema.Job, user: UserSchema.User, question: JobSchema.Question):
 
@@ -58,7 +49,53 @@ class AnsweringEngine:
 		return string
 
 	@staticmethod
-	def sendCompletionPrompt(prompt, note=None, tokens = 1024)-> str:
+	def promptGenerator(promptName, variableDict):
+		with open('prompts/'+promptName, 'r') as f:
+			rawPrompt = f.read()
+
+		variableNames = set(var.split('}}')[0] for var in rawPrompt.split('{{') if '}}' in var)
+
+		text = rawPrompt
+		for variableName in variableNames:
+			if variableName in variableDict:
+				text = text.replace('{{' + variableName + '}}', variableDict[variableName])
+		return text
+
+	@staticmethod
+	def getEmbedding(prompt: str, note=None):
+		model = "text-embedding-ada-002"
+		attempts = 0
+		while attempts < 3:
+			try:
+				sent_timestamp_ms = datetime.now()
+				response = openai.Embedding.create(
+					input=prompt,
+					model="text-embedding-ada-002"
+				)
+
+				from components.db import jobaiDB
+				jobaiDB.request_log.insert_one({
+					"sent_ts": sent_timestamp_ms,
+					"model": model,
+					"success": True,
+					"prompt_tokens": response["usage"]["prompt_tokens"],
+					"completion_tokens": 0,
+					"total_tokens": response["usage"]["total_tokens"],
+					"note": note
+				})
+
+				return response["data"][0]["embedding"]
+			except openai.OpenAIError as e:
+				attempts += 1
+				print("Rate Limited")
+				sleep(1)
+
+	@staticmethod
+	def cosine_similarity(vector1: List[float], vector2: List[float]):
+		return dot(vector1, vector2)/(norm(vector1)*norm(vector2))
+
+	@staticmethod
+	def sendCompletionPrompt(prompt: str, note=None, tokens = 1024)-> str:
 		model = "text-davinci-003"
 		try:
 			sent_timestamp_ms = datetime.now()
@@ -87,7 +124,7 @@ class AnsweringEngine:
 			raise e	
 	
 	@staticmethod
-	def sendSimpleChatPrompt(prompt, note=None, force_single_line = False, system = 'You Are A Job Application Engine', tokens = 1024)-> str:
+	def sendSimpleChatPrompt(prompt: str, note=None, force_single_line = False, system = 'You Are A Job Application Engine', tokens = 1024)-> str:
 		model = "gpt-3.5-turbo"
 		attempts = 0
 		while attempts < 3:

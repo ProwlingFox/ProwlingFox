@@ -11,7 +11,7 @@ jobaiDB = db.jobaiDB
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import user, jobs, admin, ai
+from routes import user, jobs, admin
 
 app = FastAPI(
     title="ProwlingFox",
@@ -31,7 +31,6 @@ app.add_middleware(
 app.include_router(user.router)
 app.include_router(jobs.router)
 app.include_router(admin.router)
-app.include_router(ai.router)
 
 @app.get("/")
 def api_info():

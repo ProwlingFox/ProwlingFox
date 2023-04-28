@@ -1,7 +1,7 @@
 from typing import List
 from bson.objectid import ObjectId
 
-import asyncio
+from components.schemas.configurations import Role
 from components.user import User
 import components.schemas.job as JobSchema
 import components.schemas.user as UserSchema
@@ -14,7 +14,25 @@ class Job:
 		self.id = ObjectId(job_id) if type(job_id) is str else job_id
 		return
 
-	def preprocess_job(self):
+	def preprocess_job(self, role_embeddings: List[Role]):
+		def getClosestRole(role: str, predefined_roles: List[Role]) -> Role:
+			role_embedding = AnsweringEngine.getEmbedding(role, "MatchRole")
+
+			bestMatch = {
+				"role": None,
+				"cos_sim": 0
+			}
+
+			for predefined_role in predefined_roles:
+				cos_sim = AnsweringEngine.cosine_similarity(predefined_role.embedding, role_embedding)
+				if cos_sim > bestMatch["cos_sim"]:
+					bestMatch = {
+						"role": predefined_role,
+						"cos_sim": cos_sim
+					}
+			
+			return bestMatch["role"]
+
 		job = self.get_details()
 
 		if job.short_description:
@@ -43,14 +61,16 @@ class Job:
 		job.key_points = []
 		for bullet_point in response.splitlines():
 			job.key_points.append(bullet_point.removeprefix("- "))
-		
 
+		role = getClosestRole(job.role, role_embeddings)
 
 		self.upsert_job({
 			"short_description": job.short_description,
 			"role_description": job.role_description,
 			"requirements": job.requirements,
 			"key_points": job.key_points,
+			"role_category": role.role,
+			"sector_category": role.sector,
 			"questions": list(map(lambda x: x.dict(), job.questions)),
 			"job_processing": False
 		})
