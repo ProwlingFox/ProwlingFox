@@ -1,6 +1,7 @@
 from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
+from components.metrics import metrics
 from components.authentication import access_level
 
 import schemas.job as JobSchema
@@ -50,3 +51,8 @@ def get_job_details(req: Request, job_id: str, a: apply_to_job):
 	j = Job(job_id)
 	u = User(req.state.user_id)
 	return j.apply_to_role(u, a.responses)
+
+@router.get("/roles")
+@access_level("Candidate")
+def get_job_details():
+	return metrics.getRoles()
