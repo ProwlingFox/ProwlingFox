@@ -2,6 +2,7 @@ import requests
 from datetime import datetime
 import html2text
 from JobsiteSniffers.baseJobsniffer import baseJobsniffer
+from api.schemas.job import Job
 import schemas.job as JobSchema
 from schemas.configurations import City
 
@@ -157,13 +158,13 @@ class workableJobsniffer(baseJobsniffer):
 
 		return responseJson["downloadUrl"]
 
-	def apply(self, job):
-		applicationURL = workableAPI + "jobs/" + job["exid"] + "/apply"
+	def apply(self, job: JobSchema.Job, application: JobSchema.Application):
+		applicationURL = f"{workableAPI}jobs/{job.ext_ID}/apply"
 
 		body = {"candidate": []}
 
-		for question in job["questions"]:
-			if question["type"]:
+		for question in job.questions:
+			if not question.type == JobSchema.FieldType.FILE:
 				body["candidate"].append({
 					"name": question["id"],
 					"value": question["response"]

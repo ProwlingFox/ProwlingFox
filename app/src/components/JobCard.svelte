@@ -104,7 +104,7 @@
 			{#if !srcJob.remote}
 				Remote |
 			{/if}
-			{srcJob.location}
+			{srcJob.location.city ? srcJob.location.city + ", " : ""} {srcJob.location.country}
 		</div>
 		<div>
 			{srcJob.role_description}
