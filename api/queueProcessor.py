@@ -116,15 +116,6 @@ def loadJobSniffer(jobSnifferName, forceLoad=False):
 		print("Error with %s Plugin" % (jobSnifferName))
 		raise
 
-def updateOneJob(snifferIter: Iterator ):
-    try:
-        job = JobSchema.Job.parse_obj(next(snifferIter))
-        resp = jobaiDB.jobs.insert_one(job.dict())
-        print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
-    except MongoErrors.DuplicateKeyError:
-        print("Job Allready Existed")
-    return
-
 def fillRoleEmbeddings():
     jobaiDB.roles.delete_many({})
     with open("roleslist.md") as roles_list:
@@ -167,6 +158,15 @@ def fillQuestionEmbeddings():
 
 def getRoleEmbeddings() -> List[Role]:
     return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
+
+def updateOneJob(snifferIter: Iterator ):
+    try:
+        job = JobSchema.Job.parse_obj(next(snifferIter))
+        resp = jobaiDB.jobs.insert_one(job.dict())
+        print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
+    except MongoErrors.DuplicateKeyError:
+        print("Job Allready Existed")
+    return
 
 def get_jobs():
     for jobSnifferIter in jobSniifferIters:
