@@ -22,7 +22,10 @@
         for (let response in srcApplication.responses) {
             let value = srcApplication.responses[response]
             if (value instanceof FileList){
-                srcApplication.responses[response] = await blobToData(value[0])
+                srcApplication.responses[response] = {
+                    file_name: value[0].name,
+                    data: await blobToData(value[0])
+                }
             }
         }
 

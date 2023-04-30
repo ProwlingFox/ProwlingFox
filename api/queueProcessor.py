@@ -102,7 +102,7 @@ def preprocess_job():
     j.preprocess_job(role_embeddings)
     return
 
-def loadJobSniffer(jobSnifferName, forceLoad=False):
+def load_jobSniffer(jobSnifferName, forceLoad=False):
 	snifferData = secrets["sniffers"][jobSnifferName]
 
 	if not (forceLoad or snifferData["enabled"]) :
@@ -159,9 +159,9 @@ def fillQuestionEmbeddings():
 def getRoleEmbeddings() -> List[Role]:
     return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
 
-def updateOneJob(snifferIter: Iterator ):
+def insert_one_job(sniffer):
     try:
-        job = JobSchema.Job.parse_obj(next(snifferIter))
+        job = JobSchema.Job.parse_obj(sniffer.getOneJob())
         resp = jobaiDB.jobs.insert_one(job.dict())
         print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
     except MongoErrors.DuplicateKeyError:
@@ -169,14 +169,39 @@ def updateOneJob(snifferIter: Iterator ):
     return
 
 def get_jobs():
-    for jobSnifferIter in jobSniifferIters:
-        updateOneJob(jobSnifferIter)
+    for jobSniiffer in jobSniiffers:
+        insert_one_job(jobSniiffer)
+    return
+
+def apply_to_job():
+    application_from_db = jobaiDB.applications.find_one_and_update({
+        "application_reviewed": True,
+        "application_sending": {"$ne": True}
+    },
+    {
+        '$set': {'application_sending': True}
+    })
+
+    if not application_from_db:
+        return
+
+    application = JobSchema.Application.parse_obj(application_from_db)
+    job = Job(application.job_id).get_details()
+
+    jobSniffer = load_jobSniffer(job.source, True)
+    resp = jobSniffer.apply(job, application)
+    print(resp.text)
+
+    jobaiDB.applications.update_one({
+        "_id": application.id
+    },{
+         "$set": {"application_sent": True}
+    })
     return
 
 
-
-jobSniifferIters = [
-    iter(loadJobSniffer("workableJobsniffer"))
+jobSniiffers = [
+    load_jobSniffer("workableJobsniffer")
 ]
 
 # Load into memory to prevent expensive db calls, (Eventually lets implement a vector DB)
@@ -184,9 +209,10 @@ role_embeddings=getRoleEmbeddings()
 
 def main():
     process_functions = [
+        apply_to_job,
         get_jobs,
         preprocess_job,
-        solve_application
+        solve_application,
     ]
 
     while True:   

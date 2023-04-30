@@ -1,8 +1,8 @@
+import base64
 import requests
 from datetime import datetime
 import html2text
 from JobsiteSniffers.baseJobsniffer import baseJobsniffer
-from api.schemas.job import Job
 import schemas.job as JobSchema
 from schemas.configurations import City
 
@@ -20,10 +20,7 @@ class workableJobsniffer(baseJobsniffer):
 		super().__init__(config)
 		return
 
-	def __iter__(self):
-		return self
-
-	def __next__(self):
+	def getOneJob(self):
 		#Refill queue if needed or end the itterator
 		if not self.jobsStack:
 			if not self.refillStack():
@@ -142,18 +139,28 @@ class workableJobsniffer(baseJobsniffer):
 		else:
 			return False
 
-	def uploadResume(self, jobID):
-		uploadUrl = workableAPI + "jobs/" + jobID + "/form/upload/resume?contentType=application\%2Fpdf"
+	def uploadResume(self, data_url:str, job_id):
+		# Process File
+		# Strip MIME Types
+		header, encoded = data_url.split(",", 1)
 
-		resume = open("resume.pdf", "rb")
-		files = {'file': resume}
+		if "base64" not in header:
+			raise ValueError("Not a base64-encoded data URL")
+		
+		mimetype = header.split(";")[0].split(":")[1]
+		file = base64.b64decode(encoded)
 
-		getHeaders = {"Content-Type": "application/pdf"}
+
+		uploadUrl = f"{workableAPI}jobs/{job_id}/form/upload/resume?contentType={mimetype}"
+
+		files = {'file': file}
+
+		getHeaders = {"Content-Type": mimetype}
 		response = requests.request("GET", uploadUrl, headers=getHeaders)
 		responseJson = response.json()
 
 		payload = responseJson["uploadPostUrl"]["fields"]
-		payload["Content-Type"] = "application/pdf"
+		payload["Content-Type"] = mimetype
 		awsresponse = requests.request("POST", responseJson["uploadPostUrl"]["url"], data=payload, files=files)
 
 		return responseJson["downloadUrl"]
@@ -166,29 +173,21 @@ class workableJobsniffer(baseJobsniffer):
 		for question in job.questions:
 			if not question.type == JobSchema.FieldType.FILE:
 				body["candidate"].append({
-					"name": question["id"],
-					"value": question["response"]
+					"name": question.id,
+					"value": application.responses[question.id]
 				})
 			else:
-				#Check If Looking For Known File
-				if question["rawtype"] == "file":
-					if question["id"] == "resume":
-						body["candidate"].append({
-							"name": question["id"],
-							"value": {
-								"url": self.uploadResume(job["exid"]),
-								"name": "resume.pdf"
-							}
-
-						})
-						continue
-				#Check if required
-				if question["required"]:
-					raise Exception("Missing Type For Required Field %s on question %s" % (question["rawtype"], question["label"]))
+				body["candidate"].append({
+					"name": question.id,
+					"value": {
+						"url": self.uploadResume(application.responses[question.id]["data"], job.ext_ID),
+						"name": application.responses[question.id]["file_name"]
+					}
+				})
 
 		headers = {"Content-Type": "application/json"}
 		response = requests.request("POST", applicationURL, headers=headers, json=body)
-		return True
+		return response
 
 	def generateJobListing(self, rawJob):
 		h = html2text.HTML2Text()
