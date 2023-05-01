@@ -5,10 +5,18 @@
 	import { goto } from '$app/navigation'
 
 	export let data
-	
-	const JWT = parseJWT()
 
-	const role = JWT?.permission
+
+	let JWT = parseJWT()
+	let role: string | undefined
+	let authenticated: boolean = false
+
+	$: {
+		authenticated = data.authenticated
+		JWT = parseJWT()
+		role = JWT?.permission
+	}
+
 
 	function signOut() {
 		document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT"
@@ -23,7 +31,7 @@
 			<h2>Helping you catch the career you're looking for.</h2>
 		</header>
 	</a>
-	{#if JWT}
+	{#if authenticated}
 	<div class="mr-4 ml-auto self-center z-50">
 		<Avatar id="user-drop" src="/default-avatar.jpg" dot={{color:'green'}} />
 		<Dropdown triggeredBy="#user-drop">

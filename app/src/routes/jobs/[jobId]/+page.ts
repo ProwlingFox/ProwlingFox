@@ -7,7 +7,7 @@ interface LoadParams {
 
 export async function load({ params }: { params: LoadParams }) {
 	const jobId = params.jobId
-	console.log(jobId)
+	console.log("JobID:", jobId)
 	let job = await get('/jobs/' + jobId)
 
 	return {

@@ -14,10 +14,6 @@
 
 	$: relatedApplication = $as.applications.find(x => x.job_id == srcJob._id)
 
-	$: console.log(relatedApplication)
-
-	$: console.log(srcJob)
-
 	let nextId: string
 
 	let visible = true
