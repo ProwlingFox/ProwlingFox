@@ -2,7 +2,7 @@ import base64
 import requests
 from datetime import datetime
 import html2text
-from JobsiteSniffers.baseJobsniffer import baseJobsniffer
+from JobsiteSniffers.baseJobsniffer import baseJobsniffer, OutOfJobs
 import schemas.job as JobSchema
 from schemas.configurations import City
 
@@ -11,22 +11,27 @@ workableAPI = "https://jobs.workable.com/api/v1/"
 
 class workableJobsniffer(baseJobsniffer):
 	jobsStack = []
-	jobOffset = 0
+	jobOffset = {
+		
+	}
 	duplicate_entries = 0
-	searchFilter = "Software"
+	searchFilter = None
 	locationFilter = "UK"
 
 	def __init__(self, config):
 		super().__init__(config)
 		return
 
-	def getOneJob(self):
-		#Refill queue if needed or end the itterator
-		if not self.jobsStack:
+	def getOneJob(self, searchQuery):
+		#Refill queue if needed
+		print("Search: ", searchQuery)
+		if (not self.jobsStack) or (not searchQuery == self.searchFilter):
+			self.searchFilter = searchQuery
 			if not self.refillStack():
-				raise StopIteration
+				raise OutOfJobs
 			
-		#Return a Job From The Stack In Expected Format
+		#Return a Job From The Stack In Expected Forma
+		self.jobOffset[self.searchFilter] = (self.jobOffset[self.searchFilter] + 1) if (self.searchFilter in self.jobOffset) else 0
 		return self.formatJob( self.jobsStack.pop() )
 
 	def formatJob(self, rawJob):
@@ -91,6 +96,18 @@ class workableJobsniffer(baseJobsniffer):
 						question["ai"] = "Create a cover letter for this position."
 					if question["id"] == "gdpr":
 						question["label"] = "I have read, understand and accept the content of this Privacy Notice and consent to the processing of my data as part of this application."
+					if question["id"] == "firstname":
+						question["response"] = "{firstname}"
+					if question["id"] == "lastname":
+						question["response"] = "{surname}"
+					if question["id"] == "email":
+						question["response"] = "{email}"
+					if question["id"] == "phone":
+						question["response"] = "{phone_number}"
+					if question["id"] == "address":
+						question["response"] = "{address}"
+					if question["id"] == "resume":
+						question["response"] = "{resume}"
 					if "onlyTrueAllowed" in question:
 						qresponse = True
 
@@ -103,6 +120,7 @@ class workableJobsniffer(baseJobsniffer):
 						ai_prompt = question["ai"] if "ai" in question else None,
 						type = self.questionTypeTranslation[question["type"]],
 						required = question["required"],
+						response= question["response"] if "response" in question else None,
 						raw_data= {
 							'raw_question_type': question["type"]
 						}
@@ -125,8 +143,8 @@ class workableJobsniffer(baseJobsniffer):
 	def refillStack(self):
 		querystring = {
 			"remote": False,
-			"offset":self.jobOffset,
-			"query":self.searchFilter,
+			"offset":self.jobOffset[self.searchFilter] if self.searchFilter in self.jobOffset else 0,
+			"query":self.searchFilter or "",
 			"location": self.locationFilter
 			}
 		response = requests.request("GET", workableAPI + "jobs", params=querystring)
@@ -134,7 +152,6 @@ class workableJobsniffer(baseJobsniffer):
 
 		if json["jobs"]:
 			self.jobsStack += json["jobs"]
-			self.jobOffset += 10
 			return True
 		else:
 			return False

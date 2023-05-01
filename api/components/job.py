@@ -8,6 +8,8 @@ import schemas.user as UserSchema
 from components.answeringEngine import AnsweringEngine
 from components.db import prowling_fox_db
 
+from pprint import pprint
+
 class Job:
 	job_data: JobSchema.Job = None
 
@@ -16,28 +18,40 @@ class Job:
 		return
 
 	def preprocess_job(self, role_embeddings: List[Role]):
-		def getClosestRole(role: str, predefined_roles: List[Role]) -> Role:
+		def getCloseRoles(role: str, predefined_roles: List[Role]):
+			COS_SIM_EPSILON = 0.02
+
 			role_embedding = AnsweringEngine.getEmbedding(role, "MatchRole")
 
-			bestMatch = {
-				"role": None,
-				"cos_sim": 0
-			}
+			cos_sims = []
 
 			for predefined_role in predefined_roles:
 				cos_sim = AnsweringEngine.cosine_similarity(predefined_role.embedding, role_embedding)
-				if cos_sim > bestMatch["cos_sim"]:
-					bestMatch = {
-						"role": predefined_role,
-						"cos_sim": cos_sim
-					}
+				cos_sims.append({
+					"role": predefined_role.role,
+					"sector": predefined_role.sector,
+					"cos_sim": cos_sim
+				})
 			
-			return bestMatch["role"]
+			cos_sims.sort(key=lambda x: x["cos_sim"], reverse=True)
+
+			best = cos_sims[0]["cos_sim"]
+			sector = cos_sims[0]["sector"]
+			topRoles = list(map(
+					lambda y: y["role"],
+					filter(
+						lambda x: x["cos_sim"] > best - COS_SIM_EPSILON, 
+						cos_sims
+					)
+				))
+			return topRoles, sector
 
 		job = self.get_details()
 
 		if job.short_description:
 			print("It looks like this job has allready been processed. JobID:", self.id)
+
+		roles, sector = getCloseRoles(job.role, role_embeddings)
 
 		job.questions = self.preprocess_questions(job.questions)
 
@@ -63,15 +77,13 @@ class Job:
 		for bullet_point in response.splitlines():
 			job.key_points.append(bullet_point.removeprefix("- "))
 
-		role = getClosestRole(job.role, role_embeddings)
-
 		self.upsert_job({
 			"short_description": job.short_description,
 			"role_description": job.role_description,
 			"requirements": job.requirements,
 			"key_points": job.key_points,
-			"role_category": role.role,
-			"sector_category": role.sector,
+			"role_category": roles,
+			"sector_category": sector,
 			"questions": list(map(lambda x: x.dict(), job.questions)),
 			"job_processing": False
 		})
@@ -84,6 +96,7 @@ class Job:
 		for question in questions:
 			# This Allows JobSniffers to prefil questions too
 			if question.response:
+				print("question allready filled: ", question.id)
 				continue
 
 			if question.type == JobSchema.FieldType.TEXT:

@@ -4,6 +4,7 @@ from time import sleep
 
 # Error Handling Imports
 from pymongo import errors as MongoErrors
+from JobsiteSniffers.baseJobsniffer import OutOfJobs
 
 # Initiialisation Imports
 from components.secrets import secrets
@@ -22,6 +23,11 @@ from typing import Iterator, List
 import schemas.job as JobSchema
 import schemas.user as UserSchema
 from schemas.configurations import Role
+
+SECTORS_WHITELIST = ["IT and Digital Technology"]
+MIN_JOB_PER_ROLE = 1
+
+EMPTY_ROLES = []
 
 def reset_processing():
     # update all records, mark them as not currently being processed
@@ -159,18 +165,84 @@ def fillQuestionEmbeddings():
 def getRoleEmbeddings() -> List[Role]:
     return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
 
-def insert_one_job(sniffer):
-    try:
-        job = JobSchema.Job.parse_obj(sniffer.getOneJob())
-        resp = jobaiDB.jobs.insert_one(job.dict())
-        print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
-    except MongoErrors.DuplicateKeyError:
-        print("Job Allready Existed")
-    return
+def insert_one_job(sniffer, searchQuery=None):
+    while True:
+        try:
+            job = JobSchema.Job.parse_obj(sniffer.getOneJob(searchQuery))
+            resp = jobaiDB.jobs.insert_one(job.dict())
+            print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
+            return
+        except OutOfJobs:
+            print("That Query Is Out Of Jobs")
+            global EMPTY_ROLES
+            EMPTY_ROLES.append(searchQuery)
+            break
+        except MongoErrors.DuplicateKeyError:
+            print("Job Allready Existed")
 
 def get_jobs():
+    global SECTORS_WHITELIST, MIN_JOB_PER_ROLE
+    # Get The Roles that don't have enough jobs
+    roles_to_add = jobaiDB.roles.aggregate([
+        {
+            '$lookup': {
+                'from': 'jobs', 
+                'let': {
+                    'role': '$role'
+                }, 
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$expr': {
+                                '$in': [
+                                    '$$role', {'$ifNull': [ "$role_category", [] ]}
+                                ]
+                            }
+                        }
+                    }, {
+                        '$count': 'count'
+                    }
+                ], 
+                'as': 'count'
+            }
+        }, {
+            '$match': {
+                'sector': {
+                    '$in': SECTORS_WHITELIST
+                }
+            }
+        }, {
+            '$unwind': {
+                'path': '$count', 
+                'preserveNullAndEmptyArrays': True
+            }
+        }, {
+            '$project': {
+                'role': 1, 
+                'sector': 1, 
+                'count': '$count.count'
+            }
+        }, {
+            '$match': {
+                '$and': [
+                    {'$or': [
+                        { 'count': { '$lt': MIN_JOB_PER_ROLE } },
+                        { 'count': { '$exists': False } },
+                    ]},
+                    { 'role': { '$nin': EMPTY_ROLES  }}
+                ]
+                
+            }
+        }
+    ])
+
+    if not roles_to_add:
+         return
+    
+    roleToAdd = roles_to_add.next()["role"]
+
     for jobSniiffer in jobSniiffers:
-        insert_one_job(jobSniiffer)
+        insert_one_job(jobSniiffer, searchQuery=roleToAdd)
     return
 
 def apply_to_job():
@@ -209,10 +281,10 @@ role_embeddings=getRoleEmbeddings()
 
 def main():
     process_functions = [
-        apply_to_job,
         get_jobs,
         preprocess_job,
         solve_application,
+        apply_to_job,
     ]
 
     while True:   

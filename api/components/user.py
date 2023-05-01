@@ -50,10 +50,10 @@ class User:
 		# jobs_from_db = jobaiDB.jobs.find({}, limit=10)
 		jobs_from_db = jobaiDB.jobs.aggregate([
 		{
-			'$lookup': {
+			'$lookup': { # Attach user's role preferences to the job
 				'from': 'users', 
 				'let': {
-					'user_id': ObjectId('6430601e2fe5a4859e58ce0e')
+					'user_id': self.user_id
 				}, 
 				'pipeline': [
 					{
@@ -77,26 +77,34 @@ class User:
 				'path': '$user'
 			}
 		}, {
-			'$match': {
+			'$match': { # Get jobs where the roles Intersect
 				'$expr': {
-					'$in': [
-						'$role_category', '$user.roles'
-					]
+					'$gt': [
+						{
+							'$size': {
+							'$setIntersection': [
+								{'$ifNull': [ "$role_category", [] ]},
+								"$user.roles",
+							],
+							},
+						},
+						0,
+					],
 				}
 			}
 		}, {
-			'$lookup': {
+			'$lookup': { # Attach applications to the job
 				'from': 'applications', 
 				'localField': '_id', 
 				'foreignField': 'job_id', 
-				'as': 'matched_docs'
+				'as': 'applications'
 			}
 		}, {
-			'$match': {
-				'matched_docs': {
+			'$match': { # Remove Jobs Where the user has applied
+				'applications': {
 					'$not': {
 						'$elemMatch': {
-							'user_id': ObjectId('6430601e2fe5a4859e58ce0e')
+							'user_id': self.user_id
 						}
 					}
 				}, 
