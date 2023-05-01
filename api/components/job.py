@@ -1,10 +1,15 @@
 from typing import List
+import bson
 from bson.objectid import ObjectId
 
+from fastapi import HTTPException
+from pydantic import ValidationError
+
 from schemas.configurations import Role
-from components.user import User
 import schemas.job as JobSchema
 import schemas.user as UserSchema
+
+from components.user import User
 from components.answeringEngine import AnsweringEngine
 from components.db import prowling_fox_db
 
@@ -14,7 +19,10 @@ class Job:
 	job_data: JobSchema.Job = None
 
 	def __init__(self, job_id: str | ObjectId):
-		self.id = ObjectId(job_id) if type(job_id) is str else job_id
+		try:
+			self.id = ObjectId(job_id) if type(job_id) is str else job_id
+		except bson.errors.InvalidId as e:
+			raise HTTPException(status_code=400, detail="MALFOMED_BSON_ID")
 		return
 
 	def preprocess_job(self, role_embeddings: List[Role]):
@@ -123,8 +131,15 @@ class Job:
 			return self.job_data
 				
 		job_from_db = prowling_fox_db.jobs.find_one({"_id": self.id})
-		job = JobSchema.Job.parse_obj(job_from_db)
-		self.job_data = job
+
+		if not job_from_db:
+			raise HTTPException(status_code=400, detail="JOB_NOT_FOUND")
+
+		try:
+			job = JobSchema.Job.parse_obj(job_from_db)
+			self.job_data = job
+		except ValidationError as e:
+			raise HTTPException(status_code=500, detail="JOB_EXISTS_BUT_IS_INVALID")
 
 		return job
 
