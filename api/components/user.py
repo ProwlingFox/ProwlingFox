@@ -83,14 +83,15 @@ class User:
 			'$match': { # Get jobs where the roles Intersect
 				'$expr': {
 					'$gt': [
-						{
-							'$size': {
-							'$setIntersection': [
-								{'$ifNull': [ "$role_category", [] ]},
-								"$user.roles",
-							],
-							},
-						},
+						{'$size': {
+							'$ifNull': [
+								{'$setIntersection': [
+									{'$ifNull': [ "$role_category", [] ]},
+									"$user.roles"
+								]},
+								[]
+							]
+						}},
 						0,
 					],
 				}
@@ -223,14 +224,15 @@ class User:
 
 	@staticmethod
 	def get_details_from_linkedIn(code: str):
+		from components.secrets import secrets
 		url = "https://www.linkedin.com/oauth/v2/accessToken"
 
 		payload = {
 			"grant_type": "authorization_code",
 			"code": code,
-			"client_id": "78fcsza3cuh8o9",
-			"client_secret": "VG5txWkg3WT2NNbW",
-			"redirect_uri": "http://localhost:5173/login"
+			"client_id": secrets["LinkedIn"]["id"],
+			"client_secret": secrets["LinkedIn"]["secret"],
+			"redirect_uri": secrets["App_URL"] + "/login"
 		}
 		headers = {"Content-Type": "application/x-www-form-urlencoded"}
 		oauth_response = requests.request("POST", url, data=payload, headers=headers)
