@@ -61,7 +61,7 @@
     </div>
     
     {#each Object.keys(sectors) as sector}
-        {#if !searchQuery}
+        {#if searchQuery.length < 3}
             <DropdownItem class="flex items-center justify-between hover:bg-orange-100"><Chevron placement="right">{sector}</Chevron></DropdownItem>
             <Dropdown placement="right-start" class="overflow-y-auto px-3 pb-3 text-sm max-h-[20rem]">
             {#each Object.keys(sectors[sector]) as role}
