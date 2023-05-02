@@ -7,6 +7,7 @@
     
     const WHITELISTED_SECTORS = ["IT and Digital Technology"]
     const sectors: {[key: string]: {[key: string]: boolean} } = {}
+    let searchQuery = ""
 
     async function getRoles() {
         const roles: Role[] = await get("/roles")
@@ -56,11 +57,13 @@
 
     <Dropdown class="overflow-y-auto px-3 pb-3 text-sm max-h-[20rem]">
     <div slot="header" class="p-3">
-        <Search size="md"/>
+        <Search bind:value={searchQuery} size="md"/>
     </div>
+    
     {#each Object.keys(sectors) as sector}
-        <DropdownItem class="flex items-center justify-between hover:bg-orange-100"><Chevron placement="right">{sector}</Chevron></DropdownItem>
-        <Dropdown placement="right-start" class="overflow-y-auto px-3 pb-3 text-sm max-h-[20rem]">
+        {#if !searchQuery}
+            <DropdownItem class="flex items-center justify-between hover:bg-orange-100"><Chevron placement="right">{sector}</Chevron></DropdownItem>
+            <Dropdown placement="right-start" class="overflow-y-auto px-3 pb-3 text-sm max-h-[20rem]">
             {#each Object.keys(sectors[sector]) as role}
                 <DropdownItem defaultClass="pl-2 hover:bg-orange-100">
                     <Checkbox color="orange" bind:checked={sectors[sector][role]} on:click={(e) => addOrRemoveRole(sector, role)}>
@@ -68,7 +71,18 @@
                     </Checkbox>
                 </DropdownItem>
             {/each}
-        </Dropdown>
+            </Dropdown>
+        {:else}
+            {#each Object.keys(sectors[sector]) as role}
+                {#if role.toLowerCase().includes(searchQuery.toLowerCase())}
+                    <DropdownItem defaultClass="pl-2 hover:bg-orange-100">
+                        <Checkbox color="orange" bind:checked={sectors[sector][role]} on:click={(e) => addOrRemoveRole(sector, role)}>
+                            <div class="p-2">{role}</div>
+                        </Checkbox>
+                    </DropdownItem>
+                {/if}
+            {/each}
+        {/if}
     {/each}
     </Dropdown>
 </div>
