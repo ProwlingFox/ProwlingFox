@@ -3,6 +3,7 @@
 	import { invalidateAll } from '$app/navigation'
 	import { browser } from '$app/environment'
 	import { PUBLIC_APP_URL, PUBLIC_LINKEDIN_CLIENT_ID } from '$env/static/public';
+	import Icon from '@iconify/svelte'
 
 	export let data
 
@@ -80,7 +81,12 @@
 				<button on:click={loginClickHandler} class=" bg-orange-400 hover:bg-orange-500 w-full">Sign In</button>
 			</div>
 			<div class="d-flex pt-1 justify-content-md-start justify-content-center mt-6">
-				<a href={getLinkedInOAuthURI()} class="block text-center bg-teal-800 hover:bg-teal-500 w-full p-2 rounded-xl drop-shadow text-white">Sign In With LinkedIn</a>
+				<a 
+					href={getLinkedInOAuthURI()} 
+					class="text-center bg-teal-800 hover:bg-teal-500 w-full gap-4 flex justify-center p-2 rounded-xl drop-shadow text-white"
+				>
+					<Icon inline={false} height="1.5em" icon="fa-brands:linkedin"/> Sign In With LinkedIn
+				</a>
 			</div>
 		</div>
 		<!-- <p class="mb-0 mt-3">

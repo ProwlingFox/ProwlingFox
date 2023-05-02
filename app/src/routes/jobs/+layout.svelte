@@ -1,5 +1,5 @@
 <script lang="ts">
-    import MyJobs from '$components/MyJobs.svelte'
+    import MyJobs from '$components/MyApplications.svelte'
 	import { isJWTValid } from '$lib/requestUtils'
 </script>
 

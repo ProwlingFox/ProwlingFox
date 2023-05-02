@@ -1,8 +1,8 @@
 import { get } from '$lib/requestUtils'
 
 
-export async function load({}) {
-    const metrics = await get('/admin/metrics')
+export async function load({ fetch }) {
+    const metrics = await get('/admin/metrics', fetch)
 
     return {
         metrics: metrics

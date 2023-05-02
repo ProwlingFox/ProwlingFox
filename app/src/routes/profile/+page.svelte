@@ -1,80 +1,46 @@
 <script lang="ts">
-	import { tweened } from 'svelte/motion'
-	import { cubicOut } from 'svelte/easing'
-	import PersonalInfoForm from '$components/SignupFlow/PersonalInfoForm.svelte'
-	import JobSelectionForm from '$components/SignupFlow/JobSelectionForm.svelte'
-	import JobPreferencesForm from '$components/SignupFlow/JobPreferencesForm.svelte'
-	import type { User } from '$interfaces/user'
+	import Overview from "$components/profileTabs/Overview.svelte";
+	import SearchPreferences from "$components/profileTabs/SearchPreferences.svelte";
+	import DataCollection from "$components/profileTabs/DataCollection.svelte";
+	import Settings from "$components/profileTabs/Settings.svelte";
 
-	let carousel: HTMLElement
+	export let data;
+	let userInfo = data.userInfo
+	let selection = "Role Preferences"
 
-	let user: User = {
-		name: '',
-		tel: '',
-		pronouns: '',
-		job_preferences: {
-			roles: [''],
-			sector: '',
-			locations: [''],
-			remote: false,
-			salary: 0,
-		},
-	}
+	const categories = [
+		// "Overview",
+		"Role Preferences",
+		"Data Collection",
+		"Settings"
+	]
 
-	let carouselPosition = tweened(0, {
-		duration: 600,
-		easing: cubicOut,
-	})
-
-	function carouselMove(next: boolean): void {
-		let { clientWidth } = carousel
-
-		if (next && carousel.scrollLeft > clientWidth) return
-		if (!next && carousel.scrollLeft == 0) return
-
-		carouselPosition.update((current) =>
-			Math.min(current + (next ? clientWidth : -clientWidth))
-		)
-
-		carouselPosition.subscribe((value) => {
-			carousel.scrollLeft = value
-		})
-	}
-
-	// async function setUserData(): Promise<void> {
-	// 	const body = {
-	// 		name: 'Liaaaaaa',
-	// 		tel: '123-456-7890',
-	// 		pronouns: 'she/her',
-	// 		job_preferences: {
-	// 			roles: ['Frontend', 'Backend'],
-	// 			sector: 'IT',
-	// 			locations: ['New York, New York'],
-	// 			remote: true,
-	// 			salary: 100000,
-	// 		},
-	// 	}
-
-	// 	const response = await post('/user/update', body)
-	// 	if (response.success) {
-	// 	}
-	// }
-
-	// onMount(async () => {
-	// 	export const scrollLeft = writable(carousel.scrollLeft)
-	// })
 </script>
 
-<div class="carousel flex" bind:this={carousel}>
-	<PersonalInfoForm bind:user {carouselMove} />
-	<JobSelectionForm bind:user {carouselMove} />
-	<JobPreferencesForm bind:user {carouselMove} />
+<div class="m-4 flex bg-white flex-grow shadow rounded-xl">
+	<div class="shadow h-full w-40 min-w-[10rem] rounded-xl">
+		<div class="w-full p-4 text-center font-bold text-lg border-b-2">
+			My Profile
+		</div>
+		<ul>
+			{#each categories as category}
+				<button 
+					on:click={() => {selection = category}}
+					class="w-full p-4 hover:bg-amber-200 {category == selection ? "bg-amber-300" : ""}"
+				>
+					{category}
+				</button>
+			{/each}
+		</ul>
+	</div>
+	<div class="flex flex-col flex-grow">
+		<Overview {userInfo}/>
+		{#if selection == "Role Preferences"}
+		<SearchPreferences {userInfo}/>
+		{:else if selection == "Data Collection"}
+		<DataCollection {userInfo}/>
+		{:else if selection == "Settings"}
+		<Settings {userInfo}/>
+		{/if}
+	</div>
 </div>
-
-<style>
-	.carousel {
-		width: 300vw;
-		height: 100%;
-		overflow-x: hidden;
-	}
-</style>

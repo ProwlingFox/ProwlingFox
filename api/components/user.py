@@ -38,8 +38,6 @@ class User:
 	def update_details(self, details):
 		u = UserSchema.UpdateUserDetails.parse_obj(details)
 
-		print(u)
-
 		from components.db import prowling_fox_db as jobaiDB
 		try:
 			update_response = jobaiDB.users.update_one({"_id":self.user_id}, {"$set": u.flatten_dict()})
@@ -215,6 +213,7 @@ class User:
 			"user_id": str(user_from_db['_id']),
 			"permission": user_from_db['permission'],
 			"name": user_from_db['name'],
+			"profileImage": user_from_db["picture"],
 			"email": user_from_db['email']
 		}
 

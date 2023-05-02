@@ -8,15 +8,15 @@ import { PUBLIC_API_URL } from '$env/static/public';
 const apiUrl = PUBLIC_API_URL
 let JWTStore: Readable<string>
 
-function get(path: string) {
-	return makeRequest('GET', path)
+function get(path: string, fetch_override: Function = fetch) {
+	return makeRequest('GET', path, fetch_override = fetch_override)
 }
 
-function post(path: string, body: object) {
-	return makeRequest('POST', path, body)
+function post(path: string, body: object, fetch_override: Function = fetch) {
+	return makeRequest('POST', path, body, fetch_override = fetch_override)
 }
 
-async function makeRequest(method: string, path: string, body?: object) {
+async function makeRequest(method: string, path: string, body?: object, fetch_override: Function = fetch) {
 	let headers: Headers = new Headers({
 		'Content-Type': 'application/json',
 	})
@@ -29,7 +29,7 @@ async function makeRequest(method: string, path: string, body?: object) {
 	let uri = apiUrl + path
 
 	try {
-		var response = await fetch(uri, {
+		var response = await fetch_override(uri, {
 			method: method.toUpperCase(),
 			body: body ? JSON.stringify(body) : undefined,
 			headers: headers,

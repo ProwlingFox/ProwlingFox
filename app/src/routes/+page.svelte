@@ -1,6 +1,6 @@
 <script lang="ts">
     import JobCard from "$components/JobCard.svelte";
-	import MyJobs from "$components/MyJobs.svelte"
+	import MyJobs from "$components/MyApplications.svelte"
     import { popNextJobID } from '$lib/myJobs'
 
     let nextJobId = popNextJobID()

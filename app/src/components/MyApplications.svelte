@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { applications as as } from '$lib/myJobs'
+	import Icon from '@iconify/svelte'
 	import type {
 		Application,
 		ApplicationStatus,
@@ -50,6 +51,14 @@
 		My Applications
 	</div>
 	<ul class="overflow-y-auto overflow-x-hidden flex-grow p-0">
+		{#if !$as.applications.length}
+			<div class="text-white text-xl h-full flex flex-col justify-center items-center">
+				<div class="flex flex-col items-center font-light pb-20">
+					<Icon height="6em" inline={false} icon="ion:file-tray"/>
+					No Applications Yet
+				</div>
+			</div>
+		{/if}
 		{#each $as.applications as app (app._id)}
 			<a href={"/jobs/" + app.job_id}>
 				<li in:receive={{ key: app._id }}>

@@ -5,10 +5,10 @@ interface LoadParams {
 }
 
 
-export async function load({ params }: { params: LoadParams }) {
+export async function load({ params, fetch }) {
 	const jobId = params.jobId
 	console.log("JobID:", jobId)
-	let job = await get('/jobs/' + jobId)
+	let job = await get('/jobs/' + jobId, fetch)
 
 	return {
 		job: job

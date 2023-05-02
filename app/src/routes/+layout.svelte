@@ -13,7 +13,6 @@
 	$: {
 		authenticated = data.authenticated
 		JWT = parseJWT()
-		console.log(JWT?.permission, )
 	}
 
 
@@ -33,12 +32,12 @@
 	{#if JWT && authenticated && ["admin", "candidate"].includes(JWT.permission)}
 	<div class="mr-4 ml-auto self-center z-50">
 		<Avatar id="user-drop" src={JWT?.profileImage ?? "/default-avatar.jpg"}/>
-		<Dropdown triggeredBy="#user-drop">
+		<Dropdown  triggeredBy="#user-drop">
 			<DropdownHeader>
 			<span class="block text-sm"> {JWT.name} </span>
 			<span class="block truncate text-sm font-medium"> {JWT.email} </span>
 			</DropdownHeader>
-			<DropdownItem href="/jobs">Jobs</DropdownItem>
+			<DropdownItem href="/">Dashboard</DropdownItem>
 			<DropdownItem href="/profile">Profile</DropdownItem>
 			{#if JWT.permission == "admin"}
 			<DropdownItem href="/admin">Admin</DropdownItem>
@@ -79,25 +78,5 @@
 		font-family: 'Fredoka', sans-serif;
 		font-size: 0.825rem;
 		font-weight: 400;
-	}
-
-	ul {
-		margin: 0px;
-		margin-left: auto;
-		display: flex;
-		flex-direction: row;
-		list-style-type: none;
-		align-items: center;
-		font-size: 1.125em;
-	}
-
-	ul > a {
-		@apply h-full flex items-center px-2;
-		text-decoration: none;
-		color: inherit;
-	}
-
-	ul > a:hover {
-		background-color: rgba(0, 0, 0, 0.15);
 	}
 </style>

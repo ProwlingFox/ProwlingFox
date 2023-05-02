@@ -9,8 +9,9 @@ class UserRoles(str, Enum):
     ADMIN = "admin"
     CANDIDATE = "candidate"
     AUTHENTICATED = "authenticated"
+    UNVERIFIED = "unverified"
 
-class UserDataFields(BaseModel, extra=Extra.forbid):
+class UserDataFields(BaseModel):
     firstname: Optional[str]
     surname: Optional[str]
     website: Optional[str]
@@ -33,7 +34,7 @@ class LocationCriteria(BaseModel):
     strict_preferences: bool
 
 # Todo: Add Blacklists
-class UserJobPreferences(BaseModel, extra=Extra.forbid):
+class UserJobPreferences(BaseModel):
     roles: Optional[list[Role]]
     location: Optional[LocationCriteria]
     min_salary: Optional[int]
@@ -43,12 +44,13 @@ class User(MongoBaseModel):
     name: str
     email: str
     permission: UserRoles
+    picture: str
 
     # Data
     data: Optional[UserDataFields]
     job_preferences: Optional[UserJobPreferences]
 
-class UpdateUserDetails(BaseModel, extra=Extra.forbid):
+class UpdateUserDetails(BaseModel):
     name: Optional[str]
     # Data
     data: Optional[UserDataFields]
