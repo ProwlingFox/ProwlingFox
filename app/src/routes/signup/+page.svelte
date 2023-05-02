@@ -59,8 +59,19 @@
 			createAccount()
 		}
 	}
+
+	function getOAuthURI() {
+		const clientId = "78fcsza3cuh8o9"
+
+		return "https://www.linkedin.com/oauth/v2/authorization"
+	}
 </script>
 
+<div class="justify-center">
+	<a class="bg-orange-400 p-4 roundex-xl m-6" >Signup With Linkedin</a>
+</div>
+
+{#if false}
 <div class="w-full ml-auto mr-auto">
 	<div class="flex justify-center">
 		<div class="md:w-1/2">
@@ -129,3 +140,4 @@
 		</div>
 	</div>
 </div>
+{/if}
