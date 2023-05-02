@@ -13,6 +13,7 @@
 	$: {
 		authenticated = data.authenticated
 		JWT = parseJWT()
+		console.log(JWT?.permission, )
 	}
 
 
@@ -29,7 +30,7 @@
 			<h2>Helping you catch the career you're looking for.</h2>
 		</header>
 	</a>
-	{#if JWT && authenticated}
+	{#if JWT && authenticated && ["admin", "candidate"].includes(JWT.permission)}
 	<div class="mr-4 ml-auto self-center z-50">
 		<Avatar id="user-drop" src={JWT?.profileImage ?? "/default-avatar.jpg"}/>
 		<Dropdown triggeredBy="#user-drop">

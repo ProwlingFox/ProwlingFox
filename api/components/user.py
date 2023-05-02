@@ -293,7 +293,7 @@ class User:
 			"name": name,
 			"email": email,
 			"password": hashedPassword,
-			"permission": "candidate"
+			"permission": "unverified"
 		}
 
 		try:
@@ -315,7 +315,7 @@ class User:
 			"email": userinfo["email"],
 			"picture": userinfo["picture"],
 			"password": None,
-			"permission": "candidate",
+			"permission": "unverified",
 			"linkedInID": userinfo["sub"]
 		}
 

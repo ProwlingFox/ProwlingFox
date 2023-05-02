@@ -83,10 +83,10 @@
 				<a href={getLinkedInOAuthURI()} class="block text-center bg-teal-800 hover:bg-teal-500 w-full p-2 rounded-xl drop-shadow text-white">Sign In With LinkedIn</a>
 			</div>
 		</div>
-		<p class="mb-0 mt-3">
+		<!-- <p class="mb-0 mt-3">
 			Don't have an account?
 			<a href="signup" class="text-orange-700"> Sign up </a>
-		</p>
+		</p> -->
 	</div>
 </div>
 
