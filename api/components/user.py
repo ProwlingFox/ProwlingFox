@@ -1,8 +1,11 @@
+import re
+from fastapi import HTTPException
+from pydantic import BaseModel
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
 import schemas.job as JobSchema
 import schemas.user as UserSchema
-
+import requests
 
 MIN_PASSWORD_LENGTH = 8
 
@@ -191,9 +194,8 @@ class User:
 
 	@staticmethod
 	def autenticate_by_email(email: str, password: str):
-		from api import jobaiDB
-
-		user_from_db = jobaiDB.users.find_one({"email": email})
+		from components.db import prowling_fox_db
+		user_from_db = prowling_fox_db.users.find_one({"email": email})
 
 		# Corfirm User Exists
 		if not user_from_db:
@@ -201,7 +203,7 @@ class User:
 
 		# Check Password
 		import bcrypt
-		if not bcrypt.checkpw(password.encode('utf-8'), user_from_db['password']):
+		if not user_from_db['password'] or (not bcrypt.checkpw(password.encode('utf-8'), user_from_db['password'])):
 			return {'success': False, 'error': 'AUTHENTICATION_FAILED'}
 
 		# Create JWT Token
@@ -218,6 +220,61 @@ class User:
 		token = jwt.encode(payload, secrets["JWT"]["Secret"], algorithm=secrets["JWT"]["Algorithm"])
 
 		return {'success': True, 'Token': token}
+
+	@staticmethod
+	def get_details_from_linkedIn(code: str):
+		url = "https://www.linkedin.com/oauth/v2/accessToken"
+
+		payload = {
+			"grant_type": "authorization_code",
+			"code": code,
+			"client_id": "78fcsza3cuh8o9",
+			"client_secret": "VG5txWkg3WT2NNbW",
+			"redirect_uri": "http://localhost:5173/login"
+		}
+		headers = {"Content-Type": "application/x-www-form-urlencoded"}
+		oauth_response = requests.request("POST", url, data=payload, headers=headers)
+		oauth = oauth_response.json()
+
+		if "error" in oauth:
+			raise HTTPException(400, "OAUTH_CODE_INVALID")
+
+		url = "https://api.linkedin.com/v2/userinfo"
+		headers = {"Authorization": "Bearer " + oauth["access_token"]}
+		userinfo_response = requests.request("GET", url, headers=headers)
+		userinfo = userinfo_response.json() 
+		return oauth, userinfo
+
+	@staticmethod
+	def authenticate_by_linkedIn(code: str):
+		oauth, userinfo = User.get_details_from_linkedIn(code)
+
+		from components.db import prowling_fox_db
+		user_from_db = prowling_fox_db.users.find_one({"linkedInID": userinfo["sub"]})
+
+		if not user_from_db:
+			u = User.create_user_from_linkedin(code, oauth, userinfo)
+			if u["success"]:
+				user_from_db = prowling_fox_db.users.find_one({"_id": ObjectId(u["user_id"])})
+			else:
+				raise HTTPException(500, "COULD_NOT_CREATE_USER")
+
+		# Create JWT Token
+		from components.secrets import secrets
+		import jwt, time
+		payload = {
+			"expiry": int(time.time()) + oauth["expires_in"],
+			"user_id": str(user_from_db['_id']),
+			"permission": user_from_db['permission'],
+			"name": user_from_db['name'],
+			"email": user_from_db['email'],
+			"profileImage": user_from_db["picture"],
+			"linkedInAccessKey": oauth["access_token"],
+		}
+		token = jwt.encode(payload, secrets["JWT"]["Secret"], algorithm=secrets["JWT"]["Algorithm"])
+
+		return {'success': True, 'Token': token}
+
 
 	@staticmethod
 	def create_user(name, email, password):
@@ -242,6 +299,31 @@ class User:
 			userId = str( jobaiDB.users.insert_one(user).inserted_id )
 		except Mongoerrors.DuplicateKeyerror:
 			return {'success': False, 'error': "USER_EXISTS"}
+
+		return {'success': True, 'user_id': userId}
+	
+	@staticmethod
+	def create_user_from_linkedin(code, oauth = None, userinfo = None):
+		print("CREATING USER")
+		if oauth == None and userinfo == None:
+			oauth, userinfo = User.get_details_from_linkedIn(code)
+
+		user = {
+			"name": userinfo["name"],
+			"email": userinfo["email"],
+			"picture": userinfo["picture"],
+			"password": None,
+			"permission": "candidate",
+			"linkedInID": userinfo["sub"]
+		}
+
+		try:
+			from api import jobaiDB
+			userId = str( jobaiDB.users.insert_one(user).inserted_id )
+		except Mongoerrors.DuplicateKeyerror:
+			return {'success': False, 'error': "USER_EXISTS"}
+		except Mongoerrors:
+			return {'success': False, 'error': "OTHER_DB_ERROR"}
 
 		return {'success': True, 'user_id': userId}
 

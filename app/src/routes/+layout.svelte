@@ -8,13 +8,11 @@
 
 
 	let JWT = parseJWT()
-	let role: string | undefined
-	let authenticated: boolean = false
+	let authenticated = false
 
 	$: {
 		authenticated = data.authenticated
 		JWT = parseJWT()
-		role = JWT?.permission
 	}
 
 
@@ -31,9 +29,9 @@
 			<h2>Helping you catch the career you're looking for.</h2>
 		</header>
 	</a>
-	{#if authenticated}
+	{#if JWT && authenticated}
 	<div class="mr-4 ml-auto self-center z-50">
-		<Avatar id="user-drop" src="/default-avatar.jpg" dot={{color:'green'}} />
+		<Avatar id="user-drop" src={JWT?.profileImage ?? "/default-avatar.jpg"}/>
 		<Dropdown triggeredBy="#user-drop">
 			<DropdownHeader>
 			<span class="block text-sm"> {JWT.name} </span>
@@ -41,7 +39,9 @@
 			</DropdownHeader>
 			<DropdownItem href="/jobs">Jobs</DropdownItem>
 			<DropdownItem href="/profile">Profile</DropdownItem>
+			{#if JWT.permission == "admin"}
 			<DropdownItem href="/admin">Admin</DropdownItem>
+			{/if}
 			<DropdownDivider />
 			<DropdownItem on:click={signOut}>Sign out</DropdownItem>
 		</Dropdown>

@@ -5,7 +5,7 @@ const publicPaths = ['/login', '/signup']
 
 
 /** @type {import('./$types').LayoutLoad} */
-export async function load({ url, params }) {	
+export async function load({ url, params }) {
 	if (isJWTValid()) {
 		if (publicPaths.includes(url.pathname)) {
 			throw redirect(301, '/')

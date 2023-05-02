@@ -3,8 +3,9 @@ import { browser } from '$app/environment'
 import { readable, get as getStore } from 'svelte/store'
 import type { Readable } from 'svelte/store'
 import jwt_decode from 'jwt-decode'
+import { PUBLIC_API_URL } from '$env/static/public';
 
-const apiUrl = 'http://127.0.0.1:8000'
+const apiUrl = PUBLIC_API_URL
 let JWTStore: Readable<string>
 
 function get(path: string) {
@@ -67,6 +68,8 @@ interface DecodedJWT {
 	user_id: string
 	name: string
 	email: string
+	profileImage: string
+	linkedInAccessKey: string
 }
 
 function parseJWT(): DecodedJWT | null {
@@ -106,4 +109,25 @@ async function login(email: string, password: string) {
 	}
 }
 
-export { get, post, login, getJWT, setJWT, parseJWT, isJWTValid }
+async function loginLinkedIn(code: string) {
+	const body = {
+		code: code
+	}
+
+	const response = await post('/user/login/linkedin', body)
+
+	if (response.success) {
+		if(browser){
+			document.cookie = `token=${response.Token}; expires=${new Date(
+				Date.now() + 1000 * 60 * 60 * 24 * 30
+			)}; path=/`
+			return true
+		}
+		return false
+	} else {
+		console.warn('Login Error')
+		return false
+	}
+}
+
+export { get, post, login, loginLinkedIn, getJWT, setJWT, parseJWT, isJWTValid }

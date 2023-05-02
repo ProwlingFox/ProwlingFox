@@ -1,13 +1,27 @@
 <script lang="ts">
-	import { login } from '$lib/requestUtils'
+	import { login, loginLinkedIn } from '$lib/requestUtils'
 	import { invalidateAll } from '$app/navigation'
+	import { browser } from '$app/environment'
+	import { PUBLIC_APP_URL, PUBLIC_LINKEDIN_CLIENT_ID } from '$env/static/public';
+
+	export let data
 
 	let email: string, password: string
 	let loggedIn: boolean | null;
 
+	if (data.code && browser) {
+		loginLinkedIn(data.code).then(
+			(success) => {
+				loggedIn = success
+				if (loggedIn) {
+					invalidateAll()
+				}
+			}
+		)
+	}
+
 	async function loginClickHandler() {
 		loggedIn = await login(email, password)
-
 		if (loggedIn) {
 			invalidateAll()
 		}
@@ -17,6 +31,20 @@
 		if (e.key === 'Enter') {
 			loginClickHandler()
 		}
+	}
+
+	function getLinkedInOAuthURI() {
+		const url = new URL("https://www.linkedin.com/oauth/v2/authorization")
+		const oauthParams: {[key: string]: string} = {
+			response_type: "code",
+			client_id: PUBLIC_LINKEDIN_CLIENT_ID,
+			redirect_uri: PUBLIC_APP_URL + "/login",
+			state: "",
+			scope: "openid profile email"
+		}
+
+		Object.keys(oauthParams).forEach(key => url.searchParams.append(key, oauthParams[key]));
+		return url.href
 	}
 </script>
 
@@ -50,6 +78,9 @@
 			</div>
 			<div class="d-flex pt-1 justify-content-md-start justify-content-center">
 				<button on:click={loginClickHandler} class=" bg-orange-400 hover:bg-orange-500 w-full">Sign In</button>
+			</div>
+			<div class="d-flex pt-1 justify-content-md-start justify-content-center mt-6">
+				<a href={getLinkedInOAuthURI()} class="block text-center bg-teal-800 hover:bg-teal-500 w-full p-2 rounded-xl drop-shadow text-white">Sign In With LinkedIn</a>
 			</div>
 		</div>
 		<p class="mb-0 mt-3">
