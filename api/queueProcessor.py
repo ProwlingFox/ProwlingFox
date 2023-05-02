@@ -4,6 +4,7 @@ from time import sleep
 
 # Error Handling Imports
 from pymongo import errors as MongoErrors
+from JobsiteSniffers.baseJobsniffer import OutOfJobs
 
 # Initiialisation Imports
 from components.secrets import secrets
@@ -22,6 +23,11 @@ from typing import Iterator, List
 import schemas.job as JobSchema
 import schemas.user as UserSchema
 from schemas.configurations import Role
+
+SECTORS_WHITELIST = ["IT and Digital Technology"]
+MIN_JOB_PER_ROLE = 1
+
+EMPTY_ROLES = []
 
 def reset_processing():
     # update all records, mark them as not currently being processed
@@ -102,7 +108,7 @@ def preprocess_job():
     j.preprocess_job(role_embeddings)
     return
 
-def loadJobSniffer(jobSnifferName, forceLoad=False):
+def load_jobSniffer(jobSnifferName, forceLoad=False):
 	snifferData = secrets["sniffers"][jobSnifferName]
 
 	if not (forceLoad or snifferData["enabled"]) :
@@ -115,15 +121,6 @@ def loadJobSniffer(jobSnifferName, forceLoad=False):
 	except Exception as e:
 		print("Error with %s Plugin" % (jobSnifferName))
 		raise
-
-def updateOneJob(snifferIter: Iterator ):
-    try:
-        job = JobSchema.Job.parse_obj(next(snifferIter))
-        resp = jobaiDB.jobs.insert_one(job.dict())
-        print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
-    except MongoErrors.DuplicateKeyError:
-        print("Job Allready Existed")
-    return
 
 def fillRoleEmbeddings():
     jobaiDB.roles.delete_many({})
@@ -168,15 +165,115 @@ def fillQuestionEmbeddings():
 def getRoleEmbeddings() -> List[Role]:
     return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
 
+def insert_one_job(sniffer, searchQuery=None):
+    while True:
+        try:
+            job = JobSchema.Job.parse_obj(sniffer.getOneJob(searchQuery))
+            resp = jobaiDB.jobs.insert_one(job.dict())
+            print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
+            return
+        except OutOfJobs:
+            print("That Query Is Out Of Jobs")
+            global EMPTY_ROLES
+            EMPTY_ROLES.append(searchQuery)
+            break
+        except MongoErrors.DuplicateKeyError:
+            print("Job Allready Existed")
+
 def get_jobs():
-    for jobSnifferIter in jobSniifferIters:
-        updateOneJob(jobSnifferIter)
+    global SECTORS_WHITELIST, MIN_JOB_PER_ROLE
+    # Get The Roles that don't have enough jobs
+    roles_to_add = jobaiDB.roles.aggregate([
+        {
+            '$lookup': {
+                'from': 'jobs', 
+                'let': {
+                    'role': '$role'
+                }, 
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$expr': {
+                                '$in': [
+                                    '$$role', {'$ifNull': [ "$role_category", [] ]}
+                                ]
+                            }
+                        }
+                    }, {
+                        '$count': 'count'
+                    }
+                ], 
+                'as': 'count'
+            }
+        }, {
+            '$match': {
+                'sector': {
+                    '$in': SECTORS_WHITELIST
+                }
+            }
+        }, {
+            '$unwind': {
+                'path': '$count', 
+                'preserveNullAndEmptyArrays': True
+            }
+        }, {
+            '$project': {
+                'role': 1, 
+                'sector': 1, 
+                'count': '$count.count'
+            }
+        }, {
+            '$match': {
+                '$and': [
+                    {'$or': [
+                        { 'count': { '$lt': MIN_JOB_PER_ROLE } },
+                        { 'count': { '$exists': False } },
+                    ]},
+                    { 'role': { '$nin': EMPTY_ROLES  }}
+                ]
+                
+            }
+        }
+    ])
+
+    if not roles_to_add:
+         return
+    
+    roleToAdd = roles_to_add.next()["role"]
+
+    for jobSniiffer in jobSniiffers:
+        insert_one_job(jobSniiffer, searchQuery=roleToAdd)
+    return
+
+def apply_to_job():
+    application_from_db = jobaiDB.applications.find_one_and_update({
+        "application_reviewed": True,
+        "application_sending": {"$ne": True}
+    },
+    {
+        '$set': {'application_sending': True}
+    })
+
+    if not application_from_db:
+        return
+
+    application = JobSchema.Application.parse_obj(application_from_db)
+    job = Job(application.job_id).get_details()
+
+    jobSniffer = load_jobSniffer(job.source, True)
+    resp = jobSniffer.apply(job, application)
+    print(resp.text)
+
+    jobaiDB.applications.update_one({
+        "_id": application.id
+    },{
+         "$set": {"application_sent": True}
+    })
     return
 
 
-
-jobSniifferIters = [
-    iter(loadJobSniffer("workableJobsniffer"))
+jobSniiffers = [
+    load_jobSniffer("workableJobsniffer")
 ]
 
 # Load into memory to prevent expensive db calls, (Eventually lets implement a vector DB)
@@ -186,7 +283,8 @@ def main():
     process_functions = [
         get_jobs,
         preprocess_job,
-        solve_application
+        solve_application,
+        apply_to_job,
     ]
 
     while True:

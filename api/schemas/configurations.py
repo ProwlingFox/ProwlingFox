@@ -7,6 +7,6 @@ class Role(BaseModel):
     embedding: Optional[List[float]]
 
 class City(BaseModel):
-    city: str
-    region: Optional[str]
-    country: str
+    city: str | None
+    region: str | None
+    country: str | None

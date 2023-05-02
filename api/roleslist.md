@@ -1,3 +1,6 @@
+Audio-visual technician
+CAD technician
+Forensic computer analyst
 # Administration, business and management
 Administrator
 Business analyst
@@ -83,20 +86,20 @@ Veterinary surgeon
 Wind turbine technician
 Zookeeper
 # IT and Digital Technology
-App developer
-AR/VR programmer
-Audio-visual technician
+iOS Developer
+Android Developer
 Big data engineer
-CAD technician
-Computer service and repair technician
 Database administrator
-DevSecOps developer
+DevOps Engineer
 Ethical hacker
-Forensic computer analyst
+Frontend developer
+Backend developer
+Full-Stack developer
 Game designer
 Games developer
 Games tester
 Infrastructure engineer
+Production Engineer
 IT project analyst
 IT support technician
 IT trainer
@@ -110,7 +113,6 @@ Software engineer
 Software tester
 Solution architect
 Systems analyst
-Virtual reality designer
 Web developer
 Web editor
 # Construction and building

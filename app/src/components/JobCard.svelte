@@ -14,10 +14,6 @@
 
 	$: relatedApplication = $as.applications.find(x => x.job_id == srcJob._id)
 
-	$: console.log(relatedApplication)
-
-	$: console.log(srcJob)
-
 	let nextId: string
 
 	let visible = true
@@ -104,7 +100,7 @@
 			{#if !srcJob.remote}
 				Remote |
 			{/if}
-			{srcJob.location}
+			{srcJob.location.city ? srcJob.location.city + ", " : ""} {srcJob.location.country}
 		</div>
 		<div>
 			{srcJob.role_description}

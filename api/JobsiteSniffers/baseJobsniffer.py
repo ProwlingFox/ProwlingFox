@@ -24,3 +24,8 @@ class baseJobsniffer:
         
     def apply():
         return
+    
+class OutOfJobs(Exception):
+    def __init__(self, message='No More Jobs Left'):
+        # Call the base class constructor with the parameters it needs
+        super(OutOfJobs, self).__init__(message)

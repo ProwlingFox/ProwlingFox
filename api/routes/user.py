@@ -62,3 +62,9 @@ def update_user_details(req: Request, ud: UserSchema.UpdateUserDetails):
 def get_user_applications(req: Request):
 	u = User(req.state.user_id)
 	return u.get_applications()
+
+@router.post("/user/file/{filetype}/upload")
+@authentication.access_level("Authenticated")
+def update_user_details(req: Request):
+	u = User(req.state.user_id)
+	return 

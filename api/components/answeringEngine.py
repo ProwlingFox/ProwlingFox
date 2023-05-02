@@ -91,7 +91,7 @@ class AnsweringEngine:
 				sleep(1)
 
 	@staticmethod
-	def cosine_similarity(vector1: List[float], vector2: List[float]):
+	def cosine_similarity(vector1: List[float], vector2: List[float]) -> int:
 		return dot(vector1, vector2)/(norm(vector1)*norm(vector2))
 
 	@staticmethod

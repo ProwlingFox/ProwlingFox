@@ -21,7 +21,11 @@ export interface Job {
 		sectors?: string[]
 	}
 	short_description: string
-	location: string
+	location: {
+		city: string
+		region?: string
+		country: string
+	}
 	salary?: string
 	salary_currency?: any
 	remote?: any
