@@ -267,7 +267,8 @@ def get_jobs():
 def apply_to_job():
     application_from_db = jobaiDB.applications.find_one_and_update({
         "application_reviewed": True,
-        "application_sending": {"$ne": True}
+        "application_sending": {"$ne": True},
+        "application_sent": {"$ne": True}
     },
     {
         '$set': {'application_sending': True}
@@ -286,7 +287,10 @@ def apply_to_job():
     jobaiDB.applications.update_one({
         "_id": application.id
     },{
-         "$set": {"application_sent": True}
+         "$set": {
+             "application_sent": True,
+             'application_sending': False
+        }
     })
     return
 
@@ -365,7 +369,6 @@ def main():
         for process_function in process_functions:
             process_function()
         sleep(0.5)
-        print("Done One Round")
         continue
 
 if __name__ == "__main__":
