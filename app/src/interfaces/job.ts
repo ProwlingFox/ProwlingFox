@@ -29,7 +29,7 @@ export interface Job {
 	salary?: string
 	salary_currency?: any
 	remote?: any
-	role_category: string
+	role_category: string[]
 	skills: string[]
 	status: 'Active' | 'Inactive'
 	questions: Question[]

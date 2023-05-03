@@ -9,6 +9,7 @@ const [send, receive] = svelteCrossfade({ duration: 400 })
 
 export const jobQueue = writable<string[]>([])
 export const userJobsLeft = writable<number>(0)
+export const userJobTags = writable<string[]>([])
 
 export function invalidateJobQueue() {
 	jobQueue.set([])
@@ -27,6 +28,15 @@ export async function popNextJobID() {
 		const id = getStore(jobQueue)[0]
 		jobQueue.update((x) => x.splice(1))
 		userJobsLeft.set(totalJobs)
+		let roles: {[key: string]: number} = {}
+		for (let job of newJobs) {
+			for (let role of job.role_category) {
+				if (!(role in roles)) {roles[role] = 0}
+				roles[role] += 1
+			}
+		}
+		console.log(roles, Object.keys(roles).sort((a, b) => roles[b] - roles[a]))
+		userJobTags.set(Object.keys(roles).sort((a, b) => roles[b] - roles[a]))
 		return id
 	}
 }
