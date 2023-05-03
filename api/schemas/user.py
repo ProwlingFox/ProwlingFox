@@ -1,3 +1,4 @@
+from traceback import print_tb
 from matplotlib.pyplot import flag
 from pydantic import BaseModel, Extra, validator
 from typing import Type, List, Any, Optional
@@ -66,6 +67,8 @@ class UpdateUserDetails(BaseModel):
         Recursive helper function to flatten a dictionary with dot-separated keys.
         """
         flattened_dict = {}
+        if d == {}:
+            return d
         if not d:
             d = self.dict(exclude_unset = True, exclude_none = True)
         for k, v in d.items():

@@ -3,6 +3,7 @@
 
     import type { Role, User } from "$interfaces/user"
 	import { get, post } from "$lib/requestUtils"
+	import { invalidateJobQueue } from '$lib/myJobs'
     export let userInfo: User
     
     const WHITELISTED_SECTORS = ["IT and Digital Technology"]
@@ -36,6 +37,8 @@
         }
         
         post('/user/update', userInfo)
+        // Invalidate Current Job Queue
+        invalidateJobQueue()
     }
 
     getRoles()

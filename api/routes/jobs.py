@@ -5,6 +5,7 @@ from components.metrics import metrics
 from components.authentication import access_level
 
 import schemas.job as JobSchema
+from schemas.return_types import get_job_reccomendations_return
 
 from components.user import User
 from components.job import Job
@@ -14,10 +15,9 @@ router = APIRouter(tags=["Jobs"])
 # Get Summary Of Reccomended Jobs
 @router.get("/jobs")
 @access_level("Candidate")
-def get_job_reccomendations(req: Request) -> List[JobSchema.JobSimplified]:
+def get_job_reccomendations(req: Request):
 	u = User(req.state.user_id)
 	return u.get_job_reccomendations()
-
 
 # Get Specific Job Details
 @router.get("/jobs/{job_id}")

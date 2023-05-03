@@ -2,7 +2,7 @@
 	import '../app.postcss'
 	import { parseJWT } from '$lib/requestUtils'
 	import {Avatar, Dropdown, DropdownHeader, DropdownItem, DropdownDivider} from 'flowbite-svelte'
-	import { goto } from '$app/navigation'
+	import { goto, invalidateAll } from '$app/navigation'
 
 	export let data
 
@@ -18,6 +18,7 @@
 
 	function signOut() {
 		document.cookie = "token=;expires=Thu, 01 Jan 1970 00:00:00 GMT"
+		invalidateAll() //Hopefully fixes ghost stores
 		goto("/login")
 	}
 </script>

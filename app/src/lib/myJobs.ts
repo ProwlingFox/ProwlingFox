@@ -8,6 +8,11 @@ import { browser } from '$app/environment'
 const [send, receive] = svelteCrossfade({ duration: 400 })
 
 export const jobQueue = writable<string[]>([])
+export const userJobsLeft = writable<number>(0)
+
+export function invalidateJobQueue() {
+	jobQueue.set([])
+}
 
 export async function popNextJobID() {
 	if (getStore(jobQueue).length > 0) {
@@ -15,11 +20,13 @@ export async function popNextJobID() {
 		jobQueue.update((x) => x.splice(1))
 		return id
 	} else {
-		const newJobs: Job[] = await get('/jobs')
+		const {jobs, totalJobs} = await get('/jobs')
+		const newJobs: Job[] = jobs
 		if (!newJobs.length) return null
 		jobQueue.set(newJobs.map((j) => j._id))
 		const id = getStore(jobQueue)[0]
 		jobQueue.update((x) => x.splice(1))
+		userJobsLeft.set(totalJobs)
 		return id
 	}
 }

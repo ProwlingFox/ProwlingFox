@@ -3,7 +3,7 @@
 	import type { Application as JobApplication } from '$interfaces/application'
 	import type { Job } from '$interfaces/job'
 
-	import { applications as as, popNextJobID } from '$lib/myJobs'
+	import { applications as as, popNextJobID, userJobsLeft } from '$lib/myJobs'
 	import { get, post } from '$lib/requestUtils'
 	import JobApplicationForm from './JobApplicationForm.svelte'
 
@@ -14,7 +14,7 @@
 
 	$: relatedApplication = $as.applications.find(x => x.job_id == srcJob._id)
 
-	let nextId: string
+	let nextId: string | null
 
 	let visible = true
 
@@ -59,6 +59,7 @@
 
 	async function loadNext() {
 		await goto('/jobs/' + (await nextId))
+		userJobsLeft.update(x => x-1)
 		visible = true
 		preLoadNext()
 	}
