@@ -76,7 +76,7 @@
 
 {#if visible}
 <div class="flex flex-col xl:flex-row w-full lg:w-auto">
-	<div class="bg-white pb-20 p-4 md:px-12 sm:rounded-xl lg:left-2 sm:mx-4 lg:mx-0 lg:max-w-2xl sm:my-4 md:py-8 shadow-md relative z-10" out:send={{ key: srcJob._id }}>
+	<div class="bg-white p-4 md:px-12 sm:rounded-xl xl:left-2 sm:mx-4 lg:mx-0 lg:max-w-2xl sm:my-4 md:py-8 shadow-md relative z-10" out:send={{ key: srcJob._id }}>
 		{#if relatedApplication?.application_processed}
 			<div id="banner" class="bg-green-400 sm:rounded-t-xl">
 				Application Ready For Review
@@ -119,7 +119,7 @@
 			{/each}
 		</ul>
 		{#if !relatedApplication}
-			<div class="fade md:shadow-black fixed w-[100vw] bottom-4 md:static md:shadow md:left-auto md:bottom-auto md:w-auto left-0 flex justify-evenly mt-4 ">
+			<div class="z-50 fade md:shadow-black sticky bottom-2 w-full md:static md:shadow md:left-auto md:bottom-auto md:w-auto left-0 flex justify-center gap-8 mt-4 ">
 				<button class="bg-red-500" on:click={reject}>Reject</button>
 				<button class="bg-green-500" on:click={apply}>Apply</button>
 			</div>

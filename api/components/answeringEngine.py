@@ -155,7 +155,7 @@ class AnsweringEngine:
 				return answer
 			except openai.OpenAIError as e:
 				error_message: str = e.error["message"]
-				if error_message.startswith("Rate limit reached"):
+				if error_message.startswith("Rate limit reached") or error_message.startswith("That model is currently overloaded"):
 					print("Rate Limited")
 					sleep(20)
 					attempts += 1

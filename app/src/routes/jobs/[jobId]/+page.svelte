@@ -7,6 +7,6 @@
 	$: job = data.job
 </script>
 
-<div class="flex justify-center">
+<div class="flex justify-center items-start">
 	<JobCard srcJob={job}></JobCard>
 </div>

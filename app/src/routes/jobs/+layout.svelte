@@ -1,11 +1,9 @@
 <script lang="ts">
-    import MyJobs from '$components/MyApplications.svelte'
-	import { isJWTValid } from '$lib/requestUtils'
+    import ApplicationSwitcher from '$components/ApplicationSwitcher.svelte'
 </script>
 
-{#if isJWTValid()}
-    <MyJobs></MyJobs>
-{/if}
-<div class="flex-grow h-full overflow-x-clip overflow-y-auto p-0">
-    <slot />
-</div>
+<ApplicationSwitcher selectedTab="Current Role">
+    <div class="flex w-full justify-center overflow-auto">
+        <slot />
+    </div>
+</ApplicationSwitcher> 

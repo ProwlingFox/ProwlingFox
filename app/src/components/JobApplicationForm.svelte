@@ -2,6 +2,7 @@
 	import type { Application as JobApplication } from "$interfaces/application"
 	import type { Job } from "$interfaces/job"
 	import { post } from "$lib/requestUtils"
+	import Icon from "@iconify/svelte"
 	import { read } from "@popperjs/core"
 
     export let srcApplication: JobApplication
@@ -15,6 +16,9 @@
         })
     }
 
+    async function rejectApplication() {
+
+    }
 
     async function sendApplication() {
         console.log(srcApplication.responses)
@@ -37,7 +41,7 @@
 
 </script>
 
-<div class=" md:mx-4 lg:mx-0 lg:max-w-2xl bg-white my-4 sm:p-12 sm:rounded-xl shadow-xl relative lg:right-4 flex flex-col">
+<div class="pt-12 p-2 my-0 xl:min-w-[30em] xl:w-[40em] md:mx-4 lg:mx-0 lg:max-w-2xl bg-white sm:my-4 sm:p-12 sm:rounded-xl shadow-xl relative xl:right-4 flex flex-col">
     <h2 class="w-full absolute top-0 text-center right-0 text-xl rounded-t-xl font-semibold p-4">Application Review</h2>
     {#each srcJob.questions as question }
         {#if question.type == "Text"}
@@ -70,7 +74,10 @@
             <input id={question.id} bind:value={srcApplication.responses[question.id]}/>
         {/if}
     {/each}
-    <button on:click={sendApplication} class="bg-green-400 self-end">Send Application</button>
+    <div class="flex justify-between">
+        <button on:click={rejectApplication} class="bg-red-500 self-end w-auto px-2"><Icon height="1.5em" icon="fa:trash-o"/></button>
+        <button on:click={sendApplication} class="bg-green-400 self-end w-40">Send Application</button>
+    </div>
 </div>
 
 <style lang="postcss">
@@ -79,7 +86,7 @@
     }
 
     button {
-        @apply p-2 w-40 rounded-xl drop-shadow text-white;
+        @apply p-2 rounded-xl drop-shadow text-white;
     } 
 
     input:focus, textarea:focus, select:focus{

@@ -9,6 +9,9 @@ export interface Application {
 	application_requested: boolean
 	application_processing: boolean
 	application_processed: boolean
+    application_reviewed: boolean
+    application_sending: boolean
+    application_sent: boolean
 	progress: ApplicationStatus
 	responses: {
 		[key: string]: any;

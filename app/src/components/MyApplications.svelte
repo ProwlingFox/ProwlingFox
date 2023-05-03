@@ -9,6 +9,22 @@
 	const { receive } = $as
 
 	function getApplicationStatus(app: Application): ApplicationStatus {
+		if (app.application_sent) {
+			return {
+				label: 'Application Sent',
+				percent: 100,
+				color: 'bg-green-400',
+			}
+		}
+
+		if (app.application_reviewed) {
+			return {
+				label: 'Sending Application',
+				percent: 100,
+				color: 'bg-green-400',
+			}
+		}
+
 		if (app.application_processed) {
 			return {
 				label: 'Awaiting Review',
@@ -45,7 +61,7 @@
 	})
 </script>
 
-<div id="container" class="hidden md:flex min-w-[20rem]">
+<div id="container" class="flex w-full flex-grow md:w-auto md:flex-grow-0 min-w-[20rem]">
 	<div
 		class="text-center p-2 text-xl font-medium text-white bg-amber-800">
 		My Applications
