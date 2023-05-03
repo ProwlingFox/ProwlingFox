@@ -43,27 +43,20 @@
 </script>
 
 <h4 class="my-2 mx-4 text-lg font-bold">My Active Searches</h4>
-<div class="mx-4 flex flex-wrap">
-    {#each userInfo.job_preferences.roles as role}
-        <Button
-            on:click={() => {addOrRemoveRole(role.sector, role.role, false)}}
-            btnClass="m-1 p-2 px-4 bg-orange-400 rounded-xl text-white"
-        >
-            <div class="text-md">{role.role}</div>
-            <div class="text-xs font-light">{role.sector}</div>
-        </Button>
-    {/each}
-    <Button btnClass="m-1 p-2 px-4 bg-orange-700 rounded-xl text-white flex items-center"><Chevron>Add New Search</Chevron></Button>
+<div class="mx-2 md:mx-4 flex flex-wrap">
+    
+    <Button btnClass="m-1 p-2 w-full md:w-auto px-4 justify-center bg-orange-700 rounded-xl text-white flex items-center"><Chevron>Add New Search</Chevron></Button>
 
-    <Dropdown class="overflow-y-auto px-3 pb-3 text-sm max-h-[20rem]">
+    <Dropdown class="w-[95vw] md:w-auto overflow-y-auto px-3 pb-3 text-sm max-h-[20rem]">
     <div slot="header" class="p-3">
         <Search bind:value={searchQuery} size="md"/>
     </div>
+    <div class="empty:before:content-['Nothing_Matches_This_Search.'] before:pt-4 before:w-full empty:before:block">
     
     {#each Object.keys(sectors) as sector}
         {#if searchQuery.length < 3}
             <DropdownItem class="flex items-center justify-between hover:bg-orange-100"><Chevron placement="right">{sector}</Chevron></DropdownItem>
-            <Dropdown placement="right-start" class="overflow-y-auto px-3 pb-3 text-sm max-h-[20rem]">
+            <Dropdown placement="bottom-start" class="w-[88vw] md:w-auto overflow-y-auto px-3 pb-3 text-sm max-h-[14rem] md:max-h-[20rem]">
             {#each Object.keys(sectors[sector]) as role}
                 <DropdownItem defaultClass="pl-2 hover:bg-orange-100">
                     <Checkbox color="orange" bind:checked={sectors[sector][role]} on:click={(e) => addOrRemoveRole(sector, role)}>
@@ -84,7 +77,17 @@
             {/each}
         {/if}
     {/each}
+    </div>
     </Dropdown>
+    {#each userInfo.job_preferences.roles as role}
+        <Button
+            on:click={() => {addOrRemoveRole(role.sector, role.role, false)}}
+            btnClass="m-1 p-2 w-full md:w-auto px-2 md:px-4 bg-orange-400 rounded-xl text-white"
+        >
+            <div class="text-md">{role.role}</div>
+            <div class="text-xs font-light">{role.sector}</div>
+        </Button>
+    {/each}
 </div>
 <div>
     

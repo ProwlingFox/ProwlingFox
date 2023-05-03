@@ -105,7 +105,7 @@ def preprocess_job():
     global role_embeddings
     j = Job(job.id)
     print("preprocessing job: ", job.id)
-    j.preprocess_job(role_embeddings)
+    j.preprocess_job()
     return
 
 def load_jobSniffer(jobSnifferName, forceLoad=False):
@@ -238,8 +238,13 @@ def get_jobs():
 
     if not roles_to_add:
          return
+
+    try:
+        roleToAdd = roles_to_add.next()["role"]
+    except StopIteration:
+        print("Job Cap Reached")
+        return
     
-    roleToAdd = roles_to_add.next()["role"]
 
     for jobSniiffer in jobSniiffers:
         insert_one_job(jobSniiffer, searchQuery=roleToAdd)
@@ -271,6 +276,59 @@ def apply_to_job():
     })
     return
 
+def preprocess_job_embeddings():
+    global role_embeddings
+    job_from_db = jobaiDB.jobs.find_one_and_update({
+        'job_processing': {'$ne': True},
+        'sector_category': None,
+        'role_category': None
+    },
+    {
+        '$set': {'job_processing': True}
+    })
+
+    if not job_from_db:
+        return
+
+    job = JobSchema.Job.parse_obj(job_from_db)
+
+    def getCloseRoles(role: str, predefined_roles: List[Role]):
+        COS_SIM_EPSILON = 0.02
+
+        role_embedding = AnsweringEngine.getEmbedding(role, "MatchRole")
+
+        cos_sims = []
+
+        for predefined_role in predefined_roles:
+            cos_sim = AnsweringEngine.cosine_similarity(predefined_role.embedding, role_embedding)
+            cos_sims.append({
+                "role": predefined_role.role,
+                "sector": predefined_role.sector,
+                "cos_sim": cos_sim
+            })
+        
+        cos_sims.sort(key=lambda x: x["cos_sim"], reverse=True)
+
+        best = cos_sims[0]["cos_sim"]
+        sector = cos_sims[0]["sector"]
+        topRoles = list(map(
+                lambda y: y["role"],
+                filter(
+                    lambda x: x["cos_sim"] > best - COS_SIM_EPSILON, 
+                    cos_sims
+                )
+            ))
+        return topRoles, sector
+    
+    roles, sector = getCloseRoles(job.role, role_embeddings)
+
+    j = Job(job.id)
+    j.upsert_job({
+        "role_category": roles,
+        "sector_category": sector,
+        "job_processing": False
+    })
+    return
 
 jobSniiffers = [
     load_jobSniffer("workableJobsniffer")
@@ -282,9 +340,10 @@ role_embeddings=getRoleEmbeddings()
 def main():
     process_functions = [
         get_jobs,
-        preprocess_job,
-        solve_application,
-        apply_to_job,
+        preprocess_job_embeddings, #Embeds are so much faster, meaning we can actually use them in our search
+        # preprocess_job,
+        # solve_application,
+        # apply_to_job,
     ]
 
     while True:
