@@ -156,7 +156,7 @@ class workableJobsniffer(baseJobsniffer):
 		else:
 			return False
 
-	def uploadResume(self, data_url:str, job_id):
+	def uploadFile(self, data_url:str, job_id):
 		# Process File
 		# Strip MIME Types
 		header, encoded = data_url.split(",", 1)
@@ -194,13 +194,14 @@ class workableJobsniffer(baseJobsniffer):
 					"value": application.responses[question.id]
 				})
 			else:
-				body["candidate"].append({
-					"name": question.id,
-					"value": {
-						"url": self.uploadResume(application.responses[question.id]["data"], job.ext_ID),
-						"name": application.responses[question.id]["file_name"]
-					}
-				})
+				if question.response:
+					body["candidate"].append({
+						"name": question.id,
+						"value": {
+							"url": self.uploadFile(application.responses[question.id]["data"], job.ext_ID),
+							"name": application.responses[question.id]["file_name"]
+						}
+					})
 
 		headers = {"Content-Type": "application/json"}
 		response = requests.request("POST", applicationURL, headers=headers, json=body)
