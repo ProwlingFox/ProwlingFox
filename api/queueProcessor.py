@@ -199,7 +199,21 @@ def get_jobs():
                                 ]
                             }
                         }
-                    }, {
+                    }, 
+                    {
+                        '$lookup': {
+                            'from': "applications",
+                            'localField': "_id",
+                            'foreignField': "job_id",
+                            'as': "application",
+                        },
+                    },
+                    {
+                        '$match': {
+                        'application': { '$size': 0 }
+                        },
+                    },
+                    {
                         '$count': 'count'
                     }
                 ], 
@@ -341,9 +355,9 @@ def main():
     process_functions = [
         get_jobs,
         preprocess_job_embeddings, #Embeds are so much faster, meaning we can actually use them in our search
-        # preprocess_job,
-        # solve_application,
-        # apply_to_job,
+        preprocess_job,
+        solve_application,
+        apply_to_job,
     ]
 
     while True:
