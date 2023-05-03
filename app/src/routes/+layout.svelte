@@ -29,7 +29,7 @@
 			<h2>Helping you catch the career you're looking for.</h2>
 		</header>
 	</a>
-	{#if JWT && authenticated && ["admin", "candidate"].includes(JWT.permission)}
+	{#if JWT && authenticated}
 	<div class="mr-4 ml-auto self-center z-50">
 		<Avatar id="user-drop" src={JWT?.profileImage ?? "/default-avatar.jpg"}/>
 		<Dropdown  triggeredBy="#user-drop">
@@ -37,10 +37,12 @@
 			<span class="block text-sm"> {JWT.name} </span>
 			<span class="block truncate text-sm font-medium"> {JWT.email} </span>
 			</DropdownHeader>
-			<DropdownItem href="/">Dashboard</DropdownItem>
-			<DropdownItem href="/profile">Profile</DropdownItem>
-			{#if JWT.permission == "admin"}
-			<DropdownItem href="/admin">Admin</DropdownItem>
+			{#if ["admin", "candidate"].includes(JWT.permission)}
+				<DropdownItem href="/">Dashboard</DropdownItem>
+				<DropdownItem href="/profile">Profile</DropdownItem>
+				{#if JWT.permission == "admin"}
+				<DropdownItem href="/admin">Admin</DropdownItem>
+				{/if}
 			{/if}
 			<DropdownDivider />
 			<DropdownItem on:click={signOut}>Sign out</DropdownItem>

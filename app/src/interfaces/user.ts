@@ -56,7 +56,7 @@ export interface User {
 	name: string
     email: string
     permission: 'admin' | 'candidate' | 'unverified'
-	picture: string
+	picture?: string
 
     // Data
     data: UserDataFields

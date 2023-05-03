@@ -288,16 +288,17 @@ class User:
 		import bcrypt
 		hashedPassword = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-		user = {
-			"name": name,
-			"email": email,
-			"password": hashedPassword,
-			"permission": "unverified"
-		}
+		user = UserSchema.CreateUser(
+			name = name,
+			email = email,
+			picture = None,
+			password = hashedPassword,
+			permission = "unverified",
+		)
 
 		try:
 			from api import jobaiDB
-			userId = str( jobaiDB.users.insert_one(user).inserted_id )
+			userId = str( jobaiDB.users.insert_one(user.dict()).inserted_id )
 		except Mongoerrors.DuplicateKeyerror:
 			return {'success': False, 'error': "USER_EXISTS"}
 
@@ -309,18 +310,18 @@ class User:
 		if oauth == None and userinfo == None:
 			oauth, userinfo = User.get_details_from_linkedIn(code)
 
-		user = {
-			"name": userinfo["name"],
-			"email": userinfo["email"],
-			"picture": userinfo["picture"],
-			"password": None,
-			"permission": "unverified",
-			"linkedInID": userinfo["sub"]
-		}
+		user = UserSchema.CreateUser(
+			name = userinfo["name"],
+			email = userinfo["email"],
+			picture = userinfo["picture"],
+			password = None,
+			permission = "unverified",
+			linkedInID = userinfo["sub"],
+		)
 
 		try:
 			from api import jobaiDB
-			userId = str( jobaiDB.users.insert_one(user).inserted_id )
+			userId = str( jobaiDB.users.insert_one(user.dict()).inserted_id )
 		except Mongoerrors.DuplicateKeyerror:
 			return {'success': False, 'error': "USER_EXISTS"}
 		except Mongoerrors:

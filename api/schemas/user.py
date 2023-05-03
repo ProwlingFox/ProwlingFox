@@ -1,3 +1,4 @@
+from matplotlib.pyplot import flag
 from pydantic import BaseModel, Extra, validator
 from typing import Type, List, Any, Optional
 from enum import Enum
@@ -25,18 +26,18 @@ class UserDataFields(BaseModel):
     address: Optional[str]
 
 class LocationCriteria(BaseModel):
-    can_relocate: bool
-    distance_km: int
+    can_relocate: bool = False
+    distance_km: int = 10
 
-    remote_only: bool
-    allowed_countries: list[str]
-    city_preferences: Optional[list[City]]
-    strict_preferences: bool
+    remote_only: bool = False
+    allowed_countries: list[str] = []
+    city_preferences: list[City] = []
+    strict_preferences: bool = False
 
 # Todo: Add Blacklists
 class UserJobPreferences(BaseModel):
-    roles: Optional[list[Role]]
-    location: Optional[LocationCriteria]
+    roles: list[Role] = []
+    location: LocationCriteria = LocationCriteria()
     min_salary: Optional[int]
 
 
@@ -45,16 +46,20 @@ class User(MongoBaseModel):
     email: str
     permission: UserRoles
     picture: str
+    linkedInID: Optional[str]
 
     # Data
-    data: Optional[UserDataFields]
-    job_preferences: Optional[UserJobPreferences]
+    data: UserDataFields = UserDataFields()
+    job_preferences: UserJobPreferences = UserJobPreferences()
+
+class CreateUser(User):
+    password: Optional[str]
 
 class UpdateUserDetails(BaseModel):
     name: Optional[str]
     # Data
-    data: Optional[UserDataFields]
-    job_preferences: Optional[UserJobPreferences]
+    data: UserDataFields
+    job_preferences: UserJobPreferences
     
     def flatten_dict(self, d=None, parent_key='', sep='.'):
         """
