@@ -153,7 +153,7 @@ class User:
             "jobs": jobs
         }
 
-    def get_applications(self, getCompleted = False):
+    def get_applications(self, getSent = False):
         from api import jobaiDB
 
         matchCriteria = {
@@ -161,7 +161,7 @@ class User:
             'application_requested': True
         }
 
-        if not getCompleted:
+        if not getSent:
             matchCriteria['application_sent'] = False
 
         applications_from_db = jobaiDB.applications.aggregate([

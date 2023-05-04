@@ -8,15 +8,15 @@ import { PUBLIC_API_URL } from '$env/static/public';
 const apiUrl = PUBLIC_API_URL
 let JWTStore: Readable<string>
 
-function get(path: string, fetch_override: Function = fetch) {
-	return makeRequest('GET', path, fetch_override = fetch_override)
+function get(path: string, fetch_override: Function = fetch, params: {[key: string]: string | number | boolean} = {}) {
+	return makeRequest('GET', path, undefined, params=params, fetch_override)
 }
 
-function post(path: string, body: object, fetch_override: Function = fetch) {
-	return makeRequest('POST', path, body, fetch_override = fetch_override)
+function post(path: string, body: object, fetch_override: Function = fetch, params: {[key: string]: string | number | boolean} = {}) {
+	return makeRequest('POST', path, body, params, fetch_override )
 }
 
-async function makeRequest(method: string, path: string, body?: object, fetch_override: Function = fetch) {
+async function makeRequest(method: string, path: string, body: object = {}, params: {[key: string]: string | number | boolean} = {}, fetch_override: Function = fetch) {
 	let headers: Headers = new Headers({
 		'Content-Type': 'application/json',
 	})
@@ -28,12 +28,22 @@ async function makeRequest(method: string, path: string, body?: object, fetch_ov
 
 	let uri = apiUrl + path
 
+	if (params) {
+		const stringified_params: {[key: string]: string} = {}
+		for (const key in params) {
+			stringified_params[key] = params[key].toString()
+		}
+		uri += "?" + new URLSearchParams(stringified_params).toString()
+	}
+
 	try {
-		var response = await fetch_override(uri, {
+		let fetch_obj: RequestInit = {
 			method: method.toUpperCase(),
-			body: body ? JSON.stringify(body) : undefined,
 			headers: headers,
-		})
+		}
+		if (method == "POST") {fetch_obj["body"] = JSON.stringify(body)}
+
+		var response = await fetch_override(uri, fetch_obj)
 		if (response.ok) return response.json()
 		else throw response
 	} catch (error) {

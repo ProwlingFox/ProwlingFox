@@ -15,7 +15,7 @@
 <svelte:window bind:innerWidth />
 
 <div class="flex flex-col w-full">
-    <div class="flex flex-grow overflow-auto">
+    <div class="flex flex-grow overflow-hidden overflow-y-auto">
         {#if (innerWidth > WIDTH_CHANGE_PX) || (selectedTab == "Applications")}
             <MyJobs/>
         {/if}

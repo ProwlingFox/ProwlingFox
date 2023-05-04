@@ -36,7 +36,6 @@
         const resp = await post(`/jobs/${srcJob._id}/apply`, {
             responses: srcApplication.responses
         })
-        console.log(resp)
     }
 
 </script>

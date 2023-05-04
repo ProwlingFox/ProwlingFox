@@ -23,7 +23,6 @@ class UserDataFields(BaseModel):
     pronouns: Optional[str]
     notice_period: Optional[str]
     expected_sallary: Optional[int]
-    location: Optional[str]
     address: Optional[str]
 
 class LocationCriteria(BaseModel):

@@ -35,7 +35,6 @@ export async function popNextJobID() {
 				roles[role] += 1
 			}
 		}
-		console.log(roles, Object.keys(roles).sort((a, b) => roles[b] - roles[a]))
 		userJobTags.set(Object.keys(roles).sort((a, b) => roles[b] - roles[a]))
 		return id
 	}

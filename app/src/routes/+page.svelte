@@ -1,13 +1,20 @@
 <script lang="ts">
     import ApplicationSwitcher from "$components/ApplicationSwitcher.svelte"
 	import CallToAction from "$components/dashboard/CallToAction.svelte"
-    import { popNextJobID, userJobsLeft } from '$lib/myJobs'    
+	import SentApplications from "$components/dashboard/SentApplications.svelte"
+	import Statistics from "$components/dashboard/Statistics.svelte"
 
-    let nextJobId = popNextJobID()
+	import type { Application } from "$interfaces/application"
+
+    export let data
+    let allApplications: Application[] = data.fullApplications
+    
 </script>
 
 <ApplicationSwitcher selectedTab="Home">
-    <div class="flex flex-col w-full m-2">
+    <div class="flex flex-col w-full m-2 overflow-x-hidden">
         <CallToAction/>
+        <Statistics/>
+        <SentApplications sentApplications={allApplications}/>
     </div>
 </ApplicationSwitcher>

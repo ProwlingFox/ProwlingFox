@@ -23,6 +23,7 @@ export interface City{
 }
 
 interface UserDataFields{
+    [key: string]: any
     firstname: string
     surname: string
     website: string

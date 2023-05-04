@@ -1,3 +1,4 @@
+from tkinter import NO
 from fastapi import HTTPException, Request
 
 # TODO: Enforce w/ pydantic
@@ -7,7 +8,7 @@ from fastapi import HTTPException, Request
  # Admin - Only Admins can access
 def access_level(accessLevel):
 	def wrapper(f):
-		def wrapped_f(authCheck_request: Request, *args, **kwargs):
+		def wrapped_f(authCheck_request: Request = None, *args, **kwargs):
 
 			#Check to see if Request in kwargs and add if not
 			for param in inspect.signature(f).parameters:
@@ -34,12 +35,13 @@ def access_level(accessLevel):
 			parameters = [
 				# Use all parameters from handler
 				*inspect.signature(f).parameters.values(),
-
-				# Skip *args and **kwargs from wrapper parameters:
 				*filter(
 					lambda p: p.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD),
 					inspect.signature(wrapped_f).parameters.values()
 				)
+
+				# Skip *args and **kwargs from wrapper parameters:
+				
 			],
 			return_annotation = inspect.signature(f).return_annotation,
 		)
