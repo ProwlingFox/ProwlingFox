@@ -32,9 +32,13 @@ interface UserDataFields{
     phone_number: string
     pronouns: string
     notice_period: string
-    expected_sallary: Number
+    expected_sallary: string
     location: string
     address: string
+    resume: {
+        file_name: string
+        data: string
+    }
 }
 
 interface LocationCriteria{

@@ -3,6 +3,7 @@ from typing import List
 from numpy import dot, void
 from numpy.linalg import norm
 import openai
+from schemas.configurations import B64_File
 from components.secrets import secrets
 openai.api_key = secrets["OpenAISecret"]
 
@@ -24,23 +25,27 @@ class AnsweringEngine:
 		if question.response:
 			return AnsweringEngine.generate_prefilled_response(user, question)
 
-		prompt = AnsweringEngine.promptGenerator("answerJobQuestionPrompt", {
-			"role": job.role,
-			"companyName": job.company.name,
-			"jobDescription": job.short_description,
-			"FullName": user.name,
-			"Email": user.email,
-			"question": question.ai_prompt or question.content
-		} )
+		if question.type == JobSchema.FieldType.TEXT or question.type == JobSchema.FieldType.LONG_TEXT:
+			prompt = AnsweringEngine.promptGenerator("answerJobQuestionPrompt", {
+				"role": job.role,
+				"companyName": job.company.name,
+				"jobDescription": job.short_description,
+				"FullName": user.name,
+				"Email": user.email,
+				"question": question.ai_prompt or question.content
+			} )
 
-		response = AnsweringEngine.sendSimpleChatPrompt(prompt, "answerQuestion")
-
-		return response
+			return AnsweringEngine.sendSimpleChatPrompt(prompt, "answerQuestion")
+	
+		return None
 
 	@staticmethod
 	def generate_prefilled_response(user: UserSchema.User, question: JobSchema.Question):
 		string = question.response
 		
+		if string == "{resume}":
+			return B64_File(file_name=user.data.resume.file_name, data=f"preset:{user.id},resume").dict()
+
 		for key, value in user.data:
 			string = string.replace("{" + key + "}", str(value))
 

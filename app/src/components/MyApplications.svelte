@@ -64,14 +64,14 @@
 <div id="container" class="flex w-full flex-grow md:w-auto md:flex-grow-0 min-w-[20rem]">
 	<div
 		class="text-center p-2 text-xl font-medium text-white bg-amber-800">
-		My Applications
+		Current Applications
 	</div>
 	<ul class="overflow-y-auto overflow-x-hidden flex-grow p-0">
 		{#if !$as.applications.length}
 			<div class="text-white text-xl h-full flex flex-col justify-center items-center">
 				<div class="flex flex-col items-center font-light pb-20">
 					<Icon height="6em" inline={false} icon="ion:file-tray"/>
-					No Applications Yet
+					No Applications In Progress
 				</div>
 			</div>
 		{/if}

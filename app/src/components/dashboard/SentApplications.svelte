@@ -10,10 +10,10 @@
         <div class="flex w-fit">
             {#each sentApplications as application}
                 {#if application.application_sent}
-                    <div class="bg-white p-4 my-2 mr-4 w-80 h-52 shadow rounded-xl">
+                    <a href={"/jobs/" + application.job_id} class="bg-white p-4 my-2 mr-4 w-80 h-52 shadow rounded-xl">
                         <div class="text-xl">{application.job.role}</div>
                         <div class="font-light">{application.job.company.name}</div>
-                    </div>
+                    </a>
                 {/if}
             {/each}
         </div>

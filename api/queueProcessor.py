@@ -32,9 +32,9 @@ EMPTY_ROLES = []
 def reset_processing():
     # update all records, mark them as not currently being processed
     jobaiDB.applications.update_many({
-        "application_processing": True
+        # "application_processing": True
     },{
-        '$set': {'application_processing': False}
+        '$set': {'application_processing': False, 'application_sending': False}
     })
     jobaiDB.jobs.update_many({
         "job_processing": True
@@ -46,9 +46,9 @@ def reset_processing():
 def solve_application():
     application_from_db = jobaiDB.applications.find_one_and_update({
         "application_requested": True,
-        "application_processing": False,
-        "application_processed": False,
-        "application_sent": False
+        "application_processing": {"$ne": True},
+        "application_processed":  {"$ne": True},
+        "application_sent":  {"$ne": True}
     },
     {
         '$set': {'application_processing': True}
@@ -66,11 +66,9 @@ def solve_application():
 
     for question in job.questions:
         print("answering question:", question.id)
-        if question.type == JobSchema.FieldType.TEXT or question.type == JobSchema.FieldType.LONG_TEXT:
-            answer = AnsweringEngine.answer_question(job, user, question)
-            print(answer)
-        else:
-            answer = None
+        
+        answer = AnsweringEngine.answer_question(job, user, question)
+        print(answer)
 
         answered_questions[question.id] = answer
 
@@ -78,7 +76,7 @@ def solve_application():
         "_id": application.id,
         "application_requested": True,
         "application_processing": True,
-        "application_processed": False
+        "application_processed": {"$ne": True}
     },
     {
         '$set': {
@@ -256,7 +254,6 @@ def get_jobs():
     try:
         roleToAdd = roles_to_add.next()["role"]
     except StopIteration:
-        print("Job Cap Reached")
         return
     
 

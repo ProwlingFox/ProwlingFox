@@ -157,9 +157,11 @@ class workableJobsniffer(baseJobsniffer):
 			return False
 
 	def uploadFile(self, data_url:str, job_id):
-		# Process File
-		# Strip MIME Types
-		header, encoded = data_url.split(",", 1)
+		# Handle Preset Files Like Resume
+		if data_url.startswith("preset"):
+			header, encoded = super().load_preset_file(data_url)
+		else:
+			header, encoded = data_url.split(",", 1)		
 
 		if "base64" not in header:
 			raise ValueError("Not a base64-encoded data URL")

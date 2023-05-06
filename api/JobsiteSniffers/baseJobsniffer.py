@@ -1,4 +1,7 @@
+from bson import ObjectId
+from schemas.configurations import B64_File
 import schemas.job as JobSchema
+from components.db import prowling_fox_db
 
 
 # Must return an itterator when called for that returns a new job, defined above.
@@ -21,6 +24,22 @@ class baseJobsniffer:
     # Gets updates to a job i.e. status change
     def getUpdates(jobID):
         return
+    
+    def load_preset_file(self, preset: str):
+        print(preset)
+        header, presetType = preset.split(",", 1)
+        x, userId = header.split(":", 1)
+
+        file_from_db = prowling_fox_db.users.find_one({"_id": ObjectId(userId)}, {"data": "$data.resume.data", "file_name": "$data.resume.file_name"})
+        if not file_from_db:
+            raise Exception("User doesn't exist.")
+
+        try:
+            file = B64_File.parse_obj(file_from_db)
+        except ValueError:
+            raise Exception("File doesn't exist.")
+
+        return file.data.split(",", 1)
         
     def apply():
         return

@@ -152,9 +152,6 @@ class Job:
 			{
 				"job_id":self.id,
 				"user_id":ObjectId(user.user_id),
-				"application_processing": False,
-				"application_processed": False,
-				"application_sent": False
 			}, {
 				"$set": {
 					"application_read": True,

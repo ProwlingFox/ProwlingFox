@@ -3,7 +3,20 @@
 	import { post } from "$lib/requestUtils"
     export let userInfo: User
 
-    function inputBlur(e: FocusEvent) {
+    const blobToData = (blob: Blob) => {
+        return new Promise<string>((resolve) => {
+            const reader = new FileReader()
+            reader.onloadend = () => {
+                if (typeof(reader.result) === "string") {
+                    resolve(reader.result)
+                }
+            }
+            reader.readAsDataURL(blob)
+        })
+    }
+
+    async function inputBlur(e: FocusEvent) {
+
         post('/user/update', userInfo)
     }
 
@@ -17,7 +30,8 @@
         pronouns: "Prefered Pronouns",
         notice_period: "Notice Period",
         expected_sallary: "Sallary Expectation",
-        address: "Current Address"
+        address: "Current Address",
+        resume: "Resume"
     }
 
     for(const [key, value] of Object.entries(userInfo.data)){
@@ -40,10 +54,17 @@
             <h3 class="text-xl font-bold mt-4">Basic Information</h3>
             <div class="flex gap-4 flex-wrap">
                 {#each Object.keys(userInfo.data) as key}
+                    {#if typeof(userInfo.data[key]) == "object" && userInfo.data[key]}
                     <div class="display flex flex-col w-full sm:w-60 p-2 bg-orange-400 rounded-xl shadow-sm">
-                        <label class="leading-0 font-normal text-white" for={key}>{getTitle(key)}</label>
-                        <input class="" id={key} on:blur={inputBlur} bind:value={userInfo.data[key]}>
-                    </div>
+                            <label class="leading-0 font-normal text-white" for={key}>{getTitle(key)}</label>
+                            FILE NOT IMPLEMENTED
+                        </div>
+                    {:else}
+                        <div class="display flex flex-col w-full sm:w-60 p-2 bg-orange-400 rounded-xl shadow-sm">
+                            <label class="leading-0 font-normal text-white" for={key}>{getTitle(key)}</label>
+                            <input class="" id={key} on:blur={inputBlur} bind:value={userInfo.data[key]}>
+                        </div>
+                    {/if}
                 {/each}
             </div>
         </div>
@@ -51,11 +72,11 @@
 </div>
 
 <style lang="postcss">
-    input, textarea, select{
+    input{
         @apply border-solid border-2 border-orange-300 rounded-lg mb-2 pl-2;
     }
 
-    input:focus, textarea:focus, select:focus{
+    input:focus{
         @apply border-gray-900;
     }
 </style>

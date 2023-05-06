@@ -75,6 +75,12 @@ def get_user_applications(req: Request, showSent: bool = False):
 	u = User(req.state.user_id)
 	return u.get_applications(showSent)
 
+@router.get("/user/applications/{job_id}")
+@authentication.access_level("Authenticated")
+def get_user_applications(req: Request, job_id: str):
+	u = User(req.state.user_id)
+	return u.get_application(job_id)
+
 @router.post("/user/file/{filetype}/upload")
 @authentication.access_level("Authenticated")
 def update_user_details(req: Request):

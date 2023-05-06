@@ -5,7 +5,7 @@ from typing import Type, List, Any, Optional
 from enum import Enum
 
 from schemas.mongo import MongoBaseModel
-from schemas.configurations import City, Role
+from schemas.configurations import City, Role, B64_File
 
 class UserRoles(str, Enum):
     ADMIN = "admin"
@@ -14,16 +14,17 @@ class UserRoles(str, Enum):
     UNVERIFIED = "unverified"
 
 class UserDataFields(BaseModel):
-    firstname: Optional[str]
-    surname: Optional[str]
-    website: Optional[str]
-    git: Optional[str]
-    linkedIn: Optional[str]
-    phone_number: Optional[str]
-    pronouns: Optional[str]
-    notice_period: Optional[str]
-    expected_sallary: Optional[int]
-    address: Optional[str]
+    firstname: Optional[str] = ""
+    surname: Optional[str] = ""
+    website: Optional[str] = ""
+    git: Optional[str] = ""
+    linkedIn: Optional[str] = ""
+    phone_number: Optional[str] = ""
+    pronouns: Optional[str] = ""
+    notice_period: Optional[str] = ""
+    expected_sallary: Optional[str] = ""
+    address: Optional[str] = ""
+    resume: Optional[B64_File]
 
 class LocationCriteria(BaseModel):
     can_relocate: bool = False

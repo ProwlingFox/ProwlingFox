@@ -49,7 +49,7 @@ async function makeRequest(method: string, path: string, body: object = {}, para
 	} catch (error) {
 		console.error('Fetch Request Failed', error)
 		return {}
-	}
+	} 
 }
 
 function setJWT(JWT: string) {

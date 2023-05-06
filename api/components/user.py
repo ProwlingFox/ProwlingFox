@@ -1,7 +1,4 @@
-from pydoc import doc
-import re
 from fastapi import HTTPException
-from pydantic import BaseModel
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
 import schemas.job as JobSchema
@@ -162,7 +159,7 @@ class User:
         }
 
         if not getSent:
-            matchCriteria['application_sent'] = False
+            matchCriteria['application_sent'] = {"$ne": True}
 
         applications_from_db = jobaiDB.applications.aggregate([
             {
@@ -199,6 +196,35 @@ class User:
                 print("Issue with jobID " + application["job_id"])
 
         return applications
+
+    def get_application(self, job_id):
+        from components.db import prowling_fox_db
+        applications_from_db = prowling_fox_db.applications.aggregate([
+            {
+                '$match': {
+                    'user_id': self.user_id,
+                    'job_id': ObjectId(job_id)
+                }
+            },
+            {
+                '$lookup': {
+                    'from': 'jobs',
+                    'localField': 'job_id',
+                    'foreignField': '_id',
+                    'as': 'job'
+                }
+            },
+            {"$unwind": {
+                    "path": "$job",
+                    "preserveNullAndEmptyArrays": False
+                }
+            }
+        ])
+        
+        try:
+            return JobSchema.Application.parse_obj(applications_from_db.next())
+        except StopIteration:
+            return {}
 
     @staticmethod
     def authenticate_by_JWT(JWT: str):
@@ -296,7 +322,6 @@ class User:
         token = jwt.encode(payload, secrets["JWT"]["Secret"], algorithm=secrets["JWT"]["Algorithm"])
 
         return {'success': True, 'Token': token}
-
 
     @staticmethod
     def create_user(name, email, password):

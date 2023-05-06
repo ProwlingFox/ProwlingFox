@@ -10,3 +10,7 @@ class City(BaseModel):
     city: str | None
     region: str | None
     country: str | None
+
+class B64_File(BaseModel):
+    file_name: str
+    data: str

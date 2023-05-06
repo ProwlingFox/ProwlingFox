@@ -75,10 +75,10 @@ class Application(MongoBaseModel):
     job_id: ObjectId
     job: Optional[JobSimplified]
     responses: Optional[object]
-    application_read: bool
-    application_requested: Optional[bool]
-    application_processing: Optional[bool]
-    application_processed: Optional[bool]
-    application_reviewed: Optional[bool]
-    application_sending: Optional[bool]
-    application_sent: Optional[bool]
+    application_read: bool = False
+    application_requested: bool = False
+    application_processing: bool = False
+    application_processed: bool = False
+    application_reviewed: bool = False
+    application_sending: bool = False
+    application_sent: bool = False

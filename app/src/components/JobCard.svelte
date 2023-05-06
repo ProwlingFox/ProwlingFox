@@ -10,15 +10,24 @@
 	export let srcJob: Job
 
 	const { send } = $as
-	let relatedApplication: JobApplication | undefined
 
+
+	let relatedApplication: JobApplication | undefined;
 	$: relatedApplication = $as.applications.find(x => x.job_id == srcJob._id)
+
+	console.log(relatedApplication)
+
 
 	let nextId: string | null
 
 	let visible = true
 
-
+	async function getRelatedApplicationIfRequired() {
+		if(!relatedApplication) {
+			relatedApplication = await get("/user/applications/" + srcJob._id)
+		}
+	}
+	getRelatedApplicationIfRequired()
 
 	async function apply() {
 		post(`/jobs/${srcJob._id}/mark`, { requestApply: true })
@@ -77,19 +86,25 @@
 {#if visible}
 <div class="flex flex-col xl:flex-row w-full lg:w-auto">
 	<div class="bg-white p-4 md:px-12 sm:rounded-xl xl:left-2 sm:mx-4 lg:mx-0 lg:max-w-2xl sm:my-4 md:py-8 shadow-md relative z-10" out:send={{ key: srcJob._id }}>
-		{#if relatedApplication?.application_processed}
-			<div id="banner" class="bg-green-400 sm:rounded-t-xl">
-				Application Ready For Review
+		{#await relatedApplication then relatedApplication}
+			{#if relatedApplication?.application_sent}
+			<div id="banner" class="bg-slate-400 sm:rounded-t-xl">
+				Application Sent
 			</div>
-		{:else if relatedApplication?.application_processing}
-			<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
-				Application Processing
-			</div>
-		{:else if relatedApplication?.application_requested}
-			<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
-				Application in Queue
-			</div>
-		{/if}
+			{:else if relatedApplication?.application_processed}
+				<div id="banner" class="bg-green-400 sm:rounded-t-xl">
+					Application Ready For Review
+				</div>
+			{:else if relatedApplication?.application_processing}
+				<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
+					Application Processing
+				</div>
+			{:else if relatedApplication?.application_requested}
+				<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
+					Application in Queue
+				</div>
+			{/if}
+		{/await}
 		<div class="flex justify-center mt-6">
 			<img src={srcJob.company.logo} alt="" />
 		</div>
@@ -118,17 +133,21 @@
 				<li>{key_point}</li>
 			{/each}
 		</ul>
-		{#if !relatedApplication}
-			<div class="z-50 fade md:shadow-black sticky bottom-2 w-full md:static md:shadow md:left-auto md:bottom-auto md:w-auto left-0 flex justify-center gap-8 mt-4 ">
-				<button class="bg-red-500" on:click={reject}>Reject</button>
-				<button class="bg-green-500" on:click={apply}>Apply</button>
-			</div>
-		{/if}
+		{#await relatedApplication then relatedApplication}
+			{#if !relatedApplication?.application_requested}
+				<div class="z-50 fade md:shadow-black sticky bottom-2 w-full md:static md:shadow md:left-auto md:bottom-auto md:w-auto left-0 flex justify-center gap-8 mt-4 ">
+					<button class="bg-red-500" on:click={reject}>Reject</button>
+					<button class="bg-green-500" on:click={apply}>Apply</button>
+				</div>
+			{/if}
+		{/await}
 		<div />
 	</div>
-	{#if relatedApplication?.application_processed}
-		<JobApplicationForm {srcJob} srcApplication={relatedApplication} />
-	{/if}
+	{#await relatedApplication then relatedApplication}
+		{#if relatedApplication?.application_processed}
+			<JobApplicationForm {srcJob} srcApplication={relatedApplication} />
+		{/if}
+	{/await}
 </div>
 {/if}
 

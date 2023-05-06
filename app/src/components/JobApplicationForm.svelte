@@ -1,42 +1,39 @@
 <script lang="ts">
+	import { goto } from "$app/navigation"
 	import type { Application as JobApplication } from "$interfaces/application"
 	import type { Job } from "$interfaces/job"
+	import { invalidateJobQueue, refreshApplications } from "$lib/myJobs"
 	import { post } from "$lib/requestUtils"
 	import Icon from "@iconify/svelte"
 	import { read } from "@popperjs/core"
+	import PresetsFilepicker from "./common/PresetsFilepicker.svelte"
 
     export let srcApplication: JobApplication
     export let srcJob: Job
 
-    const blobToData = (blob: Blob) => {
-        return new Promise((resolve) => {
-            const reader = new FileReader()
-            reader.onloadend = () => resolve(reader.result)
-            reader.readAsDataURL(blob)
-        })
-    }
+    const presetFileTypes = [
+        {
+            fileName: "Resume",
+            presetID: "resume"
+        }   
+    ]
 
-    async function rejectApplication() {
-
-    }
+    console.log(srcApplication)
 
     async function sendApplication() {
         console.log(srcApplication.responses)
-
-        for (let response in srcApplication.responses) {
-            let value = srcApplication.responses[response]
-            if (value instanceof FileList){
-                srcApplication.responses[response] = {
-                    file_name: value[0].name,
-                    data: await blobToData(value[0])
-                }
-            }
-        }
-
+        
         const resp = await post(`/jobs/${srcJob._id}/apply`, {
             responses: srcApplication.responses
         })
+        refreshApplications()
     }
+
+    async function rejectApplication() {
+		await post(`/jobs/${srcJob._id}/mark`, { requestApply: false })
+        refreshApplications(true)
+        goto("/")
+	}
 
 </script>
 
@@ -44,39 +41,47 @@
     <h2 class="w-full absolute top-0 text-center right-0 text-xl rounded-t-xl font-semibold p-4">Application Review</h2>
     {#each srcJob.questions as question }
         {#if question.type == "Text"}
-            <label for={question.id}>{question.content}</label>
-            <input id={question.id} bind:value={srcApplication.responses[question.id]}/>
+            <label for={question.id} data-required={question.required}>{question.content}</label>
+            <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "LongText"}
-            <label for={question.id}>{question.content}</label>
-            <textarea id={question.id} rows="4" bind:value={srcApplication.responses[question.id]}/>
+            <label for={question.id} data-required={question.required}>{question.content}</label>
+            <textarea id={question.id} required={question.required} disabled={srcApplication.application_reviewed} rows="4" bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "Number"}
-            <label for={question.id}>{question.content}</label>
-            <input id={question.id} type="number" bind:value={srcApplication.responses[question.id]}/>
+            <label for={question.id} data-required={question.required}>{question.content}</label>
+            <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} type="number" bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "MultipleChoice" && question.choices}
-            <label for={question.id}>{question.content}</label>
-            <select id={question.id} bind:value={srcApplication.responses[question.id]}>
+            <label for={question.id} data-required={question.required}>{question.content}</label>
+            <select id={question.id} required={question.required} disabled={srcApplication.application_reviewed} bind:value={srcApplication.responses[question.id]}>
                 {#each question.choices as choice}
                     <option value={choice.id}>{choice.content}</option>
                 {/each}
             </select>
         {:else if question.type == "Date"}
-            <label for={question.id}>{question.content}</label>
-            <input id={question.id} type="date" bind:value={srcApplication.responses[question.id]}/>
+            <label for={question.id} data-required={question.required}>{question.content}</label>
+            <input id={question.id} type="date" required={question.required} disabled={srcApplication.application_reviewed} bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "File"}
-            <label for={question.id}>{question.content}</label>
-            <input id={question.id} bind:files={srcApplication.responses[question.id]} type="file"/>
+            <PresetsFilepicker 
+                id={question.id}
+                required={question.required}
+                disabled={srcApplication.application_reviewed}
+                content={question.content}
+                defaultOptions={presetFileTypes}
+                bind:file={srcApplication.responses[question.id]}
+            />
         {:else if question.type == "CheckBox"}
-            <label for={question.id}>{question.content}</label>
-            <input id={question.id} type="checkbox" bind:checked={srcApplication.responses[question.id]}/>
+            <label for={question.id} data-required={question.required}>{question.content}</label>
+            <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} type="checkbox" bind:checked={srcApplication.responses[question.id]}/>
         {:else if question.type == "Radio"}
-            <label for={question.id}>{question.content} (Radio)</label>
-            <input id={question.id} bind:value={srcApplication.responses[question.id]}/>
+            <label for={question.id} data-required={question.required}>{question.content} (Radio)</label>
+            <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} bind:value={srcApplication.responses[question.id]}/>
         {/if}
     {/each}
-    <div class="flex justify-between">
-        <button on:click={rejectApplication} class="bg-red-500 self-end w-auto px-2"><Icon height="1.5em" icon="fa:trash-o"/></button>
-        <button on:click={sendApplication} class="bg-green-400 self-end w-40">Send Application</button>
-    </div>
+    {#if !srcApplication.application_reviewed}
+        <div class="flex justify-between">
+            <button on:click={rejectApplication} class="bg-red-500 self-end w-auto px-2"><Icon height="1.5em" icon="fa:trash-o"/></button>
+            <button on:click={sendApplication} class="bg-green-400 self-end w-40">Send Application</button>
+        </div>
+    {/if}
 </div>
 
 <style lang="postcss">
@@ -90,5 +95,15 @@
 
     input:focus, textarea:focus, select:focus{
         @apply border-gray-900;
+    }
+
+    input:required, textarea:required, select:required{
+        /* @apply border-red-400; */
+    }
+
+    label[data-required="true"]::after {
+        content: "*";
+        color: red;
+        
     }
 </style>
