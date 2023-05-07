@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 import bson
 from bson.objectid import ObjectId
@@ -129,6 +130,7 @@ class Job:
 			question_responses["responses." + question.id] = raw_question_responses[question.id]
 
 		question_responses["application_reviewed"] = True
+		question_responses["application_reviewed_ts"] = datetime.datetime.now()
 
 		# Save Application To DB
 		prowling_fox_db.applications.update_one({
@@ -154,8 +156,10 @@ class Job:
 				"user_id":ObjectId(user.user_id),
 			}, {
 				"$set": {
-					"application_read": True,
-					"application_requested": requestApply,
+					'application_read': True,
+					'application_read_ts': datetime.datetime.now(),
+					'application_requested': requestApply,
+					'application_requested_ts': datetime.datetime.now(),
 				}
 			}, upsert=True)
 		return True

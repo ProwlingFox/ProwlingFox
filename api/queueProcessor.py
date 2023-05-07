@@ -1,5 +1,9 @@
 # 3rd Party Imports
+import datetime
 import json, openai
+from bson import ObjectId
+from tkinter.tix import Tree
+from urllib import response
 from time import sleep
 
 # Error Handling Imports
@@ -51,7 +55,10 @@ def solve_application():
         "application_sent":  {"$ne": True}
     },
     {
-        '$set': {'application_processing': True}
+        '$set': {
+            'application_processing': True,
+            'application_processing_ts': datetime.datetime.now()
+        }
     })
 
     if not application_from_db:
@@ -82,7 +89,8 @@ def solve_application():
         '$set': {
             'responses': answered_questions,
             "application_processing": False,
-            "application_processed": True
+            "application_processed": True,
+            'application_processed_ts': datetime.datetime.now()
         }
     })
     return
@@ -268,7 +276,10 @@ def apply_to_job():
         "application_sent": {"$ne": True}
     },
     {
-        '$set': {'application_sending': True}
+        '$set': {
+            'application_sending': True,
+            'application_sending_ts': datetime.datetime.now()
+        }
     })
 
     if not application_from_db:
@@ -279,16 +290,32 @@ def apply_to_job():
 
     jobSniffer = load_jobSniffer(job.source, True)
     resp = jobSniffer.apply(job, application)
-    print(resp.text)
+
+    application_failed = False
+    if response.status_code == 404:
+        application_failed = True
+        mark_job_inactive(job.id)
+        return
 
     jobaiDB.applications.update_one({
         "_id": application.id
     },{
          "$set": {
              "application_sent": True,
-             'application_sending': False
+             "application_sent_ts": datetime.datetime.now(),
+             'application_sending': False,
+             "application_failed": application_failed
         }
     })
+    return
+
+def mark_job_inactive(job_id):
+    jobaiDB.jobs.update_one(
+        {"_id": ObjectId(job_id)},
+        {
+            "$set": {"status": JobSchema.Status.INACTIVE}
+        }
+    )
     return
 
 def preprocess_job_embeddings():

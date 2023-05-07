@@ -33,6 +33,7 @@ export interface Job {
 	skills: string[]
 	status: 'Active' | 'Inactive'
 	questions: Question[]
+	src_url?: string
 }
 
 interface Question {

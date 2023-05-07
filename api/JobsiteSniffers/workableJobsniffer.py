@@ -59,11 +59,11 @@ class workableJobsniffer(baseJobsniffer):
 			company = company,
 			role = rawJob["title"],
 			remote = "TELECOMMUTE" in rawJob["locations"],
-			skills = ["Python"],
 			status = JobSchema.Status.ACTIVE,
 			location = City(city=rawJob["location"]["city"], region=rawJob["location"]["subregion"], country=rawJob["location"]["countryName"]),
 			listing = self.generateJobListing(rawJob),
 			questions = self.getQuestions(rawJob),
+			src_url = rawJob["url"]
 		)
 		
 	questionTypeTranslation = {
@@ -156,7 +156,7 @@ class workableJobsniffer(baseJobsniffer):
 		else:
 			return False
 
-	def uploadFile(self, data_url:str, job_id):
+	def uploadFile(self, data_url:str, job_ext_id):
 		# Handle Preset Files Like Resume
 		if data_url.startswith("preset"):
 			header, encoded = super().load_preset_file(data_url)
@@ -170,14 +170,15 @@ class workableJobsniffer(baseJobsniffer):
 		file = base64.b64decode(encoded)
 
 
-		uploadUrl = f"{workableAPI}jobs/{job_id}/form/upload/resume?contentType={mimetype}"
+		uploadUrl = f"{workableAPI}jobs/{job_ext_id}/form/upload/resume?contentType={mimetype}"
 
 		files = {'file': file}
 
 		getHeaders = {"Content-Type": mimetype}
 		response = requests.request("GET", uploadUrl, headers=getHeaders)
+		if response.status_code == 404:
+			return None
 		responseJson = response.json()
-
 		payload = responseJson["uploadPostUrl"]["fields"]
 		payload["Content-Type"] = mimetype
 		awsresponse = requests.request("POST", responseJson["uploadPostUrl"]["url"], data=payload, files=files)

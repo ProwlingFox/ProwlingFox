@@ -1,3 +1,4 @@
+from datetime import date
 from pydantic import BaseModel
 from typing import List, Any, Optional
 from enum import Enum
@@ -51,6 +52,7 @@ class JobSimplified(MongoBaseModel):
     created_ts: int
     short_description: Optional[str] # A Short Description Generated automatically if it doesn't exist <200 words
     # Display Details
+    src_url: Optional[str]
     role: str #Role i.e Production Engineer
     company: Company
     role_description: Optional[str]
@@ -76,9 +78,16 @@ class Application(MongoBaseModel):
     job: Optional[JobSimplified]
     responses: Optional[object]
     application_read: bool = False
+    application_read_ts: date = None
     application_requested: bool = False
+    application_requested_ts: date = None
     application_processing: bool = False
+    application_processing_ts: date = None
     application_processed: bool = False
+    application_processed_ts: date = None
     application_reviewed: bool = False
+    application_reviewed_ts: date = None
     application_sending: bool = False
+    application_sending_ts: date = None
     application_sent: bool = False
+    application_sent_ts: date = None

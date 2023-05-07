@@ -44,7 +44,7 @@ export async function refreshApplications(buypassCheck: boolean = false) {
 	if (!buypassCheck) {
 		// Checks to see if applications could change state, if not doesn't send a needless web request
 		let moveableStates = getStore(applications).applications.some(
-			(x) => !x.application_processed
+			(x) => !( (x.application_processed && !x.application_reviewed) || (x.application_sent) )
 		)
 		if (!moveableStates) {
 			return
@@ -54,7 +54,7 @@ export async function refreshApplications(buypassCheck: boolean = false) {
 	await get('/user/applications').then((res) => {
 		applications.update((a) => {
 			return {
-				applications: res,
+				applications: Array.isArray(res) ? res : [],
 				send: send,
 				receive: receive,
 			}
@@ -63,7 +63,7 @@ export async function refreshApplications(buypassCheck: boolean = false) {
 }
 
 if (browser) {
-	var intervalId = window.setInterval(refreshApplications, 10000)
+	var intervalId = window.setInterval(refreshApplications, 5000)
 }
 
 export const applications = writable<ApplicationStore>({

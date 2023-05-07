@@ -3,10 +3,8 @@
 	import type { Job } from '$interfaces/job'
 
 	export let data
-	let job: Job
-	$: job = data.job
 </script>
 
 <div class="flex justify-center items-start">
-	<JobCard srcJob={job}></JobCard>
+	<JobCard srcJob={data.job} relatedApplication={data.relatedApplication}></JobCard>
 </div>

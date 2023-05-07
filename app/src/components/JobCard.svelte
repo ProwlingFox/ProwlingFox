@@ -2,32 +2,27 @@
 	import { goto } from '$app/navigation'
 	import type { Application as JobApplication } from '$interfaces/application'
 	import type { Job } from '$interfaces/job'
+	import { getApplicationByJobID } from '$lib/applications'
 
 	import { applications as as, popNextJobID, userJobsLeft } from '$lib/myJobs'
 	import { get, post } from '$lib/requestUtils'
 	import JobApplicationForm from './JobApplicationForm.svelte'
 
 	export let srcJob: Job
+	export let relatedApplication: JobApplication | undefined;
 
 	const { send } = $as
 
-
-	let relatedApplication: JobApplication | undefined;
-	$: relatedApplication = $as.applications.find(x => x.job_id == srcJob._id)
-
-	console.log(relatedApplication)
-
-
 	let nextId: string | null
-
 	let visible = true
 
-	async function getRelatedApplicationIfRequired() {
-		if(!relatedApplication) {
-			relatedApplication = await get("/user/applications/" + srcJob._id)
-		}
+	// If The Application is not in a stable state, do an update
+	$: if (!(relatedApplication?.application_processed || relatedApplication?.application_sent)) {
+		setTimeout(async () => {
+			console.log("Updating Application")
+			relatedApplication = await getApplicationByJobID(srcJob._id)
+		}, 10000)
 	}
-	getRelatedApplicationIfRequired()
 
 	async function apply() {
 		post(`/jobs/${srcJob._id}/mark`, { requestApply: true })
@@ -40,8 +35,6 @@
 						job: srcJob,
 						application_read: true,
 						application_requested: true,
-						application_processing: false,
-						application_processed: false,
 						progress: {
 							label: 'Pending',
 							percent: 33,
@@ -56,14 +49,11 @@
 		})
 		visible = false
 
-		//Rlly ugly solution this code should actually preload, the next job in the background like it's allready doing and then fade it in,
-		// using goto just to officially change the url like the whole thing is supposed to work in the first place
-		setTimeout(loadNext, 2001)
+		loadNext()
 	}
 
 	async function preLoadNext() {
 		nextId = await popNextJobID()
-		get('/jobs/' + nextId) // Fix so it doesn't duplicate this request lol :3
 	}
 
 	async function loadNext() {
@@ -105,9 +95,9 @@
 				</div>
 			{/if}
 		{/await}
-		<div class="flex justify-center mt-6">
+		<a href={srcJob.src_url} class="flex justify-center mt-6">
 			<img src={srcJob.company.logo} alt="" />
-		</div>
+		</a>
 
 		<h1 class="mt-4">
 			{srcJob.role}

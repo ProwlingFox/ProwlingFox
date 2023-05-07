@@ -25,6 +25,7 @@ class UserDataFields(BaseModel):
     expected_sallary: Optional[str] = ""
     address: Optional[str] = ""
     resume: Optional[B64_File]
+    headline: Optional[str] = ""
 
 class LocationCriteria(BaseModel):
     can_relocate: bool = False

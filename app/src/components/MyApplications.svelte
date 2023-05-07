@@ -13,14 +13,14 @@
 			return {
 				label: 'Application Sent',
 				percent: 100,
-				color: 'bg-green-400',
+				color: 'bg-grey-400',
 			}
 		}
 
 		if (app.application_reviewed) {
 			return {
 				label: 'Sending Application',
-				percent: 100,
+				percent: 99,
 				color: 'bg-green-400',
 			}
 		}
@@ -28,8 +28,8 @@
 		if (app.application_processed) {
 			return {
 				label: 'Awaiting Review',
-				percent: 100,
-				color: 'bg-green-400',
+				percent: 90,
+				color: 'bg-amber-400',
 			}
 		}
 

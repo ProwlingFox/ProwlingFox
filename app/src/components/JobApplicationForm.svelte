@@ -2,10 +2,9 @@
 	import { goto } from "$app/navigation"
 	import type { Application as JobApplication } from "$interfaces/application"
 	import type { Job } from "$interfaces/job"
-	import { invalidateJobQueue, refreshApplications } from "$lib/myJobs"
+	import { refreshApplications, applications, popNextJobID } from "$lib/myJobs"
 	import { post } from "$lib/requestUtils"
 	import Icon from "@iconify/svelte"
-	import { read } from "@popperjs/core"
 	import PresetsFilepicker from "./common/PresetsFilepicker.svelte"
 
     export let srcApplication: JobApplication
@@ -18,15 +17,23 @@
         }   
     ]
 
-    console.log(srcApplication)
 
     async function sendApplication() {
-        console.log(srcApplication.responses)
-        
+        console.log(srcApplication.responses) 
         const resp = await post(`/jobs/${srcJob._id}/apply`, {
             responses: srcApplication.responses
         })
-        refreshApplications()
+        refreshApplications(true)
+
+        // Goto Next Application awaiting review or New Job
+        let nextApplication = $applications.applications.findLast(x => x.application_processed && !x.application_sending && (x._id != srcApplication._id))
+        if(nextApplication) {
+            console.log("Going to application", nextApplication)
+            goto("/jobs/" + nextApplication.job_id)
+        } else {
+            console.log("Going to job")
+            goto("/jobs/" + await popNextJobID())
+        }
     }
 
     async function rejectApplication() {
@@ -77,10 +84,10 @@
         {/if}
     {/each}
     {#if !srcApplication.application_reviewed}
-        <div class="flex justify-between">
-            <button on:click={rejectApplication} class="bg-red-500 self-end w-auto px-2"><Icon height="1.5em" icon="fa:trash-o"/></button>
-            <button on:click={sendApplication} class="bg-green-400 self-end w-40">Send Application</button>
-        </div>
+    <div class="flex justify-between">
+        <button on:click={rejectApplication} class="bg-red-500 self-end w-auto px-2"><Icon height="1.5em" icon="fa:trash-o"/></button>
+        <button on:click={sendApplication} class="bg-green-400 self-end w-40">Send Application</button>
+    </div>
     {/if}
 </div>
 

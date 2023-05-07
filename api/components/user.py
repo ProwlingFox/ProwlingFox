@@ -101,17 +101,18 @@ class User:
             }
         }, {
             '$match': { # Remove Jobs Where the user has applied
-                'applications': {
-                    '$not': {
-                        '$elemMatch': {
-                            'user_id': self.user_id
+                    'applications': {
+                        '$not': {
+                            '$elemMatch': {
+                                'user_id': self.user_id
+                            }
                         }
-                    }
-                }, 
-                'short_description': {
+                    }, 
+                    'short_description': {
                         '$ne': None
-                    }
-                }
+                    },
+                    'status': JobSchema.Status.ACTIVE
+                },
             }, {
                 '$sort': {
                     '_id': -1
@@ -225,6 +226,11 @@ class User:
             return JobSchema.Application.parse_obj(applications_from_db.next())
         except StopIteration:
             return {}
+
+    def get_metrics(self):
+        # Number of job applications sent today, 
+
+        return
 
     @staticmethod
     def authenticate_by_JWT(JWT: str):
