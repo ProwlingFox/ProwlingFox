@@ -26,7 +26,6 @@ class baseJobsniffer:
         return
     
     def load_preset_file(self, preset: str):
-        print(preset)
         header, presetType = preset.split(",", 1)
         x, userId = header.split(":", 1)
 
@@ -39,7 +38,7 @@ class baseJobsniffer:
         except ValueError:
             raise Exception("File doesn't exist.")
 
-        return file.data.split(",", 1)
+        return file.data
         
     def apply():
         return

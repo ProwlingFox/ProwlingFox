@@ -12,7 +12,7 @@ async function loadFromUserdata(job: Job, application: Application | undefined) 
 	if(!application || !application.application_processed) {return application}
 	for (const question of job.questions) {
 		if (!question.response) {continue}
-		application.responses[question.id] = parsePreformattedResponse(question.response)
+		application.responses[question.id] = parsePreformattedResponse(question.response, question.type)
 	}
 	return application
 }

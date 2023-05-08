@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { UserFile } from '$interfaces/user'
 	import { parseJWT } from '$lib/requestUtils'
     import Icon from '@iconify/svelte'
     import { Dropdown, DropdownItem, DropdownDivider, DropdownHeader, Chevron, Button, Dropzone, Modal } from 'flowbite-svelte'
@@ -7,15 +8,13 @@
     export let required: boolean
     export let disabled: boolean
     export let content: string
-    export let file: {
-        file_name: string
-        data: string
-    }
+    export let file: UserFile
     let files: FileList
     let fileModal = false
     let dropdownOpen = false
 
     export let defaultOptions: {
+        presetName: string
         fileName: string
         presetID: string
     }[]
@@ -61,7 +60,7 @@
     </Button>
     <Dropdown bind:open={dropdownOpen} class="w-full" frameClass="w-full">
         {#each defaultOptions as option}
-            <DropdownItem on:click={() => {setPresetFile(option.fileName, option.presetID)}}>{option.fileName}</DropdownItem>
+            <DropdownItem on:click={() => {setPresetFile(option.fileName, option.presetID)}}>{option.presetName}: {option.fileName}</DropdownItem>
         {/each}
         <DropdownItem on:click={() => {fileModal = true}}>Upload Custom File</DropdownItem>
     </Dropdown>

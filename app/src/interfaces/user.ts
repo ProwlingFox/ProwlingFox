@@ -22,6 +22,11 @@ export interface City{
     country: string
 }
 
+export interface UserFile{
+    file_name: string
+    data: string
+}
+
 // Maybe Theres a way to deal w/ this but honestly it never shoulda been hardcoded
 interface UserDataFields{
     [key: string]: {
@@ -30,10 +35,7 @@ interface UserDataFields{
         Number?: number
         Checkbox?: Boolean
         Date?: Date
-        File?: {
-            file_name: string
-            data: string
-        }
+        File?: UserFile
     }
 }
 
@@ -54,6 +56,7 @@ interface UserJobPreferences{
 }
 
 export interface User {
+    _id: string
 	name: string
     email: string
     permission: 'admin' | 'candidate' | 'unverified'

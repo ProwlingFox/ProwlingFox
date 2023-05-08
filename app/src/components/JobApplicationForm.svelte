@@ -14,7 +14,8 @@
 
     const presetFileTypes = [
         {
-            fileName: "Resume",
+            presetName: "Resume",
+            fileName: $userData.data.resume.File?.file_name,
             presetID: "resume"
         }   
     ]
@@ -26,7 +27,7 @@
             // TODO: Make sure file works proper
             if (question.type == "File") {continue}
             // If The Response Has Changed
-            if (srcApplication.responses[question.id] != parsePreformattedResponse(question.response)) {
+            if (srcApplication.responses[question.id] != parsePreformattedResponse(question.response, question.type)) {
                 const strippedResponse = question.response.substring(1, question.response.length-1)
                 if (strippedResponse in $userData.data) {
                     changes = true

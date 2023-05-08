@@ -159,9 +159,9 @@ class workableJobsniffer(baseJobsniffer):
 	def uploadFile(self, data_url:str, job_ext_id):
 		# Handle Preset Files Like Resume
 		if data_url.startswith("preset"):
-			header, encoded = super().load_preset_file(data_url)
-		else:
-			header, encoded = data_url.split(",", 1)		
+			data_url = super().load_preset_file(data_url)
+
+		header, encoded = data_url.split(",", 1)		
 
 		if "base64" not in header:
 			raise ValueError("Not a base64-encoded data URL")
@@ -182,7 +182,6 @@ class workableJobsniffer(baseJobsniffer):
 		payload = responseJson["uploadPostUrl"]["fields"]
 		payload["Content-Type"] = mimetype
 		awsresponse = requests.request("POST", responseJson["uploadPostUrl"]["url"], data=payload, files=files)
-
 		return responseJson["downloadUrl"]
 
 	def apply(self, job: JobSchema.Job, application: JobSchema.Application):
@@ -206,8 +205,11 @@ class workableJobsniffer(baseJobsniffer):
 						}
 					})
 
+		print("Request Body", body)
+
 		headers = {"Content-Type": "application/json"}
 		response = requests.request("POST", applicationURL, headers=headers, json=body)
+		print("resp", response)
 		return response
 
 	def generateJobListing(self, rawJob):
