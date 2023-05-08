@@ -12,7 +12,7 @@
 		if (!user) return
 		const response = await post('/user/update', user)
 		if (response.success) {
-			console.log('hi')
+			console.log('Stet User Data (Not sure why there\'s a log here)')
 		}
 	}
 

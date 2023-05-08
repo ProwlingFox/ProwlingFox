@@ -15,12 +15,9 @@
 
 	let nextId: string | null
 
-	$: console.log(srcJob)
-
 	// If The Application is not in a stable state, do an update
 	$: if (!(relatedApplication?.application_processed || relatedApplication?.application_sent)) {
 		setTimeout(async () => {
-			console.log("Updating Application")
 			relatedApplication = await getApplicationByJobID(srcJob._id)
 		}, 10000)
 	}

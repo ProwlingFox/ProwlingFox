@@ -1,3 +1,4 @@
+from datetime import timedelta, datetime
 from fastapi import HTTPException
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
@@ -228,9 +229,18 @@ class User:
             return {}
 
     def get_metrics(self):
+        from components.db import prowling_fox_db
         # Number of job applications sent today, 
+        now = datetime.now()
+        past_day = now - timedelta(days=1)
 
-        return
+        applicationsToday = prowling_fox_db.applications.count_documents({
+            "user_id": self.user_id,
+            "application_sent": True,
+            "application_sent_ts": {"$gte": past_day}
+        })
+        return {"applicationsToday": applicationsToday}
+
 
     @staticmethod
     def authenticate_by_JWT(JWT: str):

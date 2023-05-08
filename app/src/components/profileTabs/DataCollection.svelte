@@ -34,9 +34,6 @@
     }
 
     async function inputBlur(e: FocusEvent) {
-        // console.log(e)
-        // console.log(userInfo)
-
         post('/user/update', userInfo)
         invaldateUserData()
     }

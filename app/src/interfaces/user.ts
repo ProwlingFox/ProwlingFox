@@ -64,3 +64,6 @@ export interface User {
     job_preferences: UserJobPreferences
 }
     
+export interface UserStats {
+    applicationsToday: number
+}

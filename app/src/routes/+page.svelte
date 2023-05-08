@@ -14,7 +14,7 @@
 <ApplicationSwitcher selectedTab="Home">
     <div class="flex flex-col w-full m-2 overflow-x-hidden">
         <CallToAction/>
-        <Statistics/>
+        <Statistics statistics={data.stats}/>
         <SentApplications sentApplications={allApplications}/>
     </div>
 </ApplicationSwitcher>

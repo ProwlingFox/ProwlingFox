@@ -9,7 +9,6 @@ interface LoadParams {
 
 
 async function loadFromUserdata(job: Job, application: Application | undefined) {
-	console.log(application)
 	if(!application || !application.application_processed) {return application}
 	for (const question of job.questions) {
 		if (!question.response) {continue}

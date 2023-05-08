@@ -22,9 +22,9 @@
     async function updateUserData() {
         let changes = false
         for (const question of srcJob.questions) {
-            if (!question.response) {return}
+            if (!question.response) {continue}
             // TODO: Make sure file works proper
-            if (question.type == "File") {return}
+            if (question.type == "File") {continue}
             // If The Response Has Changed
             if (srcApplication.responses[question.id] != parsePreformattedResponse(question.response)) {
                 const strippedResponse = question.response.substring(1, question.response.length-1)
@@ -34,14 +34,12 @@
                 }
             }
         }
-        console.log("updatingUserData", $userData)
-        saveUserData()
+        await saveUserData()
     }
 
 
     async function sendApplication() {
-        console.log(srcApplication.responses) 
-        updateUserData()
+        await updateUserData()
         const resp = await post(`/jobs/${srcJob._id}/apply`, {
             responses: srcApplication.responses
         })
@@ -50,10 +48,8 @@
         // Goto Next Application awaiting review or New Job
         let nextApplication = $applications.applications.findLast(x => x.application_processed && !x.application_sending && (x._id != srcApplication._id))
         if(nextApplication) {
-            console.log("Going to application", nextApplication)
             goto("/jobs/" + nextApplication.job_id)
         } else {
-            console.log("Going to job")
             goto("/jobs/" + await popNextJobID())
         }
     }
