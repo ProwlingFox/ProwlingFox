@@ -1,6 +1,5 @@
 <script lang="ts">
 	import JobCard from '$components/JobCard.svelte'
-	import type { Job } from '$interfaces/job'
 
 	export let data
 </script>

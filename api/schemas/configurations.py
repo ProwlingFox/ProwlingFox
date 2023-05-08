@@ -1,3 +1,4 @@
+from enum import Enum
 from pydantic import BaseModel
 from typing import List, Any, Optional
 
@@ -14,3 +15,13 @@ class City(BaseModel):
 class B64_File(BaseModel):
     file_name: str
     data: str
+
+class FieldType(str, Enum):
+    TEXT = "Text"
+    LONG_TEXT = "LongText"
+    NUMBER = "Number"
+    MULTIPLE_CHOICE = "MultipleChoice"
+    DATE = "Date"
+    FILE = "File"
+    CHECKBOX = "CheckBox"
+    RADIO = "Radio"

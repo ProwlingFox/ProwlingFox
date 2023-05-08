@@ -22,22 +22,18 @@ export interface City{
     country: string
 }
 
+// Maybe Theres a way to deal w/ this but honestly it never shoulda been hardcoded
 interface UserDataFields{
-    [key: string]: any
-    firstname: string
-    surname: string
-    website: string
-    git: string
-    linkedIn: string
-    phone_number: string
-    pronouns: string
-    notice_period: string
-    expected_sallary: string
-    location: string
-    address: string
-    resume: {
-        file_name: string
-        data: string
+    [key: string]: {
+        [key: string] : any
+        Text?: string
+        Number?: number
+        Checkbox?: Boolean
+        Date?: Date
+        File?: {
+            file_name: string
+            data: string
+        }
     }
 }
 

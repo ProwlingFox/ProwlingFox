@@ -4,21 +4,13 @@ from typing import List, Any, Optional
 from enum import Enum
 
 from schemas.mongo import MongoBaseModel, ObjectId
-from schemas.configurations import City
+from schemas.configurations import City, FieldType
 
 class Status(str, Enum):
     ACTIVE = "Active"
     INACTIVE = "Inactive"
 
-class FieldType(str, Enum):
-    TEXT = "Text"
-    LONG_TEXT = "LongText"
-    NUMBER = "Number"
-    MULTIPLE_CHOICE = "MultipleChoice"
-    DATE = "Date"
-    FILE = "File"
-    CHECKBOX = "CheckBox"
-    RADIO = "Radio"
+
 
 class Choice(BaseModel):
     id: str
@@ -64,7 +56,7 @@ class JobSimplified(MongoBaseModel):
     remote: Optional[bool]
     role_category: Optional[List[str]] # Role from a preset selection
     sector_category: Optional[str] # Sector from a preset selection
-    skills: List[str] # Skills i.e. Python, Swimming from a preset selection (TBD), likely to be automated
+    skills: Optional[List[str]] # Skills i.e. Python, Swimming from a preset selection (TBD), likely to be automated
     status: Status
 
 class Job(JobSimplified):

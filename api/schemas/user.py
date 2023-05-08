@@ -1,6 +1,7 @@
+from datetime import date
 from traceback import print_tb
 from matplotlib.pyplot import flag
-from pydantic import BaseModel, Extra, validator
+from pydantic import BaseModel, create_model
 from typing import Type, List, Any, Optional
 from enum import Enum
 
@@ -13,19 +14,46 @@ class UserRoles(str, Enum):
     AUTHENTICATED = "authenticated"
     UNVERIFIED = "unverified"
 
+Data_Field_Conversion = {
+    "Text": str,
+    "Number": int,
+    "Date": date,
+    "File": B64_File,
+    "Checkbox": bool
+}
+
+class BaseDataField(BaseModel):
+    pass
+
+def DataField(types):
+    class_dict = {}
+    for var in types:
+        if var in Data_Field_Conversion:
+            class_dict[var] = (Data_Field_Conversion[var], None)
+        else:
+            raise Exception(f"Type {var} Not Supported")
+        
+    model = create_model(
+        'DataField' + "".join(types),
+        **class_dict,
+        __base__=BaseDataField
+    )
+    return model
+
+
 class UserDataFields(BaseModel):
-    firstname: Optional[str] = ""
-    surname: Optional[str] = ""
-    website: Optional[str] = ""
-    git: Optional[str] = ""
-    linkedIn: Optional[str] = ""
-    phone_number: Optional[str] = ""
-    pronouns: Optional[str] = ""
-    notice_period: Optional[str] = ""
-    expected_sallary: Optional[str] = ""
-    address: Optional[str] = ""
-    resume: Optional[B64_File]
-    headline: Optional[str] = ""
+    firstname: DataField(["Text"]) = DataField(["Text"])()
+    surname: DataField(["Text"]) = DataField(["Text"])()
+    website: DataField(["Text"]) = DataField(["Text"])()
+    git: DataField(["Text"]) = DataField(["Text"])()
+    linkedIn: DataField(["Text"]) = DataField(["Text"])()
+    phone_number: DataField(["Text"]) = DataField(["Text"])()
+    pronouns: DataField(["Text"]) = DataField(["Text"])()
+    notice_period: DataField(["Text", "Number"]) = DataField(["Text", "Number"])()
+    expected_sallary: DataField(["Text", "Number"]) = DataField(["Text", "Number"])()
+    address: DataField(["Text"]) = DataField(["Text"])()
+    resume: DataField(["File"]) = DataField(["File"])()
+    headline: DataField(["Text"]) = DataField(["Text"])()
 
 class LocationCriteria(BaseModel):
     can_relocate: bool = False
@@ -60,8 +88,8 @@ class CreateUser(User):
 class UpdateUserDetails(BaseModel):
     name: Optional[str]
     # Data
-    data: UserDataFields
-    job_preferences: UserJobPreferences
+    data: Optional[UserDataFields]
+    job_preferences: Optional[UserJobPreferences]
     
     def flatten_dict(self, d=None, parent_key='', sep='.'):
         """

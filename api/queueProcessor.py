@@ -292,7 +292,7 @@ def apply_to_job():
     resp = jobSniffer.apply(job, application)
 
     application_failed = False
-    if response.status_code == 404:
+    if resp.status_code == 404:
         application_failed = True
         mark_job_inactive(job.id)
         return
@@ -391,7 +391,10 @@ def main():
     while True:
         # For now, just round robin things in the queue, rlly needs a balancer and to be made asyncio lol, tho rn we're being rate limited
         for process_function in process_functions:
-            process_function()
+            try:
+                process_function()
+            except Exception as e:
+                print(f"Failure With {process_function} {e}" )
         sleep(0.5)
         continue
 

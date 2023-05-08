@@ -30,7 +30,7 @@ class baseJobsniffer:
         header, presetType = preset.split(",", 1)
         x, userId = header.split(":", 1)
 
-        file_from_db = prowling_fox_db.users.find_one({"_id": ObjectId(userId)}, {"data": "$data.resume.data", "file_name": "$data.resume.file_name"})
+        file_from_db = prowling_fox_db.users.find_one({"_id": ObjectId(userId)}, {"data": "$data.resume.File.data", "file_name": "$data.resume.File.file_name"})
         if not file_from_db:
             raise Exception("User doesn't exist.")
 

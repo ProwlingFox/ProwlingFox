@@ -23,7 +23,8 @@ class AnsweringEngine:
 			raise "No Short Description :c"
 		
 		if question.response:
-			return AnsweringEngine.generate_prefilled_response(user, question)
+			return None
+			# return AnsweringEngine.generate_prefilled_response(user, question)
 
 		if question.type == JobSchema.FieldType.TEXT or question.type == JobSchema.FieldType.LONG_TEXT:
 			prompt = AnsweringEngine.promptGenerator("answerJobQuestionPrompt", {

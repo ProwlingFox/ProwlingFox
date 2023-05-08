@@ -1,6 +1,8 @@
 <script lang="ts">
     import type { User } from "$interfaces/user"
 	import { post } from "$lib/requestUtils"
+	import { invaldateUserData } from "$lib/userData"
+    import { Fileupload } from 'flowbite-svelte'
     export let userInfo: User
 
     const blobToData = (blob: Blob) => {
@@ -15,9 +17,28 @@
         })
     }
 
+    async function fileBlur(e: FocusEvent, var_name: string) {
+        if (!(e.target && "files" in e.target)) {return}
+        if (!(e.target.files instanceof FileList)) {return} 
+        if (e.target.files.length < 1) {return}
+
+        const file = e.target.files[0]
+        const b64File = await blobToData(file)
+
+        userInfo.data[var_name].File = {
+            file_name: file.name,
+            data: b64File
+        }
+
+        inputBlur(e)
+    }
+
     async function inputBlur(e: FocusEvent) {
+        // console.log(e)
+        // console.log(userInfo)
 
         post('/user/update', userInfo)
+        invaldateUserData()
     }
 
     const userDataKeyTranslation: {[key: string]: string} =  {
@@ -33,13 +54,7 @@
         address: "Current Address",
         resume: "Resume"
     }
-
-    for(const [key, value] of Object.entries(userInfo.data)){
-        console.log(key, value)
-    }
-
-
-
+    
     function getTitle(key: string) {
         return userDataKeyTranslation[key] ?? key
     }
@@ -53,18 +68,39 @@
         <div>
             <h3 class="text-xl font-bold mt-4">Basic Information</h3>
             <div class="flex gap-4 flex-wrap">
-                {#each Object.keys(userInfo.data) as key}
-                    {#if typeof(userInfo.data[key]) == "object" && userInfo.data[key]}
-                    <div class="display flex flex-col w-full sm:w-60 p-2 bg-orange-400 rounded-xl shadow-sm">
-                            <label class="leading-0 font-normal text-white" for={key}>{getTitle(key)}</label>
-                            FILE NOT IMPLEMENTED
-                        </div>
-                    {:else}
-                        <div class="display flex flex-col w-full sm:w-60 p-2 bg-orange-400 rounded-xl shadow-sm">
-                            <label class="leading-0 font-normal text-white" for={key}>{getTitle(key)}</label>
-                            <input class="" id={key} on:blur={inputBlur} bind:value={userInfo.data[key]}>
-                        </div>
-                    {/if}
+                {#each Object.keys(userInfo.data) as var_name}
+                    {#each Object.keys(userInfo.data[var_name]) as var_type}
+                        {#if var_type == "Text"}
+                            <div class="display flex flex-col w-full sm:w-60 p-2 bg-orange-400 rounded-xl shadow-sm">
+                                <label class="leading-0 font-normal text-white" for={var_name}>{getTitle(var_name)} ({var_type})</label>
+                                <input type="text" id={var_name} on:blur={inputBlur} bind:value={userInfo.data[var_name][var_type]}>
+                            </div>
+                        {:else if var_type == "Number"}
+                            <div class="display flex flex-col w-full sm:w-60 p-2 bg-orange-400 rounded-xl shadow-sm">
+                                <label class="leading-0 font-normal text-white" for={var_name}>{getTitle(var_name)} ({var_type})</label>
+                                <input type="number" id={var_name} on:blur={inputBlur} bind:value={userInfo.data[var_name][var_type]}>
+                            </div>
+                        {:else if var_type == "Date"}
+                            <div class="display flex flex-col w-full sm:w-60 p-2 bg-orange-400 rounded-xl shadow-sm">
+                                <label class="leading-0 font-normal text-white" for={var_name}>{getTitle(var_name)} ({var_type})</label>
+                                <input type="date" id={var_name} on:blur={inputBlur} bind:value={userInfo.data[var_name][var_type]}>
+                            </div>
+                        {:else if var_type == "Checkbox"}
+                            <div class="display flex flex-col w-full sm:w-60 p-2 bg-orange-400 rounded-xl shadow-sm">
+                                <label class="leading-0 font-normal text-white" for={var_name}>{getTitle(var_name)} ({var_type})</label>
+                                <input type="checkbox" id={var_name} on:blur={inputBlur} bind:value={userInfo.data[var_name][var_type]}>
+                            </div>
+                        {:else if var_type == "File"}
+                            <div class="display flex flex-col w-full sm:w-60 p-2 bg-orange-400 rounded-xl shadow-sm">
+                                <label class="leading-0 font-normal text-white" for={var_name}>{getTitle(var_name)} ({var_type})</label>
+                                <button class="border-solid border-2 border-orange-300 rounded-lg mb-2 pl-2 p-2 bg-white focus:border-gray-900" on:click={(e) => {
+                                    if(!(e.target instanceof HTMLElement && e.target.nextElementSibling instanceof HTMLElement)) {return}
+                                    e.target.nextElementSibling.click()
+                                }}>{userInfo.data[var_name][var_type]?.file_name || "Upload A File"}</button>
+                                <input type="file" id={var_name} on:blur={e => fileBlur(e, var_name)} class="hidden">
+                            </div>
+                        {/if}
+                    {/each}  
                 {/each}
             </div>
         </div>
@@ -73,10 +109,10 @@
 
 <style lang="postcss">
     input{
-        @apply border-solid border-2 border-orange-300 rounded-lg mb-2 pl-2;
+        @apply border-solid border-2 border-orange-300 rounded-lg mb-2 pl-2 p-2 bg-white;
     }
 
-    input:focus{
+    input:focus {
         @apply border-gray-900;
     }
 </style>

@@ -14,7 +14,8 @@
 	const { send } = $as
 
 	let nextId: string | null
-	let visible = true
+
+	$: console.log(srcJob)
 
 	// If The Application is not in a stable state, do an update
 	$: if (!(relatedApplication?.application_processed || relatedApplication?.application_sent)) {
@@ -47,20 +48,13 @@
 				receive: $as.receive,
 			}
 		})
-		visible = false
-
 		loadNext()
 	}
 
-	async function preLoadNext() {
-		nextId = await popNextJobID()
-	}
-
 	async function loadNext() {
+		nextId = await popNextJobID()
 		await goto('/jobs/' + (await nextId))
 		userJobsLeft.update(x => x-1)
-		visible = true
-		preLoadNext()
 	}
 
 	function reject() {
@@ -69,32 +63,28 @@
 		//Load New
 		loadNext()
 	}
-
-	preLoadNext()
 </script>
 
-{#if visible}
+{#key srcJob}
 <div class="flex flex-col xl:flex-row w-full lg:w-auto">
 	<div class="bg-white p-4 md:px-12 sm:rounded-xl xl:left-2 sm:mx-4 lg:mx-0 lg:max-w-2xl sm:my-4 md:py-8 shadow-md relative z-10" out:send={{ key: srcJob._id }}>
-		{#await relatedApplication then relatedApplication}
-			{#if relatedApplication?.application_sent}
-			<div id="banner" class="bg-slate-400 sm:rounded-t-xl">
-				Application Sent
+		{#if relatedApplication?.application_sent}
+		<div id="banner" class="bg-slate-400 sm:rounded-t-xl">
+			Application Sent
+		</div>
+		{:else if relatedApplication?.application_processed}
+			<div id="banner" class="bg-green-400 sm:rounded-t-xl">
+				Application Ready For Review
 			</div>
-			{:else if relatedApplication?.application_processed}
-				<div id="banner" class="bg-green-400 sm:rounded-t-xl">
-					Application Ready For Review
-				</div>
-			{:else if relatedApplication?.application_processing}
-				<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
-					Application Processing
-				</div>
-			{:else if relatedApplication?.application_requested}
-				<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
-					Application in Queue
-				</div>
-			{/if}
-		{/await}
+		{:else if relatedApplication?.application_processing}
+			<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
+				Application Processing
+			</div>
+		{:else if relatedApplication?.application_requested}
+			<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
+				Application in Queue
+			</div>
+		{/if}
 		<a href={srcJob.src_url} class="flex justify-center mt-6">
 			<img src={srcJob.company.logo} alt="" />
 		</a>
@@ -113,33 +103,33 @@
 		</div>
 		<h2 class="text-xl font-semibold">Requirements</h2>
 		<ul class="list-disc pl-4">
-			{#each srcJob.requirements as requirement}
-				<li>{requirement}</li>
-			{/each}
+			{#key srcJob}
+				{#each srcJob.requirements as requirement}
+					<li>{requirement}</li>
+				{/each}
+			{/key}
 		</ul>
 		<h2 class="text-xl font-semibold">Opportunities</h2>
 		<ul class="list-disc pl-4">
-			{#each srcJob.key_points as key_point}
-				<li>{key_point}</li>
-			{/each}
+			{#key srcJob}
+				{#each srcJob.key_points as key_point}
+					<li>{key_point}</li>
+				{/each}
+			{/key}
 		</ul>
-		{#await relatedApplication then relatedApplication}
 			{#if !relatedApplication?.application_requested}
 				<div class="z-50 fade md:shadow-black sticky bottom-2 w-full md:static md:shadow md:left-auto md:bottom-auto md:w-auto left-0 flex justify-center gap-8 mt-4 ">
 					<button class="bg-red-500" on:click={reject}>Reject</button>
 					<button class="bg-green-500" on:click={apply}>Apply</button>
 				</div>
 			{/if}
-		{/await}
 		<div />
 	</div>
-	{#await relatedApplication then relatedApplication}
-		{#if relatedApplication?.application_processed}
-			<JobApplicationForm {srcJob} srcApplication={relatedApplication} />
-		{/if}
-	{/await}
+	{#if relatedApplication?.application_processed}
+		<JobApplicationForm {srcJob} srcApplication={relatedApplication} />
+	{/if}
 </div>
-{/if}
+{/key}
 
 
 <style type="postcss">

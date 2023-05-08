@@ -6,6 +6,8 @@
 	import { post } from "$lib/requestUtils"
 	import Icon from "@iconify/svelte"
 	import PresetsFilepicker from "./common/PresetsFilepicker.svelte"
+    import { saveUserData, userData } from "$lib/userData"
+	import { parsePreformattedResponse } from "$lib/applications"
 
     export let srcApplication: JobApplication
     export let srcJob: Job
@@ -17,9 +19,29 @@
         }   
     ]
 
+    async function updateUserData() {
+        let changes = false
+        for (const question of srcJob.questions) {
+            if (!question.response) {return}
+            // TODO: Make sure file works proper
+            if (question.type == "File") {return}
+            // If The Response Has Changed
+            if (srcApplication.responses[question.id] != parsePreformattedResponse(question.response)) {
+                const strippedResponse = question.response.substring(1, question.response.length-1)
+                if (strippedResponse in $userData.data) {
+                    changes = true
+                    $userData.data[strippedResponse][question.type] = srcApplication.responses[question.id]
+                }
+            }
+        }
+        console.log("updatingUserData", $userData)
+        saveUserData()
+    }
+
 
     async function sendApplication() {
         console.log(srcApplication.responses) 
+        updateUserData()
         const resp = await post(`/jobs/${srcJob._id}/apply`, {
             responses: srcApplication.responses
         })

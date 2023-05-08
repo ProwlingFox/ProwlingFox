@@ -42,7 +42,7 @@ interface Question {
     type: string
     required: boolean
     choices?: Choice[]
-    response?: any
+    response?: string
 }
 
 interface Choice{
