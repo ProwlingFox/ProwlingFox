@@ -12,13 +12,19 @@
     export let srcApplication: JobApplication
     export let srcJob: Job
 
-    const presetFileTypes = [
-        {
+    let presetFileTypes: {
+        presetName: string
+        fileName: string
+        presetID: string
+    }[] = []
+
+    if ($userData.data.resume.File) {
+        presetFileTypes.push({
             presetName: "Resume",
             fileName: $userData.data.resume.File?.file_name,
             presetID: "resume"
-        }   
-    ]
+        })
+    }
 
     async function updateUserData() {
         let changes = false

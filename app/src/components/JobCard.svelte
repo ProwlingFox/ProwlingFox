@@ -15,12 +15,17 @@
 
 	let nextId: string | null
 
-	// If The Application is not in a stable state, do an update
-	$: if (!(relatedApplication?.application_processed || relatedApplication?.application_sent)) {
-		setTimeout(async () => {
+	async function updateCheck() {
+		// If The Application is not in a stable state, do an update
+		await new Promise(r => setTimeout(r, 5000));
+		if (!(relatedApplication?.application_processed || relatedApplication?.application_sent)) {
+			console.log("Checking For Progress...")
 			relatedApplication = await getApplicationByJobID(srcJob._id)
-		}, 10000)
+		}
+		updateCheck()
 	}
+
+	updateCheck()
 
 	async function apply() {
 		post(`/jobs/${srcJob._id}/mark`, { requestApply: true })
