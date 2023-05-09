@@ -193,5 +193,5 @@
     </div>
 
     <!-- Checkbox (Limit To These Cities Exclusively) -->
-    <Checkbox on:change={sendUpdate} bind:checked={userInfo.job_preferences.location.strict_preferences}>Limit searches to these cities? (We will prefer these cities regardless)</Checkbox>
+    <Checkbox on:change={sendUpdate} bind:checked={userInfo.job_preferences.location.strict_preferences}>Limit searches to these cities? (We will prefer these cities regardless) [EXPERIMENTAL: Cities are not fully implemented, enabilig this will highly restrict your search.]</Checkbox>
 </div>
