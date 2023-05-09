@@ -1,16 +1,3 @@
-// export interface User {
-// 	name: string
-// 	tel: string
-// 	pronouns: string
-// 	job_preferences: {
-// 		roles: string[]
-// 		sector: string
-// 		locations: string[]
-// 		remote: boolean
-// 		salary: number
-// 	}
-// }
-
 export interface Role{
     role: string
     sector: string
@@ -44,7 +31,10 @@ interface LocationCriteria{
     distance_km: number
 
     remote_only: boolean
-    allowed_countries: string[]
+    country_preferences: {
+        country_code: string
+        has_visa: boolean
+    }[]
     city_preferences: City[]
     strict_preferences: boolean
 }

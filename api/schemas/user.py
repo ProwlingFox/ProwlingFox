@@ -55,12 +55,13 @@ class UserDataFields(BaseModel):
     resume: DataField(["File"]) = DataField(["File"])()
     headline: DataField(["Text"]) = DataField(["Text"])()
 
-class LocationCriteria(BaseModel):
-    can_relocate: bool = False
-    distance_km: int = 10
+class CountryPreference(BaseModel):
+    country_code: str
+    has_visa: bool
 
+class LocationCriteria(BaseModel):
     remote_only: bool = False
-    allowed_countries: list[str] = []
+    country_preferences: list[CountryPreference] = []
     city_preferences: list[City] = []
     strict_preferences: bool = False
 

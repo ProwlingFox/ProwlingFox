@@ -55,4 +55,9 @@ def apply_to_job(req: Request, job_id: str, a: apply_to_job):
 @router.get("/roles")
 @access_level("Candidate")
 def get_roles():
-	return metrics.getRoles()
+	return metrics.get_roles()
+
+@router.get("/locations")
+@access_level("Candidate")
+def get_locations():
+	return metrics.get_locations()

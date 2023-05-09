@@ -20,7 +20,12 @@ class metrics:
         return userCount
     
     @staticmethod
-    def getRoles() -> List[Role]:
+    def get_roles() -> List[Role]:
         roles_from_db = prowling_fox_db.roles.find({}, projection={ "embedding": 0, "_id": 0 })
         return list(map(lambda x:Role.parse_obj(x), roles_from_db))
+    
+    @staticmethod
+    def get_locations():
+        locations_from_db = prowling_fox_db.locations.find({}, projection={"_id": 0})
+        return list(locations_from_db)
         
