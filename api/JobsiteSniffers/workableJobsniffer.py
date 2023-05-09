@@ -11,12 +11,11 @@ workableAPI = "https://jobs.workable.com/api/v1/"
 
 class workableJobsniffer(baseJobsniffer):
 	jobsStack = []
-	jobOffset = {
-		
-	}
+	jobOffset = {}
+
 	duplicate_entries = 0
 	searchFilter = None
-	locationFilter = "UK"
+	locationFilter = None
 
 	def __init__(self, config):
 		super().__init__(config)
@@ -60,7 +59,11 @@ class workableJobsniffer(baseJobsniffer):
 			role = rawJob["title"],
 			remote = "TELECOMMUTE" in rawJob["locations"],
 			status = JobSchema.Status.ACTIVE,
-			location = City(city=rawJob["location"]["city"], region=rawJob["location"]["subregion"], country=rawJob["location"]["countryName"]),
+			location = City(
+				city=rawJob["location"]["city"],
+				region=rawJob["location"]["subregion"],
+				country=super().attempt_get_country(rawJob["location"]["countryName"])
+			),
 			listing = self.generateJobListing(rawJob),
 			questions = self.getQuestions(rawJob),
 			src_url = rawJob["url"]
