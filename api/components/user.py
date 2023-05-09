@@ -49,59 +49,74 @@ class User:
         from api import jobaiDB
         # jobs_from_db = jobaiDB.jobs.find({}, limit=10)
         jobs_from_db = jobaiDB.jobs.aggregate([
-        {
-            '$lookup': { # Attach user's role preferences to the job
-                'from': 'users', 
-                'let': {
-                    'user_id': self.user_id
-                }, 
-                'pipeline': [
-                    {
-                        '$match': {
-                            '$expr': {
-                                '$eq': [
-                                    '$_id', '$$user_id'
-                                ]
+            {
+                '$lookup': {
+                    'from': 'users', 
+                    'let': {
+                        'user_id': self.user_id
+                    }, 
+                    'pipeline': [
+                        {
+                            '$match': {
+                                '$expr': {
+                                    '$eq': [
+                                        '$_id', '$$user_id'
+                                    ]
+                                }
+                            }
+                        }, {
+                            '$project': {
+                                'roles': '$job_preferences.roles.role', 
+                                'countries': '$job_preferences.location.country_preferences.country_code', 
+                                'city': '$job_preferences.location.city_preferences'
                             }
                         }
-                    }, {
-                        '$project': {
-                            'roles': '$job_preferences.roles.role'
-                        }
-                    }
-                ], 
-                'as': 'user'
-            }
-        }, {
-            '$unwind': {
-                'path': '$user'
-            }
-        }, {
-            '$match': { # Get jobs where the roles Intersect
-                '$expr': {
-                    '$gt': [
-                        {'$size': {
-                            '$ifNull': [
-                                {'$setIntersection': [
-                                    {'$ifNull': [ "$role_category", [] ]},
-                                    "$user.roles"
-                                ]},
-                                []
-                            ]
-                        }},
-                        0,
-                    ],
+                    ], 
+                    'as': 'user'
                 }
-            }
-        }, {
-            '$lookup': { # Attach applications to the job
-                'from': 'applications', 
-                'localField': '_id', 
-                'foreignField': 'job_id', 
-                'as': 'applications'
-            }
-        }, {
-            '$match': { # Remove Jobs Where the user has applied
+            }, {
+                '$unwind': {
+                    'path': '$user'
+                }
+            }, {
+                '$match': {
+                    '$expr': {
+                        '$and': [
+                            {
+                                '$gt': [
+                                    {
+                                        '$size': {
+                                            '$ifNull': [
+                                                {
+                                                    '$setIntersection': [
+                                                        {
+                                                            '$ifNull': [
+                                                                '$role_category', []
+                                                            ]
+                                                        }, '$user.roles'
+                                                    ]
+                                                }, []
+                                            ]
+                                        }
+                                    }, 0
+                                ]
+                            }, {
+                                '$in': [
+                                    '$location.country', '$user.countries'
+                                ]
+                            }
+                        ]
+                    }
+                }
+            }, {
+                '$lookup': {
+                    'from': 'applications', 
+                    'localField': '_id', 
+                    'foreignField': 'job_id', 
+                    'as': 'applications'
+                }
+            }, {
+                '$match': {
                     'applications': {
                         '$not': {
                             '$elemMatch': {
@@ -111,23 +126,32 @@ class User:
                     }, 
                     'short_description': {
                         '$ne': None
-                    },
-                    'status': JobSchema.Status.ACTIVE
-                },
+                    }
+                }
             }, {
                 '$sort': {
                     '_id': -1
                 }
-            }, 
-            {
+            }, {
                 '$facet': {
-                    'count': [{ '$count': "total" }],
-                    'results': [{ '$limit': 10 }]
+                    'count': [
+                        {
+                            '$count': 'total'
+                        }
+                    ], 
+                    'results': [
+                        {
+                            '$limit': 10
+                        }
+                    ]
                 }
-            },
-            {
+            }, {
                 '$project': {
-                    'count': { "$ifNull": [{ '$arrayElemAt': ["$count.total", 0] }, 0]},
+                    'count': {
+                        '$arrayElemAt': [
+                            '$count.total', 0
+                        ]
+                    }, 
                     'results': 1
                 }
             }
