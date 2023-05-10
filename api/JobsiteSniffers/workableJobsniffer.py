@@ -21,11 +21,12 @@ class workableJobsniffer(baseJobsniffer):
 		super().__init__(config)
 		return
 
-	def getOneJob(self, searchQuery):
+	def getOneJob(self, searchQuery, locationQuery):
 		#Refill queue if needed
-		print("Search: ", searchQuery)
-		if (not self.jobsStack) or (not searchQuery == self.searchFilter):
+		print("Search: ", searchQuery, locationQuery)
+		if (not self.jobsStack) or (not searchQuery == self.searchFilter) or (not locationQuery == self.locationFilter):
 			self.searchFilter = searchQuery
+			self.locationFilter = locationQuery
 			if not self.refillStack():
 				raise OutOfJobs
 			

@@ -91,7 +91,6 @@ Android Developer
 Big data engineer
 Database administrator
 DevOps Engineer
-Ethical hacker
 Frontend developer
 Backend developer
 Full-Stack developer

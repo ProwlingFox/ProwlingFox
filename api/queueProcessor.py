@@ -1,6 +1,8 @@
 # 3rd Party Imports
 import datetime
+from inspect import trace
 import json, openai
+import traceback
 from bson import ObjectId
 from tkinter.tix import Tree
 from urllib import response
@@ -29,7 +31,8 @@ import schemas.user as UserSchema
 from schemas.configurations import Role
 
 SECTORS_WHITELIST = ["IT and Digital Technology"]
-MIN_JOB_PER_ROLE = 1
+MIN_JOB_PER_ROLE_PER_COUNTRY = 1
+
 
 EMPTY_ROLES = []
 
@@ -171,10 +174,10 @@ def fillQuestionEmbeddings():
 def getRoleEmbeddings() -> List[Role]:
     return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
 
-def insert_one_job(sniffer, searchQuery=None):
+def insert_one_job(sniffer, searchQuery=None, locationQuery=None):
     while True:
         try:
-            job = JobSchema.Job.parse_obj(sniffer.getOneJob(searchQuery))
+            job = JobSchema.Job.parse_obj(sniffer.getOneJob(searchQuery, locationQuery))
             resp = jobaiDB.jobs.insert_one(job.dict())
             print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
             return
@@ -191,67 +194,79 @@ def get_jobs():
     # Get The Roles that don't have enough jobs
     roles_to_add = jobaiDB.roles.aggregate([
         {
-            '$lookup': {
-                'from': 'jobs', 
-                'let': {
-                    'role': '$role'
-                }, 
-                'pipeline': [
-                    {
-                        '$match': {
-                            '$expr': {
-                                '$in': [
-                                    '$$role', {'$ifNull': [ "$role_category", [] ]}
-                                ]
-                            }
-                        }
-                    }, 
-                    {
-                        '$lookup': {
-                            'from': "applications",
-                            'localField': "_id",
-                            'foreignField': "job_id",
-                            'as': "application",
-                        },
-                    },
-                    {
-                        '$match': {
-                        'application': { '$size': 0 }
-                        },
-                    },
-                    {
-                        '$count': 'count'
-                    }
-                ], 
-                'as': 'count'
-            }
-        }, {
             '$match': {
                 'sector': {
                     '$in': SECTORS_WHITELIST
                 }
             }
         }, {
+            '$project': {
+                'role': 1
+            }
+        }, {
+            '$lookup': {
+                'from': 'locations', 
+                'pipeline': [], 
+                'as': 'locations'
+            }
+        }, {
             '$unwind': {
-                'path': '$count', 
-                'preserveNullAndEmptyArrays': True
+                'path': '$locations'
             }
         }, {
             '$project': {
                 'role': 1, 
-                'sector': 1, 
-                'count': '$count.count'
+                'country_code': '$locations.country_code'
+            }
+        }, {
+            '$lookup': {
+                'from': 'jobs', 
+                'let': {
+                    'role': '$role', 
+                    'country_code': '$country_code'
+                }, 
+                'pipeline': [
+                    {
+                        '$match': {
+                            '$expr': {
+                                '$and': [
+                                    {
+                                        '$in': [
+                                            '$$role', '$role_category'
+                                        ]
+                                    }, {
+                                        '$eq': [
+                                            '$location.country', '$$country_code'
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ], 
+                'as': 'jobs'
+            }
+        }, {
+            '$project': {
+                'role': 1, 
+                'country_code': 1, 
+                'count': {
+                    '$size': '$jobs'
+                }
             }
         }, {
             '$match': {
                 '$and': [
-                    {'$or': [
-                        { 'count': { '$lt': MIN_JOB_PER_ROLE } },
-                        { 'count': { '$exists': False } },
-                    ]},
-                    { 'role': { '$nin': EMPTY_ROLES  }}
+                    {
+                        'count': {
+                            '$lt': MIN_JOB_PER_ROLE_PER_COUNTRY
+                        }
+                    }, {
+                        'role': {
+                            '$nin': EMPTY_ROLES
+                        }
+                    }
                 ]
-                
             }
         }
     ])
@@ -260,13 +275,12 @@ def get_jobs():
          return
 
     try:
-        roleToAdd = roles_to_add.next()["role"]
+        toAdd = roles_to_add.next()
     except StopIteration:
         return
-    
 
     for jobSniiffer in jobSniiffers:
-        insert_one_job(jobSniiffer, searchQuery=roleToAdd)
+        insert_one_job(jobSniiffer, searchQuery=toAdd["role"], locationQuery=toAdd["country_code"])
     return
 
 def apply_to_job():
@@ -395,6 +409,9 @@ def main():
                 process_function()
             except Exception as e:
                 print(f"Failure With {process_function} {e}" )
+                print("\x1b[44m")
+                traceback.print_exc()
+                print("\x1b[0m")
         sleep(0.5)
         continue
 

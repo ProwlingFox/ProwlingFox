@@ -76,7 +76,7 @@ class baseJobsniffer:
             self.get_country_alias_list()
 
         if country in self.country_alias_list:
-            return self.country_alias_list[alias]
+            return self.country_alias_list[country]
 
         return country
 
