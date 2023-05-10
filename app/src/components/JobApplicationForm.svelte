@@ -53,7 +53,7 @@
         refreshApplications(true)
 
         // Goto Next Application awaiting review or New Job
-        let nextApplication = $applications.applications.findLast(x => x.application_processed && !x.application_sending && (x._id != srcApplication._id))
+        let nextApplication = $applications.applications.findLast(x => x.application_processed && !x.application_reviewed && (x._id != srcApplication._id))
         if(nextApplication) {
             goto("/jobs/" + nextApplication.job_id)
         } else {
