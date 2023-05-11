@@ -71,9 +71,13 @@
 <div class="flex flex-col xl:flex-row w-full lg:w-auto">
 	<div class="bg-white p-4 md:px-12 sm:rounded-xl xl:left-2 sm:mx-4 lg:mx-0 lg:max-w-2xl sm:my-4 md:py-8 shadow-md relative z-10" out:send={{ key: srcJob._id }}>
 		{#if relatedApplication?.application_sent}
-		<div id="banner" class="bg-slate-400 sm:rounded-t-xl">
-			Application Sent
-		</div>
+			<div id="banner" class="bg-slate-400 sm:rounded-t-xl">
+				Application Sent
+			</div>
+		{:else if relatedApplication?.application_reviewed}
+			<div id="banner" class="bg-slate-400 sm:rounded-t-xl">
+				Application Sending
+			</div>
 		{:else if relatedApplication?.application_processed}
 			<div id="banner" class="bg-green-400 sm:rounded-t-xl">
 				Application Ready For Review

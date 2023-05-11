@@ -77,7 +77,7 @@
             <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "LongText"}
             <label for={question.id} data-required={question.required}>{question.content}</label>
-            <textarea id={question.id} required={question.required} disabled={srcApplication.application_reviewed} rows="4" bind:value={srcApplication.responses[question.id]}/>
+            <textarea id={question.id} required={question.required} disabled={srcApplication.application_reviewed} rows="8" bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "Number"}
             <label for={question.id} data-required={question.required}>{question.content}</label>
             <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} type="number" bind:value={srcApplication.responses[question.id]}/>

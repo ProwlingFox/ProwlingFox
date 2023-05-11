@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from pydoc import doc
 from fastapi import HTTPException
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
@@ -162,7 +163,10 @@ class User:
 
         try:
             document = jobs_from_db.next()
-            count = document["count"]
+            print("document", document)
+            count = 0
+            if "count" in document:
+                count = document["count"]
             for job in document["results"]:
                 try:
                     jobs.append(JobSchema.JobSimplified.parse_obj(job))

@@ -17,10 +17,11 @@
         })
     }
 
-    async function fileBlur(e: FocusEvent, var_name: string) {
-        if (!(e.target && "files" in e.target)) {return}
-        if (!(e.target.files instanceof FileList)) {return} 
-        if (e.target.files.length < 1) {return}
+    async function fileUpdate(e: FocusEvent, var_name: string) {
+        console.log("File")
+        if (!(e.target && "files" in e.target)) {console.log("Target Not Files"); return}
+        if (!(e.target.files instanceof FileList)) {console.log("Target Not FileList"); return} 
+        if (e.target.files.length < 1) {console.log("Target Empty"); return}
 
         const file = e.target.files[0]
         const b64File = await blobToData(file)
@@ -94,7 +95,7 @@
                                     if(!(e.target instanceof HTMLElement && e.target.nextElementSibling instanceof HTMLElement)) {return}
                                     e.target.nextElementSibling.click()
                                 }}>{userInfo.data[var_name][var_type]?.file_name || "Upload A File"}</button>
-                                <input type="file" id={var_name} on:blur={e => fileBlur(e, var_name)} class="hidden">
+                                <input type="file" id={var_name} on:change={e => fileUpdate(e, var_name)} class="hidden">
                             </div>
                         {/if}
                     {/each}  
