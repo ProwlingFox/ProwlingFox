@@ -309,7 +309,7 @@ def apply_to_job():
     if resp.status_code == 404:
         application_failed = True
         mark_job_inactive(job.id)
-        return
+        print("Application Failed")
 
     jobaiDB.applications.update_one({
         "_id": application.id
