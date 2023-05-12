@@ -50,7 +50,7 @@ class UserDataFields(BaseModel):
     phone_number: DataField(["Text"]) = DataField(["Text"])()
     pronouns: DataField(["Text"]) = DataField(["Text"])()
     notice_period: DataField(["Text", "Number"]) = DataField(["Text", "Number"])()
-    expected_sallary: DataField(["Text", "Number"]) = DataField(["Text", "Number"])()
+    expected_salary: DataField(["Text", "Number"]) = DataField(["Text", "Number"])()
     address: DataField(["Text"]) = DataField(["Text"])()
     resume: DataField(["File"]) = DataField(["File"])()
     headline: DataField(["Text"]) = DataField(["Text"])()

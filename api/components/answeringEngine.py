@@ -130,7 +130,7 @@ class AnsweringEngine:
 			raise e	
 	
 	@staticmethod
-	def sendSimpleChatPrompt(prompt: str, note=None, force_single_line = False, system = 'You Are A Job Application Engine', tokens = 1024)-> str:
+	def sendSimpleChatPrompt(prompt: str, note=None, force_single_line = False, system = 'You are applying to the following job. You should answer as though you are the person applying. DO NOT SAY "As An AI" or anything like that.' , tokens = 1024)-> str:
 		model = "gpt-3.5-turbo"
 		attempts = 0
 		while attempts < 3:

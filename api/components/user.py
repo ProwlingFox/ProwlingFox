@@ -1,5 +1,5 @@
 from datetime import timedelta, datetime
-from pydoc import doc
+from typing import List
 from fastapi import HTTPException
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
@@ -180,7 +180,7 @@ class User:
             "jobs": jobs
         }
 
-    def get_applications(self, getSent = False):
+    def get_applications(self, getSent = False) -> List[JobSchema.Application]:
         from api import jobaiDB
 
         matchCriteria = {
@@ -269,6 +269,23 @@ class User:
         })
         return {"applicationsToday": applicationsToday}
 
+    def export_applications_as_csv(self):
+        import csv, io
+        applications = self.get_applications(True)
+
+        f = io.StringIO()
+        w = csv.DictWriter(f, ["ID", "Role", "Company", "Status", "TimeStamp", "URL"])
+
+        for app in applications:
+            w.writerow({
+                "ID": app.id,
+                "Role": app.job.role,
+                "Company": app.job.company.name,
+                "URL": app.job.src_url,
+                "Status":  "SENT" if app.application_sent else ("AWAITING REVIEW" if app.application_processed else "PROCESSING"),
+                "TimeStamp": app.application_sent_ts if app.application_sent else (app.application_processed_ts if app.application_processed else app.application_requested_ts),
+            })
+        return f.getvalue()
 
     @staticmethod
     def authenticate_by_JWT(JWT: str):

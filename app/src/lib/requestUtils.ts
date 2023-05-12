@@ -44,8 +44,12 @@ async function makeRequest(method: string, path: string, body: object = {}, para
 		if (method == "POST") {fetch_obj["body"] = JSON.stringify(body)}
 
 		var response = await fetch_override(uri, fetch_obj)
-		if (response.ok) return response.json()
-		else throw response
+		if (response.ok) {
+			const contentType: string = response.clone().headers.get("content-type")
+			if (contentType.includes("text/csv")) return response.text()
+			return response.json()
+		} 
+		throw response
 	} catch (error) {
 		console.error('Fetch Request Failed', error)
 		return {}

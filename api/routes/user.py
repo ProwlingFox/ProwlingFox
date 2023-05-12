@@ -1,4 +1,6 @@
+import io
 from fastapi import APIRouter, Depends, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from typing import Type, List
 
@@ -92,3 +94,13 @@ def get_user_metrics(req: Request):
 def update_user_details(req: Request):
 	u = User(req.state.user_id)
 	return 
+
+@router.get("/user/data/applications", response_class=StreamingResponse)
+@authentication.access_level("Authenticated")
+def export_applications(req: Request):
+	u = User(req.state.user_id)
+	stream = io.StringIO(u.export_applications_as_csv())
+	response = StreamingResponse(iter([stream.getvalue()]), media_type="text/csv")
+	response.headers["Content-Disposition"] = "attachment; filename=Applications.csv"
+
+	return response

@@ -5,7 +5,7 @@
 </script>
 
 <div class="mt-2">
-    <h3 class="text-xl font-semibold">Sent Applications</h3>
+    <h3 class="text-xl font-semibold">Sent Applications ({sentApplications.filter(x => x.application_sent).length})</h3>
     <div class="overflow-x-scroll">
         <div class="flex w-fit">
             {#each sentApplications as application}

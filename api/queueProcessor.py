@@ -31,7 +31,7 @@ import schemas.user as UserSchema
 from schemas.configurations import Role
 
 SECTORS_WHITELIST = ["IT and Digital Technology"]
-MIN_JOB_PER_ROLE_PER_COUNTRY = 1
+MIN_JOB_PER_ROLE_PER_COUNTRY = 5
 
 
 EMPTY_ROLES = []
@@ -226,6 +226,21 @@ def get_jobs():
                     'country_code': '$country_code'
                 }, 
                 'pipeline': [
+                    {
+                    '$lookup': {
+                        'from': "applications",
+                        'localField': "_id",
+                        'foreignField': "job_id",
+                        'as': "application",
+                    },
+                    },
+                    {
+                    '$match': {
+                        'application': {
+                            '$size': 0,
+                        },
+                    },
+                    },
                     {
                         '$match': {
                             '$expr': {
