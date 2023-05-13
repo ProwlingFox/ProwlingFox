@@ -1,3 +1,7 @@
+pkill "queueProcessor.py"
+pkill "node index.js"
+pkill "uvicorn"
+
 git pull
 
 echo "Starting Queue Processor";
