@@ -6,7 +6,6 @@ from bson.objectid import ObjectId
 from fastapi import HTTPException
 from pydantic import ValidationError
 
-from schemas.configurations import Role
 import schemas.job as JobSchema
 import schemas.user as UserSchema
 
@@ -14,7 +13,6 @@ from components.user import User
 from components.answeringEngine import AnsweringEngine
 from components.db import prowling_fox_db
 
-from pprint import pprint
 
 class Job:
 	job_data: JobSchema.Job = None

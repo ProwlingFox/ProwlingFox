@@ -1,11 +1,10 @@
-from typing import Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, Request
+from typing import Any
+from fastapi import APIRouter, Request
 from pydantic import BaseModel
 from components.metrics import metrics
 from components.authentication import access_level
 
 import schemas.job as JobSchema
-from schemas.return_types import get_job_reccomendations_return
 
 from components.user import User
 from components.job import Job

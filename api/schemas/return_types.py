@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List, Any, Optional
+from typing import List
 
 from schemas.job import JobSimplified
 

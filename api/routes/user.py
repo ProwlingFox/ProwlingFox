@@ -1,8 +1,7 @@
 import io
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import Type, List
 
 from components import authentication
 from components.user import User

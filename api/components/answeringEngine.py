@@ -1,6 +1,6 @@
 from time import sleep
 from typing import List
-from numpy import dot, void
+from numpy import dot
 from numpy.linalg import norm
 import openai
 from schemas.configurations import B64_File

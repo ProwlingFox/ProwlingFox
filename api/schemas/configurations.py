@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
-from typing import List, Any, Optional
+from typing import List, Optional
 
 class Role(BaseModel):
     role: str

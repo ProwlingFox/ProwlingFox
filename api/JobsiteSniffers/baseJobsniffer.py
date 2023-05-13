@@ -1,7 +1,5 @@
-from ast import alias
 from bson import ObjectId
 from schemas.configurations import B64_File
-import schemas.job as JobSchema
 from components.db import prowling_fox_db
 
 

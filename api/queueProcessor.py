@@ -1,6 +1,5 @@
 # 3rd Party Imports
 import datetime
-from inspect import trace
 import openai
 import traceback
 from bson import ObjectId
@@ -23,7 +22,7 @@ from components.user import User
 openai.api_key = secrets["OpenAISecret"]
 
 # Schema/Typing Imports
-from typing import Iterator, List
+from typing import List
 import schemas.job as JobSchema
 import schemas.user as UserSchema
 from schemas.configurations import Role

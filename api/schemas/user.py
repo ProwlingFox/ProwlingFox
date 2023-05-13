@@ -1,8 +1,6 @@
 from datetime import date
-from traceback import print_tb
-from matplotlib.pyplot import flag
 from pydantic import BaseModel, create_model
-from typing import Type, List, Any, Optional
+from typing import Optional
 from enum import Enum
 
 from schemas.mongo import MongoBaseModel
