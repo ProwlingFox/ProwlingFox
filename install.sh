@@ -1,4 +1,6 @@
-
+# install.sh syntax
+# 
+# 
 # Install Dependancies
 # Node/NPN, Python, Docker
 
@@ -11,3 +13,6 @@
 # WINDOWS CREATE SYMLINK
 # New-Item -ItemType HardLink -Path "app\.env" -Target ".env"
 # New-Item -ItemType HardLink -Path "api\.env" -Target ".env"
+
+ln -s .env api/.env
+ln -s .env app/.env

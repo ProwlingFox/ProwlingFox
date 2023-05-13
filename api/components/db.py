@@ -2,7 +2,7 @@ from pymongo import MongoClient, database, errors
 from time import sleep
 
 class ProwlingFoxDB(database.Database):
-    def __init__(self, db_name):
+    def __init__(self):
         from components.secrets import secrets
 
         while True:
