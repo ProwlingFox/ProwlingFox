@@ -51,6 +51,7 @@ export interface User {
     email: string
     permission: 'admin' | 'candidate' | 'unverified'
 	picture?: string
+    email_opt_out: boolean
 
     // Data
     data: UserDataFields

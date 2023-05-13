@@ -3,6 +3,8 @@ from pydantic import BaseModel, create_model
 from typing import Optional
 from enum import Enum
 
+from pyparsing import Opt
+
 from schemas.mongo import MongoBaseModel
 from schemas.configurations import City, Role, B64_File
 
@@ -73,6 +75,7 @@ class UserJobPreferences(BaseModel):
 class User(MongoBaseModel):
     name: str
     email: str
+    email_opt_out: bool = False
     permission: UserRoles
     picture: str
     linkedInID: Optional[str]
@@ -84,8 +87,12 @@ class User(MongoBaseModel):
 class CreateUser(User):
     password: Optional[str]
 
+# WARNING WARNING WARINIG
+# The User can update any of these details freely
 class UpdateUserDetails(BaseModel):
     name: Optional[str]
+    picture: Optional[str]
+    email_opt_out: Optional[bool]
     # Data
     data: Optional[UserDataFields]
     job_preferences: Optional[UserJobPreferences]
