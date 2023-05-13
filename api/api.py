@@ -1,8 +1,7 @@
 from components.db import prowling_fox_db as jobaiDB
-
 # FAST API
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from routes import user, jobs, admin
