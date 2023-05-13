@@ -346,6 +346,7 @@ class User:
         oauth = oauth_response.json()
 
         if "error" in oauth:
+            print(oauth, payload)
             raise HTTPException(400, "OAUTH_CODE_INVALID")
 
         url = "https://api.linkedin.com/v2/userinfo"
