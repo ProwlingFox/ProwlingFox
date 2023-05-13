@@ -7,7 +7,7 @@ class ProwlingFoxDB(database.Database):
 
         while True:
             #Create DB Connection
-            mongo_client = MongoClient(secrets["database"]["credentials"])
+            mongo_client = MongoClient(secrets["DB_URI"])
             try:
                 print("Testing DB Connection")
                 mongo_client.admin.command('ping')

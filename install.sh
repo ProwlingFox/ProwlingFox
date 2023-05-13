@@ -8,5 +8,6 @@
 
 # Install 
 
-New-Item -ItemType HardLink -Path "app\.env" -Target ".env"
-New-Item -ItemType HardLink -Path "api\.env" -Target ".env"
+# WINDOWS CREATE SYMLINK
+# New-Item -ItemType HardLink -Path "app\.env" -Target ".env"
+# New-Item -ItemType HardLink -Path "api\.env" -Target ".env"

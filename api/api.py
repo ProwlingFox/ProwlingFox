@@ -1,3 +1,4 @@
+from components.secrets import secrets
 from components.db import prowling_fox_db as jobaiDB
 # FAST API
 
@@ -6,11 +7,20 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from routes import user, jobs, admin
 
-app = FastAPI(
-    title="ProwlingFox",
-    version="0.0.1",
-    debug=True
-)
+if secrets["DEVELOPMENT"] == "TRUE":
+    app = FastAPI(
+        title="ProwlingFox (DEV)",
+        version="0.1.0",
+        debug= True,
+    )
+else:
+    app = FastAPI(
+        title="ProwlingFox",
+        version="0.1.0",
+        debug= False,
+        docs_url=None,
+        redoc_url=None
+    )
 
 # Middleware to allow working on multiple points, needs adjusted for production
 app.add_middleware(
@@ -27,4 +37,4 @@ app.include_router(admin.router)
 
 @app.get("/")
 def api_info():
-	return {"success": True, "message": "Job.ai API is running"}
+	return {"success": True, "message": "ProwlingFox API is running"}

@@ -19,7 +19,7 @@ from components.job import Job
 from components.user import User
 
 # Configuration
-openai.api_key = secrets["OpenAISecret"]
+openai.api_key = secrets["OPENAI_KEY"]
 
 # Schema/Typing Imports
 from typing import List
@@ -114,16 +114,11 @@ def preprocess_job():
     j.preprocess_job()
     return
 
-def load_jobSniffer(jobSnifferName, forceLoad=False):
-	snifferData = secrets["sniffers"][jobSnifferName]
-
-	if not (forceLoad or snifferData["enabled"]) :
-		return False
-
+def load_jobSniffer(jobSnifferName):
 	try:
 		jsPlugin = __import__("JobsiteSniffers.%s" % jobSnifferName, globals(), locals(), [jobSnifferName], 0)
 		js = getattr(jsPlugin, jobSnifferName)
-		return js(secrets["sniffers"][jobSnifferName])
+		return js()
 	except Exception as e:
 		print("Error with %s Plugin" % (jobSnifferName))
 		raise
@@ -314,7 +309,7 @@ def apply_to_job():
     application = JobSchema.Application.parse_obj(application_from_db)
     job = Job(application.job_id).get_details()
 
-    jobSniffer = load_jobSniffer(job.source, True)
+    jobSniffer = load_jobSniffer(job.source)
     resp = jobSniffer.apply(job, application)
 
     application_failed = False

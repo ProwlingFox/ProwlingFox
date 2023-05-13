@@ -5,7 +5,7 @@ from numpy.linalg import norm
 import openai
 from schemas.configurations import B64_File
 from components.secrets import secrets
-openai.api_key = secrets["OpenAISecret"]
+openai.api_key = secrets["OPENAI_KEY"]
 
 import schemas.job as JobSchema
 import schemas.user as UserSchema

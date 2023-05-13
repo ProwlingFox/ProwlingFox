@@ -17,8 +17,8 @@ class workableJobsniffer(baseJobsniffer):
 	searchFilter = None
 	locationFilter = None
 
-	def __init__(self, config):
-		super().__init__(config)
+	def __init__(self):
+		super().__init__()
 		return
 
 	def getOneJob(self, searchQuery, locationQuery):

@@ -12,13 +12,7 @@ from components.db import prowling_fox_db
 class baseJobsniffer:
     country_alias_list = None
 
-    def __init__(self, config, override = False):
-        self.config = config
-
-        # Error Out if the config is disabled
-        if (not config["enabled"] and not override):
-            raise Exception(self.__class__.__name__ + " Module Is Disabled In Secrets.Json")
-    
+    def __init__(self):
         return
     
     # Gets updates to a job i.e. status change

@@ -292,7 +292,7 @@ class User:
         from components.secrets import secrets
         import jwt, time
         try:
-            decoded_token = jwt.decode(JWT, secrets["JWT"]["Secret"], algorithms=secrets["JWT"]["Algorithm"])
+            decoded_token = jwt.decode(JWT, secrets["JWT_SECRET"], algorithms=secrets["JWT_ALG"])
         except Exception as e:
             return {'success': False, 'error': 'INVALID_TOKEN'}
         if decoded_token['expiry'] < time.time():
@@ -325,7 +325,7 @@ class User:
             "email": user_from_db['email']
         }
 
-        token = jwt.encode(payload, secrets["JWT"]["Secret"], algorithm=secrets["JWT"]["Algorithm"])
+        token = jwt.encode(payload, secrets["JWT_SECRET"], algorithm=secrets["JWT_ALG"])
 
         return {'success': True, 'Token': token}
 
@@ -337,9 +337,9 @@ class User:
         payload = {
             "grant_type": "authorization_code",
             "code": code,
-            "client_id": secrets["LinkedIn"]["id"],
-            "client_secret": secrets["LinkedIn"]["secret"],
-            "redirect_uri": secrets["App_URL"] + "/login"
+            "client_id": secrets["PUBLIC_LINKEDIN_CLIENT_ID"],
+            "client_secret": secrets["LINKEDIN_CLIENT_SECRET"],
+            "redirect_uri": secrets["PUBLIC_APP_URL"] + "/login"
         }
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
         oauth_response = requests.request("POST", url, data=payload, headers=headers)
@@ -380,7 +380,7 @@ class User:
             "profileImage": user_from_db["picture"],
             "linkedInAccessKey": oauth["access_token"],
         }
-        token = jwt.encode(payload, secrets["JWT"]["Secret"], algorithm=secrets["JWT"]["Algorithm"])
+        token = jwt.encode(payload, secrets["JWT_SECRET"], algorithm=secrets["JWT_ALG"])
 
         return {'success': True, 'Token': token}
 
