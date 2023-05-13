@@ -72,4 +72,4 @@ export const applications = writable<ApplicationStore>({
 	receive,
 })
 
-await refreshApplications(true)
+refreshApplications(true)

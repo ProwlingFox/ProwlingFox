@@ -3,8 +3,10 @@ import { get, getJWT, post } from './requestUtils'
 import type { User } from '$interfaces/user'
 
 export const userData = writable<User>(
-    await get("/user")
+    // await get("/user")
 )
+
+invaldateUserData()
 
 export async function invaldateUserData() {
     userData.set(await get("/user"))

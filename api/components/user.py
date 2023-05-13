@@ -163,7 +163,6 @@ class User:
 
         try:
             document = jobs_from_db.next()
-            print("document", document)
             count = 0
             if "count" in document:
                 count = document["count"]
