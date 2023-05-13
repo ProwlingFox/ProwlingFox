@@ -17,9 +17,9 @@ class ProwlingFoxDB(database.Database):
                 print("DB Server Cannot Connect, Retrying...")
                 sleep(4)
         
-        super().__init__(mongo_client, db_name)
+        super().__init__(mongo_client, secrets["DB_NAME"])
         return
 
         
 
-prowling_fox_db = ProwlingFoxDB("jobai")
+prowling_fox_db = ProwlingFoxDB()
