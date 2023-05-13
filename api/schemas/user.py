@@ -3,8 +3,6 @@ from pydantic import BaseModel, create_model
 from typing import Optional
 from enum import Enum
 
-from pyparsing import Opt
-
 from schemas.mongo import MongoBaseModel
 from schemas.configurations import City, Role, B64_File
 
