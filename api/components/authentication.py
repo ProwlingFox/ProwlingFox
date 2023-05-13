@@ -1,4 +1,3 @@
-from tkinter import NO
 from fastapi import HTTPException, Request
 
 # TODO: Enforce w/ pydantic
