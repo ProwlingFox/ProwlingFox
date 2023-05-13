@@ -1,4 +1,4 @@
-import { isJWTValid, setJWT, getJWT, parseJWT} from '$lib/requestUtils'
+import { isJWTValid, parseJWT} from '$lib/requestUtils'
 import { redirect } from '@sveltejs/kit'
 
 const publicPaths = ['/login', '/signup']

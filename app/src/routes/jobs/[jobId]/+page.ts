@@ -1,5 +1,8 @@
 import { get } from '$lib/requestUtils'
 import { getApplicationByJobID, parsePreformattedResponse } from '$lib/applications.js'
+import { invaldateUserData, userData } from '$lib/userData.js'
+import { get as getStore } from 'svelte/store'
+
 import type { Job } from '$interfaces/job.js'
 import type { Application } from '$interfaces/application.js'
 
@@ -21,6 +24,10 @@ export async function load({ params, fetch }) {
 	const jobId = params.jobId
 	console.log("JobID:", jobId)
 	let job = get('/jobs/' + jobId, fetch)
+
+	if(!getStore(userData)) {
+		await invaldateUserData()
+	}
 
 	let relatedApplication = await getApplicationByJobID(jobId)
 	relatedApplication = await loadFromUserdata(await job, relatedApplication)
