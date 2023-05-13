@@ -1,11 +1,9 @@
 # 3rd Party Imports
 import datetime
 from inspect import trace
-import json, openai
+import openai
 import traceback
 from bson import ObjectId
-from tkinter.tix import Tree
-from urllib import response
 from time import sleep
 
 # Error Handling Imports
