@@ -134,7 +134,7 @@ class AnsweringEngine:
 	def sendSimpleChatPrompt(prompt: str, note=None, force_single_line = False, system = 'You are applying to the following job. You should answer as though you are the person applying. DO NOT SAY "As An AI" or anything like that.' , tokens = 1024)-> str:
 		model = "gpt-3.5-turbo"
 		attempts = 0
-		while attempts < 3:
+		while attempts < 5:
 			try:
 				sent_timestamp_ms = datetime.now()
 				response = openai.ChatCompletion.create(
@@ -161,10 +161,13 @@ class AnsweringEngine:
 
 				return answer
 			except openai.OpenAIError as e:
-				error_message: str = e.error["message"]
-				if error_message.startswith("Rate limit reached") or error_message.startswith("That model is currently overloaded"):
-					logging.warning("OpenAI Chat Prompt Request Rate Limited")
-					sleep(20)
-					attempts += 1
-				else:
-					raise e
+				if "message" in e.error:
+					error_message: str = e.error["message"]
+					if error_message.startswith("Rate limit reached") or error_message.startswith("That model is currently overloaded"):
+						logging.warning("OpenAI Chat Prompt Request Rate Limited")
+						sleep(20)
+						attempts += 1
+						continue
+				logging.error("Other Issue With OPENAI Call")
+				attempts += 1
+				continue
