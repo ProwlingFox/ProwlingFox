@@ -420,7 +420,7 @@ class User:
         user = UserSchema.CreateUser(
             name = userinfo["name"],
             email = userinfo["email"],
-            picture = userinfo["picture"],
+            picture = userinfo["picture"] if "picture" in userinfo else None,
             password = None,
             permission = "unverified",
             linkedInID = userinfo["sub"],

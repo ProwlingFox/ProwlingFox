@@ -82,7 +82,7 @@ def solve_application():
     })
 
     if not application_from_db:
-         return
+         return False
 
     application = JobSchema.Application.parse_obj(application_from_db)
 
@@ -113,7 +113,7 @@ def solve_application():
             'application_processed_ts': datetime.datetime.now()
         }
     })
-    return
+    return True
 
 def preprocess_job():
     job_to_preprocess_from_db = jobaiDB.jobs.find_one_and_update({
@@ -124,7 +124,7 @@ def preprocess_job():
     })
 
     if not job_to_preprocess_from_db:
-        return
+        return False
 
     job = JobSchema.Job.parse_obj(job_to_preprocess_from_db)
 
@@ -132,7 +132,7 @@ def preprocess_job():
     j = Job(job.id)
     logging.info("preprocessing job: " + str(job.id))
     j.preprocess_job()
-    return
+    return True
 
 def load_jobSniffer(jobSnifferName):
 	try:
@@ -192,12 +192,12 @@ def insert_one_job(sniffer, searchQuery=None, locationQuery=None):
             job = JobSchema.Job.parse_obj(sniffer.getOneJob(searchQuery, locationQuery))
             resp = jobaiDB.jobs.insert_one(job.dict())
             logging.info(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
-            return
+            return True
         except OutOfJobs:
             logging.warning("That Query Is Out Of Jobs")
             global EMPTY_ROLES
             EMPTY_ROLES.append(searchQuery)
-            break
+            return False
         except MongoErrors.DuplicateKeyError:
             logging.warning("Job Allready Existed")
 
@@ -324,7 +324,7 @@ def apply_to_job():
     })
 
     if not application_from_db:
-        return
+        return False
 
     application = JobSchema.Application.parse_obj(application_from_db)
     job = Job(application.job_id).get_details()
@@ -348,7 +348,7 @@ def apply_to_job():
              "application_failed": application_failed
         }
     })
-    return
+    return True
 
 def mark_job_inactive(job_id):
     jobaiDB.jobs.update_one(
@@ -371,7 +371,7 @@ def preprocess_job_embeddings():
     })
 
     if not job_from_db:
-        return
+        return False
 
     job = JobSchema.Job.parse_obj(job_from_db)
 
@@ -411,7 +411,7 @@ def preprocess_job_embeddings():
         "sector_category": sector,
         "job_processing": False
     })
-    return
+    return True
 
 jobSniiffers = [
     load_jobSniffer("workableJobsniffer")

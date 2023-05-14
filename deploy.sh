@@ -1,7 +1,7 @@
 pkill "queueProcessor.py"
 pkill "node index.js"
 pkill "uvicorn"
-
+service nginx stop
 git pull
 
 echo "Building Svelte App"
@@ -14,7 +14,7 @@ bash -c "cd api;./env/bin/python queueProcessor.py > /dev/null 2>&1 &"
 echo "Running Frontend App"
 bash -c "cd app/build;node index.js >> ../../app.log 2>&1 &"
 
-
+service nginx start
 
 # WINDOWS CREATE SYMLINK
 # New-Item -ItemType HardLink -Path "app\.env" -Target ".env"
