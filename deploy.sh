@@ -5,7 +5,7 @@ pkill "uvicorn"
 git pull
 
 echo "Starting Queue Processor";
-bash -c "cd api;./env/bin/python queueProcessor.py >> ../queue_processor.log 2>&1 &"
+bash -c "cd api;./env/bin/python queueProcessor.py > /dev/null 2>&1 &"
 echo "Starting API";
 bash -c "cd api;./env/bin/uvicorn api:app --host 127.0.0.1 --port 8000 >> ../api.log 2>&1 &"
 

@@ -1,3 +1,4 @@
+import logging
 from time import sleep
 from typing import List
 from numpy import dot
@@ -93,7 +94,7 @@ class AnsweringEngine:
 				return response["data"][0]["embedding"]
 			except openai.OpenAIError as e:
 				attempts += 1
-				print("Rate Limited")
+				logging.warning("OpenAI Embedding Request Rate Limited")
 				sleep(1)
 
 	@staticmethod
@@ -125,8 +126,8 @@ class AnsweringEngine:
 
 			return answer
 		except openai.OpenAIError as e:
-			print("I actually got to the error c:")
-			print(e.code)
+			logging.warning("I actually got to the error c:")
+			logging.warning(e.code)
 			raise e	
 	
 	@staticmethod
@@ -162,7 +163,7 @@ class AnsweringEngine:
 			except openai.OpenAIError as e:
 				error_message: str = e.error["message"]
 				if error_message.startswith("Rate limit reached") or error_message.startswith("That model is currently overloaded"):
-					print("Rate Limited")
+					logging.warning("OpenAI Chat Prompt Request Rate Limited")
 					sleep(20)
 					attempts += 1
 				else:

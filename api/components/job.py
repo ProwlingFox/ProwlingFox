@@ -1,4 +1,5 @@
 import datetime
+import logging
 from typing import List
 import bson
 from bson.objectid import ObjectId
@@ -28,7 +29,7 @@ class Job:
 		job = self.get_details()
 
 		if job.short_description:
-			print("It looks like this job has allready been processed. JobID:", self.id)
+			logging.warning("It looks like this job has allready been processed. JobID:" + str(self.id))
 
 		job.questions = self.preprocess_questions(job.questions)
 
@@ -71,7 +72,7 @@ class Job:
 		for question in questions:
 			# This Allows JobSniffers to prefil questions too
 			if question.response:
-				print("question allready filled: ", question.id)
+				logging.warning("question allready filled: " + question.id)
 				continue
 
 			if question.type == JobSchema.FieldType.TEXT:
@@ -79,17 +80,17 @@ class Job:
 					"question": question.ai_prompt or question.content,
 					"available_variables": ",".join(UserSchema.UserDataFields.__fields__.keys()) + "," + ",".join(special_case_fields)
 				}
-				print("Question:", question.content)
+				logging.info("Question:" + question.content)
 				prompt = AnsweringEngine.promptGenerator("questionPreprocessor", prompt_vars)
 				instructions = "You Are Matching Questions To Variables, Do not use more than 5 additional words"
 				response = AnsweringEngine.sendSimpleChatPrompt(prompt, "questionPreprocessor",system=instructions,  force_single_line=True, tokens = 10)
 				# TODO: Add better code here to validate the response can be parsed
 				if "N/A" in response.upper():
-					print("Cant Be Substituded")
+					logging.info("Cant Be Substituded")
 					continue
 				if "{" in response and "}" in response:
 					question.response = response
-					print("Can Be Substituded with", response)
+					logging.info("Can Be Substituded with" + response)
 				continue
 		return questions
 

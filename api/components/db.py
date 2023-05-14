@@ -1,3 +1,4 @@
+import logging
 from pymongo import MongoClient, database, errors
 from time import sleep
 
@@ -9,12 +10,12 @@ class ProwlingFoxDB(database.Database):
             #Create DB Connection
             mongo_client = MongoClient(secrets["DB_URI"])
             try:
-                print("Testing DB Connection")
+                logging.info("Testing DB Connection")
                 mongo_client.admin.command('ping')
-                print("DB Connected 🙂")
+                logging.info("DB Connected 🙂")
                 break
             except errors.ConnectionFailure:
-                print("DB Server Cannot Connect, Retrying...")
+                logging.warning("DB Server Cannot Connect, Retrying...")
                 sleep(4)
         
         super().__init__(mongo_client, secrets["DB_NAME"])

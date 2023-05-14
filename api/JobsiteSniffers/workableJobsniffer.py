@@ -1,4 +1,5 @@
 import base64
+import logging
 import requests
 from datetime import datetime
 import html2text
@@ -23,7 +24,7 @@ class workableJobsniffer(baseJobsniffer):
 
 	def getOneJob(self, searchQuery, locationQuery):
 		#Refill queue if needed
-		print("Search: ", searchQuery, locationQuery)
+		logging.info(f"Search: {searchQuery} in {locationQuery}")
 		if (not self.jobsStack) or (not searchQuery == self.searchFilter) or (not locationQuery == self.locationFilter):
 			self.searchFilter = searchQuery
 			self.locationFilter = locationQuery
@@ -209,11 +210,9 @@ class workableJobsniffer(baseJobsniffer):
 						}
 					})
 
-		print("Request Body", body)
-
 		headers = {"Content-Type": "application/json"}
 		response = requests.request("POST", applicationURL, headers=headers, json=body)
-		print("resp", response)
+		logging.info("Application Response " + str(response))
 		return response
 
 	def generateJobListing(self, rawJob):

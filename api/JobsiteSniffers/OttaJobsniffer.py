@@ -2,6 +2,7 @@ OttaGraphQLEndpoint = "https://api.otta.com/graphql"
 OttaLoginEndpoint = "https://api.otta.com/auth/login"
 Currency = "GBP"
 
+import logging
 import requests
 
 from gql import gql, Client
@@ -28,7 +29,7 @@ class ottaJobsniffer:
 		try:
 			self.attemptLogin(self.secrets['credentials'])
 		except:
-			print("Could Not Log Into Otta.com, Invalid credentials Probably")
+			logging.info("Could Not Log Into Otta.com, Invalid credentials Probably")
 			raise Exception("LOGIN_ERROR")
 			return
 		self.transport = AIOHTTPTransport(url=OttaGraphQLEndpoint, headers={'x-csrf-token': self.csrfToken, 'content-type': 'application/json'}, cookies={'_otta_session': self.sessionToken})

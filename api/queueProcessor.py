@@ -1,7 +1,28 @@
+import logging
+def setup_logger():
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+
+    # Create a formatter
+    formatter = logging.Formatter('%(asctime)s|%(levelname)s: %(message)s')
+
+    # Create a console handler and set the formatter
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+
+    # Create a file handler and set the formatter
+    file_handler = logging.FileHandler('queue_processor.log', encoding='utf-8')
+    file_handler.setFormatter(formatter)
+
+    # Add the handlers to the logger
+    logger.addHandler(console_handler)
+    logger.addHandler(file_handler)
+    return
+setup_logger()
+
 # 3rd Party Imports
 import datetime
 import openai
-import traceback
 from bson import ObjectId
 from time import sleep
 
@@ -29,7 +50,6 @@ from schemas.configurations import Role
 
 SECTORS_WHITELIST = ["IT and Digital Technology"]
 MIN_JOB_PER_ROLE_PER_COUNTRY = 5
-
 
 EMPTY_ROLES = []
 
@@ -72,10 +92,10 @@ def solve_application():
     answered_questions = {}
 
     for question in job.questions:
-        print("answering question:", question.id)
+        logging.info("answering question: " + question.id)
         
         answer = AnsweringEngine.answer_question(job, user, question)
-        print(answer)
+        logging.info(answer)
 
         answered_questions[question.id] = answer
 
@@ -110,7 +130,7 @@ def preprocess_job():
 
     global role_embeddings
     j = Job(job.id)
-    print("preprocessing job: ", job.id)
+    logging.info("preprocessing job: " + str(job.id))
     j.preprocess_job()
     return
 
@@ -120,7 +140,7 @@ def load_jobSniffer(jobSnifferName):
 		js = getattr(jsPlugin, jobSnifferName)
 		return js()
 	except Exception as e:
-		print("Error with %s Plugin" % (jobSnifferName))
+		logging.error("Error with %s Plugin" % (jobSnifferName))
 		raise
 
 def fillRoleEmbeddings():
@@ -146,7 +166,7 @@ def fillRoleEmbeddings():
             )
 
             jobaiDB.roles.insert_one(role.dict())
-            print("inserted", line)
+            logging.info("inserted: " + line)
     return
 
 def fillQuestionEmbeddings():
@@ -160,7 +180,7 @@ def fillQuestionEmbeddings():
             "variable_name": predefined_variable,
             "embeding": embeding
         })
-        print("inserted", predefined_variable)
+        logging.info("inserted " + predefined_variable)
     return
 
 def getRoleEmbeddings() -> List[Role]:
@@ -171,15 +191,15 @@ def insert_one_job(sniffer, searchQuery=None, locationQuery=None):
         try:
             job = JobSchema.Job.parse_obj(sniffer.getOneJob(searchQuery, locationQuery))
             resp = jobaiDB.jobs.insert_one(job.dict())
-            print(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
+            logging.info(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
             return
         except OutOfJobs:
-            print("That Query Is Out Of Jobs")
+            logging.warning("That Query Is Out Of Jobs")
             global EMPTY_ROLES
             EMPTY_ROLES.append(searchQuery)
             break
         except MongoErrors.DuplicateKeyError:
-            print("Job Allready Existed")
+            logging.warning("Job Allready Existed")
 
 def get_jobs():
     global SECTORS_WHITELIST, MIN_JOB_PER_ROLE
@@ -316,7 +336,7 @@ def apply_to_job():
     if resp.status_code == 404:
         application_failed = True
         mark_job_inactive(job.id)
-        print("Application Failed")
+        logging.warning("Application Failed")
 
     jobaiDB.applications.update_one({
         "_id": application.id
@@ -411,15 +431,16 @@ def main():
 
     while True:
         # For now, just round robin things in the queue, rlly needs a balancer and to be made asyncio lol, tho rn we're being rate limited
+        function_had_something_to_do = False
         for process_function in process_functions:
             try:
-                process_function()
+                function_had_something_to_do = process_function() or function_had_something_to_do
             except Exception as e:
-                print(f"Failure With {process_function} {e}" )
-                print("\x1b[44m")
-                traceback.print_exc()
-                print("\x1b[0m")
-        sleep(0.5)
+                logging.exception(f"Failure With {process_function} {e}" )
+        
+        # If Processor is sitting idling, don't waste too many packets calling DB
+        if (not function_had_something_to_do):
+            sleep(15)
         continue
 
 if __name__ == "__main__":
@@ -429,6 +450,6 @@ if __name__ == "__main__":
         # fillQuestionEmbeddings()
         main()
     except KeyboardInterrupt:
-        print("Exiting Gracefully (Kbd Interrupt)...")
+        logging.info("Exiting Gracefully (Kbd Interrupt)...")
     except Exception as e:
         raise e
