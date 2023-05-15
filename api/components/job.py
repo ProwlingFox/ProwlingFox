@@ -1,5 +1,6 @@
 import datetime
 import logging
+import re
 from typing import List
 import bson
 from bson.objectid import ObjectId
@@ -25,6 +26,7 @@ class Job:
 			raise HTTPException(status_code=400, detail="MALFOMED_BSON_ID")
 		return
 
+
 	def preprocess_job(self):
 		job = self.get_details()
 
@@ -37,6 +39,25 @@ class Job:
 			prompt = AnsweringEngine.promptGenerator("summarizeJobDescription", prompt_vars)
 			job.short_description = AnsweringEngine.sendSimpleChatPrompt(prompt, "summarizeJobDescription", tokens = 300)
 
+		prompt = AnsweringEngine.promptGenerator("multiPreprocess", prompt_vars)
+
+		job.requirements = []
+		job.key_points = []
+
+		# Attempts to preprocess a bunch of these
+		answers = AnsweringEngine.sendSimpleChatPrompt(prompt, "multiPreprocess", tokens = 300)
+		if answers:
+			logging.info(answers)
+			answers: List[str] = re.split("\d\. ", answers)
+			job.role_description = answers[0].strip()
+			for bullet_point in answers[1].splitlines():
+				if len(bullet_point) > 5: # Basic Garbage Check
+					job.requirements.append(bullet_point.removeprefix("- "))
+			for bullet_point in answers[2].splitlines():
+				if len(bullet_point) > 5: # Basic Garbage Check
+					job.key_points.append(bullet_point.removeprefix("- "))
+			
+
 		if (not job.role_description):
 			prompt = AnsweringEngine.promptGenerator("shortRoleSummary", prompt_vars)
 			job.role_description = AnsweringEngine.sendSimpleChatPrompt(prompt, "shortRoleSummary", tokens = 100)
@@ -45,7 +66,7 @@ class Job:
 		if (not job.requirements or not len(job.requirements)):
 			prompt = AnsweringEngine.promptGenerator("roleRequirements", prompt_vars)
 			response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleRequirements", tokens = 300)
-			job.requirements = []
+			
 			if response:
 				for bullet_point in response.splitlines():
 					if len(bullet_point) > 5: # Basic Garbage Check
@@ -56,7 +77,7 @@ class Job:
 			prompt = AnsweringEngine.promptGenerator("roleKeyPoints", prompt_vars)
 			response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleKeyPoints", tokens = 300)
 			if response:
-				job.key_points = []
+				
 				for bullet_point in response.splitlines():
 					if len(bullet_point) > 5: # Basic Garbage Check
 						job.key_points.append(bullet_point.removeprefix("- "))
