@@ -405,16 +405,18 @@ jobSniiffers = [
     load_jobSniffer("workableJobsniffer")
 ]
 
+logging.info("Downloading Embeddings...")
 # Load into memory to prevent expensive db calls, (Eventually lets implement a vector DB)
 role_embeddings=getRoleEmbeddings()
+logging.info("Embeddings Downloaded!")
 
 async def main():
     process_functions = [
-        # get_jobs,
-        # preprocess_job_embeddings, #Embeds are so much faster, meaning we can actually use them in our search
+        get_jobs,
+        preprocess_job_embeddings, #Embeds are so much faster, meaning we can actually use them in our search
         preprocess_job,
-        # solve_application,
-        # apply_to_job,
+        solve_application,
+        apply_to_job,
     ]
 
     while True:

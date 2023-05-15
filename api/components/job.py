@@ -52,6 +52,7 @@ class Job:
 			# Remove trailing blank if exists
 			if answers[0].strip() == "":
 				answers.pop(0)
+			logging.info(answers)
 
 			job.role_description = answers[0].strip()
 			for bullet_point in answers[1].splitlines():
@@ -63,11 +64,13 @@ class Job:
 			
 
 		if (not job.role_description):
+			logging.info("Had To Regen Role Description")
 			prompt = AnsweringEngine.promptGenerator("shortRoleSummary", prompt_vars)
 			job.role_description = AnsweringEngine.sendSimpleChatPrompt(prompt, "shortRoleSummary", tokens = 100)
 
 		# Needs converted to an array of strings
 		if (not job.requirements or not len(job.requirements) > 3):
+			logging.info("Had To Regen Requirements")
 			prompt = AnsweringEngine.promptGenerator("roleRequirements", prompt_vars)
 			response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleRequirements", tokens = 300)
 			
@@ -78,10 +81,10 @@ class Job:
 		
 		# Needs converted to an array of strings
 		if (not job.key_points or not len(job.key_points) > 3):
+			logging.info("Had To Regen Oppertunities")
 			prompt = AnsweringEngine.promptGenerator("roleKeyPoints", prompt_vars)
 			response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleKeyPoints", tokens = 300)
 			if response:
-				
 				for bullet_point in response.splitlines():
 					if len(bullet_point) > 5: # Basic Garbage Check
 						job.key_points.append(bullet_point.removeprefix("- "))
