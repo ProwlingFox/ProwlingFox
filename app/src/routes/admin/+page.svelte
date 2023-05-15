@@ -5,6 +5,7 @@
 
     interface Metrics {
         activeJobsCount: number,
+        processedJobsCount: number,
         userCount: number,
         jobApplicationCount: number,
     }
@@ -15,8 +16,8 @@
 
 <div>
     <div class="card">
-        <h2>Active Jobs</h2>
-        <p class="metric">{metrics.activeJobsCount}</p>
+        <h2>Active Jobs Processed/Scraped</h2>
+        <p class="metric">{metrics.processedJobsCount}/{metrics.activeJobsCount}</p>
     </div>
     
     <div class="card">
