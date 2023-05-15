@@ -437,6 +437,13 @@ class User:
         return {'success': True, 'user_id': userId}
 
     @staticmethod
+    def get_user_list():
+        from components.db import prowling_fox_db
+        users_cursor = prowling_fox_db.users.find({}, projection={"name":1, "email":1, "permission": 1, "linkedInID":1})
+        
+        return list(map(lambda x: UserSchema.BulkUser.parse_obj(x),users_cursor))
+
+    @staticmethod
     def validateEmail(email: str) -> bool:
         return True
 

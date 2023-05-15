@@ -69,7 +69,12 @@ class UserJobPreferences(BaseModel):
     location: LocationCriteria = LocationCriteria()
     min_salary: Optional[int]
 
-
+class BulkUser(BaseModel):
+    name: str
+    email: str
+    permission: UserRoles
+    linkedInID: Optional[str]
+    
 class User(MongoBaseModel):
     name: str
     email: str

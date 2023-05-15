@@ -90,11 +90,15 @@ def solve_application():
     job = Job(application.job_id).get_details()
     user = User(application.user_id).get_info()
 
+    if not application.responses:
+        application.responses = {}
+
     for question in job.questions:
         # If this question has a prefilled response allready, don't re-generate it
         if question.id in application.responses and application.responses[question.id]:
             if len(application.responses[question.id]):
                 continue
+        
         logging.info("answering question: " + question.id)
         try:
             answer = AnsweringEngine.answer_question(job, user, question)
@@ -406,11 +410,11 @@ role_embeddings=getRoleEmbeddings()
 
 async def main():
     process_functions = [
-        get_jobs,
-        preprocess_job_embeddings, #Embeds are so much faster, meaning we can actually use them in our search
+        # get_jobs,
+        # preprocess_job_embeddings, #Embeds are so much faster, meaning we can actually use them in our search
         preprocess_job,
-        solve_application,
-        apply_to_job,
+        # solve_application,
+        # apply_to_job,
     ]
 
     while True:

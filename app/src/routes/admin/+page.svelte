@@ -1,5 +1,6 @@
 <script lang="ts">
     export let data
+	import type { User } from '$interfaces/user'
     import { parseJWT } from '$lib/requestUtils'
 
 
@@ -12,6 +13,7 @@
 
     parseJWT()
     let metrics: Metrics = data.metrics
+    let users: User[] = data.users
 </script>
 
 <div>
@@ -21,19 +23,16 @@
     </div>
     
     <div class="card">
-        <h2>Users</h2>
-        <p class="metric">{metrics.userCount}</p>
+        <h2>Users ({metrics.userCount})</h2>
+        <div>
+            {#each users as user}
+            <div>
+                {user.name}
+                {user.email}
+            </div>
+            {/each}
+        </div>
     </div>
-    
-    <div class="card">
-        <h2>Job Applications</h2>
-        <p class="metric">{metrics.jobApplicationCount}</p>
-    </div>
-    
-    <div class="card">
-        <h2>Job Applications Per User Avg.</h2>
-        <p class="metric">{metrics.jobApplicationCount / metrics.userCount}</p>
-    </div>    
 </div>
 
 <style type="postcss">

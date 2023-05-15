@@ -2,9 +2,11 @@ import { get } from '$lib/requestUtils'
 
 
 export async function load({ fetch }) {
-    const metrics = await get('/admin/metrics', fetch)
+    const metrics =  get('/admin/metrics', fetch)
+    const users = get('/admin/users')
 
     return {
-        metrics: metrics
+        metrics: await metrics,
+        users: await users
     }
 }

@@ -47,7 +47,12 @@ class Job:
 		# Attempts to preprocess a bunch of these
 		answers = AnsweringEngine.sendSimpleChatPrompt(prompt, "multiPreprocess", tokens = 300)
 		if answers:
+			logging.info(answers)
 			answers: List[str] = re.split("\d\. ", answers)
+			# Remove trailing blank if exists
+			if answers[0].strip() == "":
+				answers.pop(0)
+
 			job.role_description = answers[0].strip()
 			for bullet_point in answers[1].splitlines():
 				if len(bullet_point) > 5: # Basic Garbage Check
@@ -62,7 +67,7 @@ class Job:
 			job.role_description = AnsweringEngine.sendSimpleChatPrompt(prompt, "shortRoleSummary", tokens = 100)
 
 		# Needs converted to an array of strings
-		if (not job.requirements or not len(job.requirements)):
+		if (not job.requirements or not len(job.requirements) > 3):
 			prompt = AnsweringEngine.promptGenerator("roleRequirements", prompt_vars)
 			response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleRequirements", tokens = 300)
 			
@@ -72,7 +77,7 @@ class Job:
 						job.requirements.append(bullet_point.removeprefix("- "))
 		
 		# Needs converted to an array of strings
-		if (not job.key_points or not len(job.key_points)):
+		if (not job.key_points or not len(job.key_points) > 3):
 			prompt = AnsweringEngine.promptGenerator("roleKeyPoints", prompt_vars)
 			response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleKeyPoints", tokens = 300)
 			if response:
