@@ -168,6 +168,9 @@ class AnsweringEngine:
 						sleep(20)
 						attempts += 1
 						continue
+					if error_message.startswith("This model's maximum context length is"):
+						logging.error("Job Is Too Verbose")
+						return
 				logging.error("Other Issue With OPENAI Call")
 				attempts += 1
 				continue

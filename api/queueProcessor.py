@@ -21,6 +21,7 @@ def setup_logger():
 setup_logger()
 
 # 3rd Party Imports
+import asyncio
 import datetime
 import openai
 from bson import ObjectId
@@ -118,7 +119,11 @@ def solve_application():
 def preprocess_job():
     job_to_preprocess_from_db = jobaiDB.jobs.find_one_and_update({
         "job_processing": {"$ne": True},
-        "short_description": None
+        "job_processing_failure": {"$ne": True},
+        "$or": [
+            {"short_description": None},
+            {"role_description": None}
+        ]
     },{
         '$set': {'job_processing': True}
     })
@@ -420,7 +425,7 @@ jobSniiffers = [
 # Load into memory to prevent expensive db calls, (Eventually lets implement a vector DB)
 role_embeddings=getRoleEmbeddings()
 
-def main():
+async def main():
     process_functions = [
         get_jobs,
         preprocess_job_embeddings, #Embeds are so much faster, meaning we can actually use them in our search
@@ -448,7 +453,7 @@ if __name__ == "__main__":
         reset_processing()
         # fillRoleEmbeddings()
         # fillQuestionEmbeddings()
-        main()
+        asyncio.run(main())
     except KeyboardInterrupt:
         logging.info("Exiting Gracefully (Kbd Interrupt)...")
     except Exception as e:

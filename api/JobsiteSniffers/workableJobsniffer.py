@@ -20,6 +20,7 @@ class workableJobsniffer(baseJobsniffer):
 
 	def __init__(self):
 		super().__init__()
+		self.jobOffset = super().getJobSnifferSave()
 		return
 
 	def getOneJob(self, searchQuery, locationQuery):
@@ -31,8 +32,9 @@ class workableJobsniffer(baseJobsniffer):
 			if not self.refillStack():
 				raise OutOfJobs
 			
-		#Return a Job From The Stack In Expected Forma
-		self.jobOffset[self.searchFilter] = (self.jobOffset[self.searchFilter] + 1) if (self.searchFilter in self.jobOffset) else 0
+		#Return a Job From The Stack In Expected Format
+		self.jobOffset[searchQuery+":"+locationQuery] = (self.jobOffset[searchQuery+":"+locationQuery] + 1) if (searchQuery+":"+locationQuery) in self.jobOffset else 0
+		super().saveJobSniffer({searchQuery+":"+locationQuery: self.jobOffset[searchQuery+":"+locationQuery]})
 		return self.formatJob( self.jobsStack.pop() )
 
 	def formatJob(self, rawJob):
@@ -148,7 +150,7 @@ class workableJobsniffer(baseJobsniffer):
 	def refillStack(self):
 		querystring = {
 			"remote": False,
-			"offset":self.jobOffset[self.searchFilter] if self.searchFilter in self.jobOffset else 0,
+			"offset":self.jobOffset[self.searchFilter+":"+self.locationFilter] if self.searchFilter+":"+self.locationFilter in self.jobOffset else 0,
 			"query":self.searchFilter or "",
 			"location": self.locationFilter
 			}

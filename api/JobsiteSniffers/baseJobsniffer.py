@@ -72,6 +72,20 @@ class baseJobsniffer:
 
         return country
 
+    def saveJobSniffer(self, saveData):
+        db_response = prowling_fox_db.jobsniffer_save.update_one(
+			{"_id": self.__class__.__name__},
+			{"$set": saveData},
+            upsert=True
+        )
+        return db_response
+
+    def getJobSnifferSave(self):
+        db_response = prowling_fox_db.jobsniffer_save.find_one(
+			{"_id": self.__class__.__name__}
+        )
+        return db_response
+
     def apply():
         return
     
