@@ -52,7 +52,7 @@ from schemas.configurations import Role
 SECTORS_WHITELIST = ["IT and Digital Technology"]
 MIN_JOB_PER_ROLE_PER_COUNTRY = 5
 
-EMPTY_ROLES = []
+# EMPTY_ROLES = []
 
 def reset_processing():
     # update all records, mark them as not currently being processed
@@ -90,15 +90,20 @@ def solve_application():
     job = Job(application.job_id).get_details()
     user = User(application.user_id).get_info()
 
-    answered_questions = {}
-
     for question in job.questions:
+        # If this question has a prefilled response allready, don't re-generate it
+        if question.id in application.responses and application.responses[question.id]:
+            if len(application.responses[question.id]):
+                continue
         logging.info("answering question: " + question.id)
+        try:
+            answer = AnsweringEngine.answer_question(job, user, question)
+            logging.debug(answer)
+        except:
+            logging.error("Question Failed To Answer")
         
-        answer = AnsweringEngine.answer_question(job, user, question)
-        logging.info(answer)
 
-        answered_questions[question.id] = answer
+        application.responses[question.id] = answer
 
     jobaiDB.applications.update_one({
         "_id": application.id,
@@ -108,7 +113,7 @@ def solve_application():
     },
     {
         '$set': {
-            'responses': answered_questions,
+            'responses': application.responses,
             "application_processing": False,
             "application_processed": True,
             'application_processed_ts': datetime.datetime.now()
@@ -191,24 +196,10 @@ def fillQuestionEmbeddings():
 def getRoleEmbeddings() -> List[Role]:
     return list(map(lambda x: Role.parse_obj(x),  jobaiDB.roles.find({}) ))
 
-def insert_one_job(sniffer, searchQuery=None, locationQuery=None):
-    while True:
-        try:
-            job = JobSchema.Job.parse_obj(sniffer.getOneJob(searchQuery, locationQuery))
-            resp = jobaiDB.jobs.insert_one(job.dict())
-            logging.info(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
-            return True
-        except OutOfJobs:
-            logging.warning("That Query Is Out Of Jobs")
-            global EMPTY_ROLES
-            EMPTY_ROLES.append(searchQuery)
-            return False
-        except MongoErrors.DuplicateKeyError:
-            logging.warning("Job Allready Existed")
-
 def get_jobs():
     global SECTORS_WHITELIST, MIN_JOB_PER_ROLE
     # Get The Roles that don't have enough jobs
+    # TODO: This is a rlly expensive query, find a way to optimise it, prolly just by calling it less frequently lol
     roles_to_add = jobaiDB.roles.aggregate([
         {
             '$match': {
@@ -293,26 +284,14 @@ def get_jobs():
                         'count': {
                             '$lt': MIN_JOB_PER_ROLE_PER_COUNTRY
                         }
-                    }, {
-                        'role': {
-                            '$nin': EMPTY_ROLES
-                        }
                     }
                 ]
             }
         }
     ])
 
-    if not roles_to_add:
-         return
-
-    try:
-        toAdd = roles_to_add.next()
-    except StopIteration:
-        return
-
     for jobSniiffer in jobSniiffers:
-        insert_one_job(jobSniiffer, searchQuery=toAdd["role"], locationQuery=toAdd["country_code"])
+        jobSniiffer.insert_one_job(roles_to_add)
     return
 
 def apply_to_job():
