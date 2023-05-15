@@ -47,7 +47,6 @@ class Job:
 		# Attempts to preprocess a bunch of these
 		answers = AnsweringEngine.sendSimpleChatPrompt(prompt, "multiPreprocess", tokens = 300)
 		if answers:
-			logging.info(answers)
 			answers: List[str] = re.split("\d\. ", answers)
 			job.role_description = answers[0].strip()
 			for bullet_point in answers[1].splitlines():

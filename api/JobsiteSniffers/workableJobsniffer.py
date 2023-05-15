@@ -55,8 +55,8 @@ class workableJobsniffer(baseJobsniffer):
 		return JobSchema.Job (
 			source = self.__class__.__name__ ,
 			ext_ID = rawJob["id"],
-			added_ts=0,
-			last_updated_ts=0,
+			added_ts=datetime.now(),
+			last_updated_ts=datetime.now(),
 			long_description=self.generateJobListing(rawJob),
 			created_ts= epoch_time,
 			company = company,
