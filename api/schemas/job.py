@@ -83,3 +83,9 @@ class Application(MongoBaseModel):
     application_sending_ts: date = None
     application_sent: bool = False
     application_sent_ts: date = None
+    application_contact: bool = False
+    application_interview: bool = False
+    application_offer: bool = False
+    application_accepted: bool = False
+    application_rejected: bool = False
+    application_rejected_by_candidate: bool = False

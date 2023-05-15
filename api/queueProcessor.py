@@ -302,7 +302,8 @@ def apply_to_job():
     application_from_db = jobaiDB.applications.find_one_and_update({
         "application_reviewed": True,
         "application_sending": {"$ne": True},
-        "application_sent": {"$ne": True}
+        "application_sent": {"$ne": True},
+        "application_failed": {"$ne": True}
     },
     {
         '$set': {
@@ -321,16 +322,17 @@ def apply_to_job():
     resp = jobSniffer.apply(job, application)
 
     application_failed = False
-    if resp.status_code == 404:
+    if not (resp.status_code == 200 or resp.status_code == 201):
         application_failed = True
         mark_job_inactive(job.id)
         logging.warning("Application Failed")
+        logging.warning(resp.text)
 
     jobaiDB.applications.update_one({
         "_id": application.id
     },{
          "$set": {
-             "application_sent": True,
+             "application_sent": not application_failed,
              "application_sent_ts": datetime.datetime.now(),
              'application_sending': False,
              "application_failed": application_failed
