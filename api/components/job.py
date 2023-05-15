@@ -42,22 +42,24 @@ class Job:
 			job.role_description = AnsweringEngine.sendSimpleChatPrompt(prompt, "shortRoleSummary", tokens = 100)
 
 		# Needs converted to an array of strings
-		prompt = AnsweringEngine.promptGenerator("roleRequirements", prompt_vars)
-		response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleRequirements", tokens = 300)
-		job.requirements = []
-		if response:
-			for bullet_point in response.splitlines():
-				if len(bullet_point) > 5: # Basic Garbage Check
-					job.requirements.append(bullet_point.removeprefix("- "))
+		if (not job.requirements or not len(job.requirements)):
+			prompt = AnsweringEngine.promptGenerator("roleRequirements", prompt_vars)
+			response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleRequirements", tokens = 300)
+			job.requirements = []
+			if response:
+				for bullet_point in response.splitlines():
+					if len(bullet_point) > 5: # Basic Garbage Check
+						job.requirements.append(bullet_point.removeprefix("- "))
 		
 		# Needs converted to an array of strings
-		prompt = AnsweringEngine.promptGenerator("roleKeyPoints", prompt_vars)
-		response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleKeyPoints", tokens = 300)
-		if response:
-			job.key_points = []
-			for bullet_point in response.splitlines():
-				if len(bullet_point) > 5: # Basic Garbage Check
-					job.key_points.append(bullet_point.removeprefix("- "))
+		if (not job.key_points or not len(job.key_points)):
+			prompt = AnsweringEngine.promptGenerator("roleKeyPoints", prompt_vars)
+			response = AnsweringEngine.sendSimpleChatPrompt(prompt, "roleKeyPoints", tokens = 300)
+			if response:
+				job.key_points = []
+				for bullet_point in response.splitlines():
+					if len(bullet_point) > 5: # Basic Garbage Check
+						job.key_points.append(bullet_point.removeprefix("- "))
 
 		# Validate Pre-Processing Went Well
 		if None in [job.short_description, job.role_description] or len(job.requirements) < 3 or len(job.key_points) < 3:

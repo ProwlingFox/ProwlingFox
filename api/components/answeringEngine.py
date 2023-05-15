@@ -37,7 +37,10 @@ class AnsweringEngine:
 				"question": question.ai_prompt or question.content
 			} )
 
-			return AnsweringEngine.sendSimpleChatPrompt(prompt, "answerQuestion")
+			response = AnsweringEngine.sendSimpleChatPrompt(prompt, "answerQuestion")
+			if response:
+				return response
+			raise Exception("Unable to Answer Question")
 	
 		return None
 

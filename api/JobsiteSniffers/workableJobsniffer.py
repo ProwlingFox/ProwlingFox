@@ -23,7 +23,7 @@ class workableJobsniffer(baseJobsniffer):
 		self.jobOffset = super().getJobSnifferSave()
 		return
 
-	def getOneJob(self, searchQuery, locationQuery):
+	def get_one_job(self, searchQuery, locationQuery):
 		#Refill queue if needed
 		logging.info(f"Search: {searchQuery} in {locationQuery}")
 		if (not self.jobsStack) or (not searchQuery == self.searchFilter) or (not locationQuery == self.locationFilter):
@@ -161,6 +161,7 @@ class workableJobsniffer(baseJobsniffer):
 			self.jobsStack += json["jobs"]
 			return True
 		else:
+			# If We're At The End Of The Jobs, Reset Back To the start, 
 			return False
 
 	def uploadFile(self, data_url:str, job_ext_id):

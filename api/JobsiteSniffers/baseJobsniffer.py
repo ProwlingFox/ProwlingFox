@@ -1,6 +1,10 @@
+import logging
 from bson import ObjectId
 from schemas.configurations import B64_File
+import schemas.job as JobSchema
+
 from components.db import prowling_fox_db
+from pymongo import errors as MongoErrors
 
 
 # Must return an itterator when called for that returns a new job, defined above.
@@ -11,6 +15,7 @@ from components.db import prowling_fox_db
 
 class baseJobsniffer:
     country_alias_list = None
+    empty_roles_location = []
 
     def __init__(self):
         return
@@ -85,6 +90,35 @@ class baseJobsniffer:
 			{"_id": self.__class__.__name__}
         )
         return db_response
+
+    def get_one_job():
+        raise NotImplementedError("Child Class Must Implement get_one_job")
+
+    def insert_one_job(self, roles_to_add):
+        while True:
+            try:
+                role_to_add = roles_to_add.next()
+                searchQuery = role_to_add["role"]
+                locationQuery = role_to_add["country_code"]
+
+                if not searchQuery+":"+locationQuery in self.empty_roles_location:
+                    break
+            except StopIteration:
+                return
+
+
+        while True:
+            try:
+                job = JobSchema.Job.parse_obj(self.get_one_job(searchQuery, locationQuery))
+                resp = prowling_fox_db.jobs.insert_one(job.dict())
+                logging.info(f"Inserted Job From {job.company.name} Into DB | ID:{resp.inserted_id}")
+                return True
+            except OutOfJobs:
+                logging.warning("That Query Is Out Of Jobs")
+                self.empty_roles_location.append(searchQuery+":"+locationQuery)
+                return False
+            except MongoErrors.DuplicateKeyError:
+                logging.warning("Job Allready Existed")
 
     def apply():
         return
