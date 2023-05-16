@@ -1,10 +1,25 @@
 import logging
 def setup_logger():
+    # Create a custom filter class
+    class ExcludeModuleFilter(logging.Filter):
+        def __init__(self, module_name):
+            super().__init__()
+            self.module_name = module_name
+
+        def filter(self, record):
+            # Exclude log records from the specified module
+            return not record.name.startswith(self.module_name)
+
+
     logger = logging.getLogger()
     logger.setLevel(logging.INFO)
 
     # Create a formatter
-    formatter = logging.Formatter('%(asctime)s|%(levelname)s: %(message)s')
+    formatter = logging.Formatter('[%(name)s]%(asctime)s|%(levelname)s: %(message)s')
+
+    exclude_filter = ExcludeModuleFilter("openai")
+    logger.addFilter(exclude_filter)
+
 
     # Create a console handler and set the formatter
     console_handler = logging.StreamHandler()

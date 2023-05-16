@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import datetime
 from pydantic import BaseModel
 from typing import List, Any, Optional
 from enum import Enum
@@ -39,9 +39,9 @@ class JobSimplified(MongoBaseModel):
     # Technical Details
     source: str  # Should be class Name i.e. sampleJobsniffer
     ext_ID: str # Should be a unique ID for the job, can be used to store id's equal to the origional src
-    added_ts: int
-    last_updated_ts: int
-    created_ts: int
+    added_ts: datetime
+    last_updated_ts: datetime
+    created_ts: datetime
     short_description: Optional[str] # A Short Description Generated automatically if it doesn't exist <200 words
     # Display Details
     src_url: Optional[str]
@@ -70,22 +70,29 @@ class Application(MongoBaseModel):
     job: Optional[JobSimplified]
     responses: Optional[object]
     application_read: bool = False
-    application_read_ts: date = None
+    application_read_ts: datetime = None
     application_requested: bool = False
-    application_requested_ts: date = None
+    application_requested_ts: datetime = None
     application_processing: bool = False
-    application_processing_ts: date = None
+    application_processing_ts: datetime = None
     application_processed: bool = False
-    application_processed_ts: date = None
+    application_processed_ts: datetime = None
     application_reviewed: bool = False
-    application_reviewed_ts: date = None
+    application_reviewed_ts: datetime = None
     application_sending: bool = False
-    application_sending_ts: date = None
+    application_sending_ts: datetime = None
     application_sent: bool = False
-    application_sent_ts: date = None
+    application_sent_ts: datetime = None
     application_contact: bool = False
+    application_contact_ts: datetime = None
     application_interview: bool = False
+    application_contact_ts: datetime = None
     application_offer: bool = False
+    application_offer_ts: datetime = None
     application_accepted: bool = False
+    application_accepted_ts: datetime = None
     application_rejected: bool = False
+    application_rejected_ts: datetime = None
     application_rejected_by_candidate: bool = False
+    application_rejected_by_candidate_ts: datetime = None
+

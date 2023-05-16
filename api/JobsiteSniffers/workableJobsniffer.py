@@ -38,9 +38,7 @@ class workableJobsniffer(baseJobsniffer):
 		return self.formatJob( self.jobsStack.pop() )
 
 	def formatJob(self, rawJob):
-		datetime_obj = datetime.fromisoformat(rawJob["created"][:-1])
-		epoch_time = int(datetime_obj.timestamp())
-
+		created_date = datetime.fromisoformat(rawJob["created"][:-1])
 		logo = rawJob["company"]["image"] if "image" in rawJob["company"] else None
 		tagline = rawJob["company"]["socialSharingDescription"] if "socialSharingDescription" in rawJob["company"] else None
 		website = rawJob["company"]["url"] if "url" in rawJob["company"] else None
@@ -58,7 +56,7 @@ class workableJobsniffer(baseJobsniffer):
 			added_ts=datetime.now(),
 			last_updated_ts=datetime.now(),
 			long_description=self.generateJobListing(rawJob),
-			created_ts= epoch_time,
+			created_ts= created_date,
 			company = company,
 			role = rawJob["title"],
 			remote = "TELECOMMUTE" in rawJob["locations"],

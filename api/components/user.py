@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+import logging
 from typing import List
 from fastapi import HTTPException
 from pymongo import errors as Mongoerrors
@@ -170,7 +171,7 @@ class User:
                 try:
                     jobs.append(JobSchema.JobSimplified.parse_obj(job))
                 except Exception as e:
-                    print("Issue With Job ID:", job["_id"])
+                    logging.error("Issue With Job ID:", job["_id"])
         except StopIteration:
             pass
 
@@ -184,7 +185,8 @@ class User:
 
         matchCriteria = {
             'user_id': self.user_id,
-            'application_requested': True
+            'application_requested': True,
+            'application_failed': {"$ne": True},
         }
 
         if not getSent:
@@ -222,7 +224,7 @@ class User:
             try:
                 applications.append(JobSchema.Application.parse_obj(application))
             except Exception as e:
-                print("Issue with jobID " + application["job_id"])
+                logging.error("Issue with jobID " + application["job_id"])
 
         return applications
 
@@ -345,7 +347,6 @@ class User:
         oauth = oauth_response.json()
 
         if "error" in oauth:
-            print(oauth, payload)
             raise HTTPException(400, "OAUTH_CODE_INVALID")
 
         url = "https://api.linkedin.com/v2/userinfo"
@@ -413,7 +414,7 @@ class User:
     
     @staticmethod
     def create_user_from_linkedin(code, oauth = None, userinfo = None):
-        print("CREATING USER")
+        logging.info("CREATING USER")
         if oauth == None and userinfo == None:
             oauth, userinfo = User.get_details_from_linkedIn(code)
 
