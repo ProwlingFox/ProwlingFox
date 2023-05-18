@@ -1,4 +1,6 @@
 import logging
+from schemas.job import ApplicationStatus
+
 def setup_logger():
     # Create a custom filter class
     class ExcludeModuleFilter(logging.Filter):
@@ -72,9 +74,14 @@ MIN_JOB_PER_ROLE_PER_COUNTRY = 5
 def reset_processing():
     # update all records, mark them as not currently being processed
     jobaiDB.applications.update_many({
-        # "application_processing": True
+        "status": ApplicationStatus.PROCESSING
     },{
-        '$set': {'application_processing': False, 'application_sending': False}
+        '$set': {'status': ApplicationStatus.REQUESTED}
+    })
+    jobaiDB.applications.update_many({
+        "status": ApplicationStatus.SENDING
+    },{
+        '$set': {'status': ApplicationStatus.REVIEWED}
     })
     jobaiDB.jobs.update_many({
         "job_processing": True
@@ -85,14 +92,11 @@ def reset_processing():
 
 def solve_application():
     application_from_db = jobaiDB.applications.find_one_and_update({
-        "application_requested": True,
-        "application_processing": {"$ne": True},
-        "application_processed":  {"$ne": True},
-        "application_sent":  {"$ne": True}
+        "status": ApplicationStatus.REQUESTED,
     },
     {
         '$set': {
-            'application_processing': True,
+            'status': ApplicationStatus.PROCESSING,
             'application_processing_ts': datetime.datetime.now()
         }
     })
@@ -126,15 +130,11 @@ def solve_application():
 
     jobaiDB.applications.update_one({
         "_id": application.id,
-        "application_requested": True,
-        "application_processing": True,
-        "application_processed": {"$ne": True}
     },
     {
         '$set': {
             'responses': application.responses,
-            "application_processing": False,
-            "application_processed": True,
+            "status": ApplicationStatus.PROCESSED,
             'application_processed_ts': datetime.datetime.now()
         }
     })
@@ -315,14 +315,12 @@ def get_jobs():
 
 def apply_to_job():
     application_from_db = jobaiDB.applications.find_one_and_update({
-        "application_reviewed": True,
-        "application_sending": {"$ne": True},
-        "application_sent": {"$ne": True},
+        "status": ApplicationStatus.REVIEWED,
         "application_failed": {"$ne": True}
     },
     {
         '$set': {
-            'application_sending': True,
+            'status': ApplicationStatus.SENDING,
             'application_sending_ts': datetime.datetime.now()
         }
     })
@@ -336,21 +334,26 @@ def apply_to_job():
     jobSniffer = load_jobSniffer(job.source)
     resp = jobSniffer.apply(job, application)
 
-    application_failed = False
     if not (resp.status_code == 200 or resp.status_code == 201):
-        application_failed = True
         mark_job_inactive(job.id)
         logging.warning("Application Failed")
         logging.warning(resp.text)
+        jobaiDB.applications.update_one({
+            "_id": application.id
+        },{
+            "$set": {
+                'status': ApplicationStatus.REVIEWED,
+                "application_failed": True
+            }
+        })
+        return True
 
     jobaiDB.applications.update_one({
         "_id": application.id
     },{
          "$set": {
-             "application_sent": not application_failed,
-             "application_sent_ts": datetime.datetime.now(),
-             'application_sending': False,
-             "application_failed": application_failed
+             'status': ApplicationStatus.SENT,
+             'application_sent_ts': datetime.datetime.now(),
         }
     })
     return True

@@ -4,6 +4,7 @@ from typing import List
 from fastapi import HTTPException
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
+from schemas.job import ApplicationStatus
 import schemas.job as JobSchema
 import schemas.user as UserSchema
 import requests
@@ -181,18 +182,15 @@ class User:
         }
 
     def get_applications(self, getSent = False) -> List[JobSchema.Application]:
-        from api import jobaiDB
+        from components.db import prowling_fox_db
 
         matchCriteria = {
             'user_id': self.user_id,
-            'application_requested': True,
+            'status': {"$gte": ApplicationStatus.REQUESTED, "$lte": 999 if getSent else ApplicationStatus.SENDING},
             'application_failed': {"$ne": True},
         }
 
-        if not getSent:
-            matchCriteria['application_sent'] = {"$ne": True}
-
-        applications_from_db = jobaiDB.applications.aggregate([
+        applications_from_db = prowling_fox_db.applications.aggregate([
             {
                 '$match': matchCriteria
             },
@@ -265,7 +263,7 @@ class User:
 
         applicationsToday = prowling_fox_db.applications.count_documents({
             "user_id": self.user_id,
-            "application_sent": True,
+            "status": {"$gte": ApplicationStatus.SENT},
             "application_sent_ts": {"$gte": past_day}
         })
         return {"applicationsToday": applicationsToday}
@@ -275,7 +273,7 @@ class User:
         applications = self.get_applications(True)
 
         f = io.StringIO()
-        w = csv.DictWriter(f, ["ID", "Role", "Company", "Status", "TimeStamp", "URL"])
+        w = csv.DictWriter(f, ["ID", "Role", "Company", "Status", "URL"])
 
         for app in applications:
             w.writerow({
@@ -283,8 +281,8 @@ class User:
                 "Role": app.job.role,
                 "Company": app.job.company.name,
                 "URL": app.job.src_url,
-                "Status":  "SENT" if app.application_sent else ("AWAITING REVIEW" if app.application_processed else "PROCESSING"),
-                "TimeStamp": app.application_sent_ts if app.application_sent else (app.application_processed_ts if app.application_processed else app.application_requested_ts),
+                "Status": ApplicationStatus(app.status).name,
+                # "TimeStamp": app.application_sent_ts if app.application_sent else (app.application_processed_ts if app.application_processed else app.application_requested_ts),
             })
         return f.getvalue()
 

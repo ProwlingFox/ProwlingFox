@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
-	import type { Application as JobApplication } from '$interfaces/application'
+	import { ApplicationStatus, applicationStatusLookup, type Application as JobApplication } from '$interfaces/application'
 	import type { Job } from '$interfaces/job'
 	import { getApplicationByJobID } from '$lib/applications'
 
@@ -18,7 +18,8 @@
 	async function updateCheck() {
 		// If The Application is not in a stable state, do an update
 		await new Promise(r => setTimeout(r, 5000));
-		if (!(relatedApplication?.application_processed || relatedApplication?.application_sent)) {
+		if (!relatedApplication) {return}
+		if (!(relatedApplication.status == ApplicationStatus.Processed || relatedApplication.status >= ApplicationStatus.Sent)) {
 			console.log("Checking For Progress...")
 			relatedApplication = await getApplicationByJobID(srcJob._id)
 		}
@@ -36,13 +37,7 @@
 						_id: srcJob._id,
 						job_id: srcJob._id,
 						job: srcJob,
-						application_read: true,
-						application_requested: true,
-						progress: {
-							label: 'Pending',
-							percent: 33,
-							color: 'bg-orange-800',
-						},
+						status: ApplicationStatus.Requested,
 					},
 					...a.applications,
 				],
@@ -70,25 +65,9 @@
 {#key srcJob}
 <div class="flex flex-col xl:flex-row w-full lg:w-auto">
 	<div class="bg-white p-4 md:px-12 sm:rounded-xl xl:left-2 sm:mx-4 lg:mx-0 lg:max-w-2xl sm:my-4 md:py-8 shadow-md relative z-10" out:send={{ key: srcJob._id }}>
-		{#if relatedApplication?.application_sent}
-			<div id="banner" class="bg-slate-400 sm:rounded-t-xl">
-				Application Sent
-			</div>
-		{:else if relatedApplication?.application_reviewed}
-			<div id="banner" class="bg-slate-400 sm:rounded-t-xl">
-				Application Sending
-			</div>
-		{:else if relatedApplication?.application_processed}
-			<div id="banner" class="bg-green-400 sm:rounded-t-xl">
-				Application Ready For Review
-			</div>
-		{:else if relatedApplication?.application_processing}
-			<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
-				Application Processing
-			</div>
-		{:else if relatedApplication?.application_requested}
-			<div id="banner" class="bg-orange-400 sm:rounded-t-xl">
-				Application in Queue
+		{#if relatedApplication}
+			<div id="banner" class="sm:rounded-t-xl {applicationStatusLookup[relatedApplication.status].color}">
+				{applicationStatusLookup[relatedApplication.status].label}
 			</div>
 		{/if}
 		<a href={srcJob.src_url} class="flex justify-center mt-6">
@@ -123,7 +102,7 @@
 				{/each}
 			{/key}
 		</ul>
-			{#if !relatedApplication?.application_requested}
+			{#if !relatedApplication || relatedApplication.status < ApplicationStatus.Requested}
 				<div class="z-50 fade md:shadow-black sticky bottom-2 w-full md:static md:shadow md:left-auto md:bottom-auto md:w-auto left-0 flex justify-center gap-8 mt-4 ">
 					<button class="bg-red-500" on:click={reject}>Reject</button>
 					<button class="bg-green-500" on:click={apply}>Apply</button>
@@ -131,7 +110,7 @@
 			{/if}
 		<div />
 	</div>
-	{#if relatedApplication?.application_processed}
+	{#if relatedApplication && relatedApplication.status >= ApplicationStatus.Processed}
 		<JobApplicationForm {srcJob} srcApplication={relatedApplication} />
 	{/if}
 </div>
@@ -153,6 +132,6 @@
 	}
 
 	#banner {
-		@apply  text-white text-center p-1 absolute top-0 left-0 right-0;
+		@apply text-white text-center p-1 absolute top-0 left-0 right-0;
 	}
 </style>

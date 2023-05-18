@@ -1,0 +1,29 @@
+use('jobai');
+
+apps = db.getCollection('applications').find({});
+
+
+
+function getNumericState(application) {
+    if (application.application_rejected) {return -3}
+    if (application.application_rejected_by_candidate) {return -2}
+    if (application.application_accepted) {return 10}
+    if (application.application_offer) {return 9}
+    if (application.application_interview) {return 8}
+    if (application.application_contact) {return 7}
+    if (application.application_sent) {return 6}
+    if (application.application_sending) {return 5}
+    if (application.application_reviewed) {return 4}
+    if (application.application_processed) {return 3}
+    if (application.application_processing) {return 2}
+    if (application.application_requested) {return 1}
+    if (application.application_read) {return -1}
+}
+
+apps.forEach(app => {
+    db.getCollection('applications').updateOne({_id: app._id},
+        {$set:{
+            state: getNumericState(app)
+        }}
+    );
+});

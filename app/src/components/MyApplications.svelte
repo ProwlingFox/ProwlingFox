@@ -1,64 +1,14 @@
 <script lang="ts">
 	import { applications as as } from '$lib/myJobs'
 	import Icon from '@iconify/svelte'
-	import type {
-		Application,
+	import {
+		type Application,
 		ApplicationStatus,
+		applicationStatusLookup
 	} from '$interfaces/application'
 
 	const { receive } = $as
 
-	function getApplicationStatus(app: Application): ApplicationStatus {
-		if (app.application_sent) {
-			return {
-				label: 'Application Sent',
-				percent: 100,
-				color: 'bg-grey-400',
-			}
-		}
-
-		if (app.application_reviewed) {
-			return {
-				label: 'Sending Application',
-				percent: 99,
-				color: 'bg-green-400',
-			}
-		}
-
-		if (app.application_processed) {
-			return {
-				label: 'Awaiting Review',
-				percent: 90,
-				color: 'bg-amber-400',
-			}
-		}
-
-		if (app.application_processing) {
-			return {
-				label: 'In progress',
-				percent: 66,
-				color: 'bg-orange-400',
-			}
-		}
-
-		if (app.application_requested) {
-			return {
-				label: 'Pending',
-				percent: 33,
-				color: 'bg-orange-800',
-			}
-		}
-
-		return {
-			label: 'Unknown',
-			percent: 0,
-			color: 'bg-gray-400',
-		}
-	}
-
-	$: $as.applications.forEach((app) => {
-		app.progress = getApplicationStatus(app) as ApplicationStatus
-	})
 </script>
 
 <div id="container" class="flex w-full flex-grow md:w-auto md:flex-grow-0 min-w-[20rem]">
@@ -76,21 +26,20 @@
 			</div>
 		{/if}
 		{#each $as.applications as app (app._id)}
+			{@const progress = applicationStatusLookup[app.status]}
 			<a href={"/jobs/" + app.job_id}>
 				<li in:receive={{ key: app._id }}>
 					<div class="text-lg font-bold">{app.job.company.name}</div>
 					<div class="text-sm font-light">{app.job.role}</div>
 					<div class="flex items-center">
-						{#if app.progress}
-							<div class="h-3 w-3/5 border-2 rounded-full">
-								<div
-									class="{app.progress.color} h-full rounded-full"
-									style="width: {app.progress.percent}%" />
+						<div class="h-3 w-3/5 border-2 rounded-full">
+							<div
+								class="{progress.color} h-full rounded-full"
+								style="width: {progress.percent}%" />
 							</div>
-							<div class="text-sm w-2/5 ml-1">
-								{app.progress.label}
-							</div>
-						{/if}
+						<div class="text-sm w-2/5 ml-1">
+							{progress.shortLabel}
+						</div>
 					</div>
 				</li>
 			</a>

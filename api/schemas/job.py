@@ -1,7 +1,7 @@
 from datetime import datetime
 from pydantic import BaseModel
 from typing import List, Any, Optional
-from enum import Enum
+from enum import Enum, IntEnum
 
 from schemas.mongo import MongoBaseModel, ObjectId
 from schemas.configurations import City, FieldType
@@ -10,7 +10,21 @@ class Status(str, Enum):
     ACTIVE = "Active"
     INACTIVE = "Inactive"
 
-
+class ApplicationStatus(IntEnum):
+    REJECTED = -3
+    CANDIDATEREJECTED = -2
+    READ = -1
+    UNREAD = 0 # Should Never Occur, Unread applications don't exist as applications
+    REQUESTED = 1
+    PROCESSING = 2
+    PROCESSED = 3
+    REVIEWED = 4
+    SENDING = 5
+    SENT = 6
+    CONTACT = 7
+    INTERVIEWING = 8
+    OFFERED = 9
+    ACCEPTED = 10
 
 class Choice(BaseModel):
     id: str
@@ -69,30 +83,21 @@ class Application(MongoBaseModel):
     job_id: ObjectId
     job: Optional[JobSimplified]
     responses: Optional[object]
-    application_read: bool = False
+    status: ApplicationStatus
+
     application_read_ts: datetime = None
-    application_requested: bool = False
     application_requested_ts: datetime = None
-    application_processing: bool = False
     application_processing_ts: datetime = None
-    application_processed: bool = False
     application_processed_ts: datetime = None
-    application_reviewed: bool = False
     application_reviewed_ts: datetime = None
-    application_sending: bool = False
     application_sending_ts: datetime = None
-    application_sent: bool = False
     application_sent_ts: datetime = None
-    application_contact: bool = False
     application_contact_ts: datetime = None
-    application_interview: bool = False
     application_interview_ts: datetime = None
-    application_offer: bool = False
     application_offer_ts: datetime = None
-    application_accepted: bool = False
     application_accepted_ts: datetime = None
-    application_rejected: bool = False
     application_rejected_ts: datetime = None
-    application_rejected_by_candidate: bool = False
     application_rejected_by_candidate_ts: datetime = None
+
+    application_failed: bool = False
 

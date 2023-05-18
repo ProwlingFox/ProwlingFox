@@ -2,7 +2,7 @@ import { writable, get as getStore } from 'svelte/store'
 import { crossfade as svelteCrossfade } from 'svelte/transition'
 import { get, getJWT } from './requestUtils'
 import type { Job } from '$interfaces/job'
-import type { ApplicationStore } from '$interfaces/application'
+import { ApplicationStatus, type ApplicationStore } from '$interfaces/application'
 import { browser } from '$app/environment'
 
 const [send, receive] = svelteCrossfade({ duration: 400 })
@@ -44,7 +44,7 @@ export async function refreshApplications(buypassCheck: boolean = false) {
 	if (!buypassCheck) {
 		// Checks to see if applications could change state, if not doesn't send a needless web request
 		let moveableStates = getStore(applications).applications.some(
-			(x) => !( (x.application_processed && !x.application_reviewed) || (x.application_sent) )
+			(x) => x.status != ApplicationStatus.Processed
 		)
 		if (!moveableStates) {
 			return

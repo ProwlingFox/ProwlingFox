@@ -7,6 +7,7 @@ from bson.objectid import ObjectId
 
 from fastapi import HTTPException
 from pydantic import ValidationError
+from schemas.job import ApplicationStatus
 
 import schemas.job as JobSchema
 import schemas.user as UserSchema
@@ -170,7 +171,7 @@ class Job:
 
 			question_responses["responses." + question.id] = raw_question_responses[question.id]
 
-		question_responses["application_reviewed"] = True
+		question_responses["status"] = ApplicationStatus.REVIEWED
 		question_responses["application_reviewed_ts"] = datetime.datetime.now()
 
 		# Save Application To DB
@@ -197,12 +198,10 @@ class Job:
 				"user_id":ObjectId(user.user_id),
 			}, {
 				"$set": {
-					'application_read': True,
+					'status': ApplicationStatus.REQUESTED if requestApply else ApplicationStatus.READ,
 					'application_read_ts': datetime.datetime.now(),
-					'application_requested': requestApply,
 					'application_requested_ts': datetime.datetime.now(),
 				}
 			}, upsert=True)
 		return True
-	
 	

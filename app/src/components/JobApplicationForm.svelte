@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { goto } from "$app/navigation"
-	import type { Application as JobApplication } from "$interfaces/application"
+	import { ApplicationStatus, type Application as JobApplication } from "$interfaces/application"
 	import type { Job } from "$interfaces/job"
 	import { refreshApplications, applications, popNextJobID } from "$lib/myJobs"
 	import { post } from "$lib/requestUtils"
@@ -53,7 +53,7 @@
         refreshApplications(true)
 
         // Goto Next Application awaiting review or New Job
-        let nextApplication = $applications.applications.findLast(x => x.application_processed && !x.application_reviewed && (x._id != srcApplication._id))
+        let nextApplication = $applications.applications.findLast(x => x.status == ApplicationStatus.Processed && (x._id != srcApplication._id))
         if(nextApplication) {
             goto("/jobs/" + nextApplication.job_id)
         } else {
@@ -74,41 +74,41 @@
     {#each srcJob.questions as question }
         {#if question.type == "Text"}
             <label for={question.id} data-required={question.required}>{question.content}</label>
-            <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} bind:value={srcApplication.responses[question.id]}/>
+            <input id={question.id} required={question.required} disabled={srcApplication.status >= ApplicationStatus.Reviewed} bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "LongText"}
             <label for={question.id} data-required={question.required}>{question.content}</label>
-            <textarea id={question.id} required={question.required} disabled={srcApplication.application_reviewed} rows="8" bind:value={srcApplication.responses[question.id]}/>
+            <textarea id={question.id} required={question.required} disabled={srcApplication.status >= ApplicationStatus.Reviewed} rows="8" bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "Number"}
             <label for={question.id} data-required={question.required}>{question.content}</label>
-            <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} type="number" bind:value={srcApplication.responses[question.id]}/>
+            <input id={question.id} required={question.required} disabled={srcApplication.status >= ApplicationStatus.Reviewed} type="number" bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "MultipleChoice" && question.choices}
             <label for={question.id} data-required={question.required}>{question.content}</label>
-            <select id={question.id} required={question.required} disabled={srcApplication.application_reviewed} bind:value={srcApplication.responses[question.id]}>
+            <select id={question.id} required={question.required} disabled={srcApplication.status >= ApplicationStatus.Reviewed} bind:value={srcApplication.responses[question.id]}>
                 {#each question.choices as choice}
                     <option value={choice.id}>{choice.content}</option>
                 {/each}
             </select>
         {:else if question.type == "Date"}
             <label for={question.id} data-required={question.required}>{question.content}</label>
-            <input id={question.id} type="date" required={question.required} disabled={srcApplication.application_reviewed} bind:value={srcApplication.responses[question.id]}/>
+            <input id={question.id} type="date" required={question.required} disabled={srcApplication.status >= ApplicationStatus.Reviewed} bind:value={srcApplication.responses[question.id]}/>
         {:else if question.type == "File"}
             <PresetsFilepicker 
                 id={question.id}
                 required={question.required}
-                disabled={srcApplication.application_reviewed}
+                disabled={srcApplication.status >= ApplicationStatus.Reviewed}
                 content={question.content}
                 defaultOptions={presetFileTypes}
                 bind:file={srcApplication.responses[question.id]}
             />
         {:else if question.type == "CheckBox"}
             <label for={question.id} data-required={question.required}>{question.content}</label>
-            <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} type="checkbox" bind:checked={srcApplication.responses[question.id]}/>
+            <input id={question.id} required={question.required} disabled={srcApplication.status >= ApplicationStatus.Reviewed} type="checkbox" bind:checked={srcApplication.responses[question.id]}/>
         {:else if question.type == "Radio"}
             <label for={question.id} data-required={question.required}>{question.content} (Radio)</label>
-            <input id={question.id} required={question.required} disabled={srcApplication.application_reviewed} bind:value={srcApplication.responses[question.id]}/>
+            <input id={question.id} required={question.required} disabled={srcApplication.status >= ApplicationStatus.Reviewed} bind:value={srcApplication.responses[question.id]}/>
         {/if}
     {/each}
-    {#if !srcApplication.application_reviewed}
+    {#if srcApplication.status == ApplicationStatus.Processed}
     <div class="flex justify-between">
         <button on:click={rejectApplication} class="bg-red-500 self-end w-auto px-2"><Icon height="1.5em" icon="fa:trash-o"/></button>
         <button on:click={sendApplication} class="bg-green-400 self-end w-40">Send Application</button>

@@ -1,45 +1,22 @@
 <script lang="ts">
-	import type { Application } from "$interfaces/application"
+	import { type Application, ApplicationStatus } from "$interfaces/application"
     import { Dropdown, DropdownItem, Button, DropdownDivider, Chevron } from 'flowbite-svelte'
 
     export let application: Application
 
     function getApplicationState(application: Application) {
-        if (application.application_accepted) return "Offer Accepted"
-        if (application.application_offer) return "Offer Received"
-        if (application.application_interview) return "Interviewing"
-        if (application.application_contact) return "Contacted"
-        if (application.application_sent) return "Applied"
-        if (application.application_rejected) return "Rejected"
+        if (application.status == ApplicationStatus.Accepted) return "Offer Accepted"
+        if (application.status == ApplicationStatus.Offered) return "Offer Received"
+        if (application.status == ApplicationStatus.Interviewing) return "Interviewing"
+        if (application.status == ApplicationStatus.Contact) return "Contacted"
+        if (application.status == ApplicationStatus.Sent) return "Applied"
+        if (application.status == ApplicationStatus.Rejected) return "Rejected"
         return "Select State"
     }
 
 
-    function updateState(stateToUpdateTo: string) {
-        switch (stateToUpdateTo) {
-            case "Rejected":
-                application.application_rejected = true
-                break;
-            case "Offer":
-                application.application_offer = true
-            case "Interviewing":
-                application.application_interview = true
-            case "Contacted":
-                application.application_contact = true
-            case "Applied":
-                application.application_sent = true
-        }
-        switch (stateToUpdateTo) {
-            case "Applied":
-                application.application_contact = false
-            case "Contacted":
-                application.application_interview = false
-            case "Interviewing":
-                application.application_offer = false
-            case "Offer":
-                application.application_rejected = false
-        }
-        console.log(application)
+    function updateState(stateToUpdateTo: ApplicationStatus) {
+        application.status = stateToUpdateTo
     }
 </script>
 
@@ -51,11 +28,12 @@
 
     <button on:click|preventDefault class="flex items-center mt-auto ml-auto">{getApplicationState(application)}<Chevron/></button>
     <Dropdown>
-        <DropdownItem on:click={() => {updateState("Applied")}}>Applied</DropdownItem>
-        <DropdownItem on:click={() => {updateState("Contacted")}}>Contacted By Company</DropdownItem>
-        <DropdownItem on:click={() => {updateState("Interviewing")}}>Interviewing</DropdownItem>
-        <DropdownItem on:click={() => {updateState("Offer")}}>Offer Received</DropdownItem>
+        <DropdownItem on:click={() => {updateState(ApplicationStatus.Sent)}}>Applied</DropdownItem>
+        <DropdownItem on:click={() => {updateState(ApplicationStatus.Contact)}}>Contacted By Company</DropdownItem>
+        <DropdownItem on:click={() => {updateState(ApplicationStatus.Interviewing)}}>Interviewing</DropdownItem>
+        <DropdownItem on:click={() => {updateState(ApplicationStatus.Offered)}}>Offer Received</DropdownItem>
+        <DropdownItem on:click={() => {updateState(ApplicationStatus.Accepted)}}>Offer Accepted</DropdownItem>
         <DropdownDivider/>
-        <DropdownItem on:click={() => {updateState("Rejected")}} class="text-red-700">Rejected</DropdownItem>
+        <DropdownItem on:click={() => {updateState(ApplicationStatus.Rejected   )}} class="text-red-700">Rejected</DropdownItem>
     </Dropdown>
 </div>

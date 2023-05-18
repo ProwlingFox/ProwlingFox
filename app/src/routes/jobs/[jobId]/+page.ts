@@ -4,7 +4,7 @@ import { invaldateUserData, userData } from '$lib/userData.js'
 import { get as getStore } from 'svelte/store'
 
 import type { Job } from '$interfaces/job.js'
-import type { Application } from '$interfaces/application.js'
+import { ApplicationStatus, type Application } from '$interfaces/application.js'
 
 interface LoadParams {
 	jobId: string
@@ -12,7 +12,7 @@ interface LoadParams {
 
 
 async function loadFromUserdata(job: Job, application: Application | undefined) {
-	if(!application || !application.application_processed) {return application}
+	if(!application || application.status < ApplicationStatus.Processed) {return application}
 	for (const question of job.questions) {
 		if (!question.response) {continue}
 		application.responses[question.id] = parsePreformattedResponse(question.response, question.type)
