@@ -86,7 +86,7 @@ class Application(MongoBaseModel):
     application_contact: bool = False
     application_contact_ts: datetime = None
     application_interview: bool = False
-    application_contact_ts: datetime = None
+    application_interview_ts: datetime = None
     application_offer: bool = False
     application_offer_ts: datetime = None
     application_accepted: bool = False

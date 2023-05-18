@@ -22,8 +22,12 @@
         return url
     }
 </script>
-
-Settings
-
-<button on:click={downloadApplications}>Export Applications As CSV</button>
+<!-- Dummy href for opening file download -->
 <a bind:this={downloader} class="hidden" hidden href="#null" >Blank</a>
+
+
+<div class="p-4">
+    <h4 class="my-2 text-lg font-bold">Export My Data</h4>
+    <button class="bg-orange-400 p-2 rounded-xl text-white" on:click={downloadApplications}>Export Applications As CSV</button>
+</div>
+
