@@ -12,7 +12,10 @@ interface LoadParams {
 
 
 async function loadFromUserdata(job: Job, application: Application | undefined) {
-	if(!application || application.status < ApplicationStatus.Processed) {return application}
+	if(!application || 
+		application.status != ApplicationStatus.Processed ||
+		!application.responses
+	) {return application}
 	for (const question of job.questions) {
 		if (!question.response) {continue}
 		application.responses[question.id] = parsePreformattedResponse(question.response, question.type)
