@@ -57,7 +57,7 @@
 	function reject() {
 		post(`/jobs/${srcJob._id}/mark`, { requestApply: false })
 		//Discard Animation
-		//Load New
+		//Load New 2
 		loadNext()
 	}
 </script>
