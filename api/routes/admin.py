@@ -14,7 +14,9 @@ def active_jobs_metric():
 		"activeJobsCount": metrics.count_active_jobs(),
 		"processedJobsCount": metrics.count_processed_jobs(),
 		"userCount": metrics.count_users(),
-		"jobApplicationCount": metrics.count_applications()
+		"jobApplicationCount": metrics.count_applications(),
+		"averageAIQuestionsPerJob": metrics.get_average_questions(),
+		"openAIUsage": metrics.get_openAI_usage(),
 	}
 
 @router.get("/admin/users")
