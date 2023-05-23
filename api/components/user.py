@@ -270,7 +270,7 @@ class User:
                 "$set": {"status": state}
             }
         )
-        return {"success": True}
+        return {"success": response.modified_count == 1}
 
     def get_metrics(self):
         from components.db import prowling_fox_db

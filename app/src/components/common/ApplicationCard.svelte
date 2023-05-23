@@ -18,7 +18,7 @@
 
     function updateState(stateToUpdateTo: ApplicationStatus) {
         application.status = stateToUpdateTo
-        post(`/applications/${application._id}/setstate`, {state: application.status})
+        post(`/applications/${application.job._id}/setstate`, {state: application.status})
     }
 </script>
 
@@ -36,6 +36,6 @@
         <DropdownItem on:click={() => {updateState(ApplicationStatus.Offered)}}>Offer Received</DropdownItem>
         <DropdownItem on:click={() => {updateState(ApplicationStatus.Accepted)}}>Offer Accepted</DropdownItem>
         <DropdownDivider/>
-        <DropdownItem on:click={() => {updateState(ApplicationStatus.Rejected   )}} class="text-red-700">Rejected</DropdownItem>
+        <DropdownItem on:click={() => {updateState(ApplicationStatus.Rejected)}} class="text-red-700">Rejected</DropdownItem>
     </Dropdown>
 </div>
