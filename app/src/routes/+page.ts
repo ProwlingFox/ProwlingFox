@@ -3,7 +3,7 @@ import type { UserStats } from '$interfaces/user.js'
 import { get } from '$lib/requestUtils'
 
 export async function load({ fetch }) {
-    const applications: Promise<Application[]> =  get('/user/applications', fetch, {"showSent": true})
+    const applications: Promise<Application[]> =  get('/applications', fetch, {"showSent": true})
     const userStats: Promise<UserStats> =  get('/user/metrics', fetch, {"showSent": true})
 
     return {

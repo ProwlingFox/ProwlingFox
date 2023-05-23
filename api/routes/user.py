@@ -1,9 +1,8 @@
-import io
 from fastapi import APIRouter, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
-from components import authentication
+from components.authentication import access_level
 from components.user import User
 import schemas.user as UserSchema
 
@@ -12,7 +11,7 @@ router = APIRouter(tags=["User"])
 
 # Get current User
 @router.get("/user")
-@authentication.access_level("Candidate")
+@access_level("Candidate")
 def get_current_user_data(req: Request):
 	u = User(req.state.user_id)
 	return u.get_info()
@@ -23,7 +22,7 @@ class update_password(BaseModel):
     password: str
 
 @router.post("/user/password")
-@authentication.access_level("Authenticated")
+@access_level("Authenticated")
 def update_password(req: Request, p: update_password):
 	u = User(req.state.user_id)
 	return u.set_password(p.password)
@@ -65,41 +64,20 @@ def create_user_using_linkedIn(o: oauth_code):
 
 # Update User Details
 @router.post("/user/update")
-@authentication.access_level("Authenticated")
+@access_level("Authenticated")
 def update_user_details(req: Request, ud: UserSchema.UpdateUserDetails):
 	u = User(req.state.user_id)
 	return u.update_details(ud)
 
-@router.get("/user/applications")
-@authentication.access_level("Authenticated")
-def get_user_applications(req: Request, showSent: bool = False):
-	u = User(req.state.user_id)
-	return u.get_applications(showSent)
-
-@router.get("/user/applications/{job_id}")
-@authentication.access_level("Authenticated")
-def get_user_applications(req: Request, job_id: str):
-	u = User(req.state.user_id)
-	return u.get_application(job_id)
 
 @router.get("/user/metrics")
-@authentication.access_level("Authenticated")
+@access_level("Authenticated")
 def get_user_metrics(req: Request):
 	u = User(req.state.user_id)
 	return u.get_metrics()
 
 @router.post("/user/file/{filetype}/upload")
-@authentication.access_level("Authenticated")
+@access_level("Authenticated")
 def update_user_details(req: Request):
 	u = User(req.state.user_id)
 	return 
-
-@router.get("/user/data/applications", response_class=StreamingResponse)
-@authentication.access_level("Authenticated")
-def export_applications(req: Request):
-	u = User(req.state.user_id)
-	stream = io.StringIO(u.export_applications_as_csv())
-	response = StreamingResponse(iter([stream.getvalue()]), media_type="text/csv")
-	response.headers["Content-Disposition"] = "attachment; filename=Applications.csv"
-
-	return response

@@ -7,7 +7,7 @@
     let downloader: HTMLAnchorElement;
 
     async function downloadApplications() {
-        const csv = await get("/user/data/applications")
+        const csv = await get("/applications/export")
         console.log(csv)
         const url = URL.createObjectURL(new Blob(
             [csv],

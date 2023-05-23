@@ -5,7 +5,7 @@ from components.db import prowling_fox_db as jobaiDB
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes import user, jobs, admin
+from routes import user, jobs, admin, application
 
 if secrets["DEVELOPMENT"] == "TRUE":
     app = FastAPI(
@@ -34,6 +34,7 @@ app.add_middleware(
 app.include_router(user.router)
 app.include_router(jobs.router)
 app.include_router(admin.router)
+app.include_router(application.router)
 
 @app.get("/")
 def api_info():

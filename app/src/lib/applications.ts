@@ -9,7 +9,7 @@ export async function getApplicationByJobID(jobId: string) {
 	let relatedApplication = getStore(applications).applications.find(x => x.job_id == jobId)
 	// If Not, Pull It from the Backend
 	if (!relatedApplication) {
-		relatedApplication = await get("/user/applications/" + jobId)
+		relatedApplication = await get("/applications/" + jobId)
 	}
 
 	if (!relatedApplication || !("_id" in relatedApplication)) {return undefined}

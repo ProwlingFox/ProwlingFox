@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { type Application, ApplicationStatus } from "$interfaces/application"
+	import { post } from "$lib/requestUtils"
     import { Dropdown, DropdownItem, Button, DropdownDivider, Chevron } from 'flowbite-svelte'
 
     export let application: Application
@@ -17,6 +18,7 @@
 
     function updateState(stateToUpdateTo: ApplicationStatus) {
         application.status = stateToUpdateTo
+        post(`/applications/${application._id}/setstate`, {state: application.status})
     }
 </script>
 

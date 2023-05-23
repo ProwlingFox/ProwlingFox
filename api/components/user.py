@@ -1,6 +1,7 @@
 from datetime import timedelta, datetime
 import logging
 from typing import List
+from urllib import response
 from fastapi import HTTPException
 from pymongo import errors as Mongoerrors
 from bson.objectid import ObjectId
@@ -254,6 +255,22 @@ class User:
             return JobSchema.Application.parse_obj(applications_from_db.next())
         except StopIteration:
             return {}
+
+    def set_application_state(self, job_id, state):
+        from components.db import prowling_fox_db
+        # The User Can Freely Move The Application To 
+        if state in [ApplicationStatus.PROCESSING, ApplicationStatus.REVIEWED, ApplicationStatus.SENDING, ApplicationStatus.PROCESSED]:
+            raise HTTPException(403, "Cannot Move To That State")
+        response = prowling_fox_db.applications.update_one(
+            {
+                'user_id': self.user_id,
+                'job_id': ObjectId(job_id)
+            },
+            {
+                "$set": {"status": state}
+            }
+        )
+        return {"success": True}
 
     def get_metrics(self):
         from components.db import prowling_fox_db

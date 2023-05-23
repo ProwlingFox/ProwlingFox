@@ -51,7 +51,7 @@ export async function refreshApplications(buypassCheck: boolean = false) {
 		}
 	}
 
-	await get('/user/applications').then((res) => {
+	await get('/applications').then((res) => {
 		applications.update((a) => {
 			return {
 				applications: Array.isArray(res) ? res : [],
