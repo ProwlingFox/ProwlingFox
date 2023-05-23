@@ -50,7 +50,7 @@
 
 	async function loadNext() {
 		nextId = await popNextJobID()
-		await goto('/jobs/' + (await nextId))
+		await goto('/jobs/' + (nextId || "complete"))
 		userJobsLeft.update(x => x-1)
 	}
 

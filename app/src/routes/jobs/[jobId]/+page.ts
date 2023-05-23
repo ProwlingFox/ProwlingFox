@@ -24,6 +24,10 @@ async function loadFromUserdata(job: Job, application: Application | undefined) 
 }
 
 export async function load({ params, fetch }) {
+	if (params.jobId == "complete") {
+		return
+	}
+
 	const jobId = params.jobId
 	console.log("JobID:", jobId)
 	let job = get('/jobs/' + jobId, fetch)
