@@ -11,7 +11,7 @@
     
 </script>
 
-<ApplicationSwitcher selectedTab="Home">
+<ApplicationSwitcher homePage={true}>
     <div class="flex flex-col w-full m-2 overflow-x-hidden">
         <CallToAction/>
         <Statistics statistics={data.stats}/>
