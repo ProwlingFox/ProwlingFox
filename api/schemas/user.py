@@ -23,6 +23,9 @@ Data_Field_Conversion = {
 class BaseDataField(BaseModel):
     pass
 
+# Prevents Duplicate Models (Causes FASTAPI Problems)
+modelCache = {}
+
 def DataField(types):
     class_dict = {}
     for var in types:
@@ -30,12 +33,16 @@ def DataField(types):
             class_dict[var] = (Data_Field_Conversion[var], None)
         else:
             raise Exception(f"Type {var} Not Supported")
-        
+
+    if 'DataField' + "".join(types) in modelCache:
+        return modelCache['DataField' + "".join(types)]
+    
     model = create_model(
         'DataField' + "".join(types),
         **class_dict,
         __base__=BaseDataField
     )
+    modelCache['DataField' + "".join(types)] = model
     return model
 
 
@@ -52,6 +59,7 @@ class UserDataFields(BaseModel):
     address: DataField(["Text"]) = DataField(["Text"])()
     resume: DataField(["File"]) = DataField(["File"])()
     headline: DataField(["Text"]) = DataField(["Text"])()
+    pass
 
 class CountryPreference(BaseModel):
     country_code: str
