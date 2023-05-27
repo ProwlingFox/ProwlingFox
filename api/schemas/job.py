@@ -41,15 +41,22 @@ class Question(BaseModel):
     response: Optional[Any]
     raw_data: Optional[Any] # Contains Any Data Required for Applying to a job, For individual questions. Please don't dump here.
 
-class Company(BaseModel):
+class CompanySummary(BaseModel):
     name: str
     logo: Optional[str]
+
+class Company(CompanySummary):
     website: Optional[str]
     tagline: Optional[str]
     employee_count: Optional[str]
     sectors: Optional[List[str]] # Company Sectors i.e. B2B,E-Commerce from a preset selection (TBD), likely to be automated
 
-class JobSimplified(MongoBaseModel):
+class JobSummary(MongoBaseModel):
+    role: str
+    company: CompanySummary
+    role_category: Optional[List[str]]
+
+class JobSimplified(JobSummary):
     # Technical Details
     source: str  # Should be class Name i.e. sampleJobsniffer
     ext_ID: str # Should be a unique ID for the job, can be used to store id's equal to the origional src
@@ -78,11 +85,10 @@ class Job(JobSimplified):
     raw_data: Optional[Any] # Contains Any Data Required for Applying to a job, that doesn't fit anywhere else i.e. real types. Please don't dump here.
     questions: List[Question]
 
-class Application(MongoBaseModel):
+class ApplicationSummary(MongoBaseModel):
     user_id: ObjectId
     job_id: ObjectId
-    job: Optional[JobSimplified]
-    responses: Optional[object]
+    job: Optional[JobSummary]
     status: ApplicationStatus
 
     application_read_ts: datetime = None
@@ -101,3 +107,6 @@ class Application(MongoBaseModel):
 
     application_failed: bool = False
 
+class Application(ApplicationSummary):
+    job: Optional[JobSimplified]
+    responses: Optional[object]

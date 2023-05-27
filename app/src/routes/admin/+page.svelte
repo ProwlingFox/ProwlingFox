@@ -54,8 +54,6 @@
         }
     })
 
-    console.log(dateGroupedOpenAI)
-
     const options: ChartOptions<'line'|'bar'> = {
         scales: {
             x: {

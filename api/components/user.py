@@ -145,7 +145,17 @@ class User:
                     ], 
                     'results': [
                         {
-                            '$limit': 10
+                            '$limit': 10,
+                        },
+                        {
+                            '$project': {
+                                'role': 1,
+                                'role_category': 1,
+                                'company': {
+                                    'name': 1,
+                                    'logo': 1,
+                                },
+                            },
                         }
                     ]
                 }
@@ -171,7 +181,7 @@ class User:
                 count = document["count"]
             for job in document["results"]:
                 try:
-                    jobs.append(JobSchema.JobSimplified.parse_obj(job))
+                    jobs.append(JobSchema.JobSummary.parse_obj(job))
                 except Exception as e:
                     logging.error("Issue With Job ID:", job["_id"])
         except StopIteration:
@@ -179,7 +189,7 @@ class User:
 
         return {
             "totalJobs": count,
-            "jobs": jobs
+            "jobs": jobs,
         }
 
     def get_applications(self, getSent = False) -> List[JobSchema.Application]:
@@ -197,9 +207,20 @@ class User:
             },
             {
                 '$lookup': {
-                    'from': 'jobs',
-                    'localField': 'job_id',
-                    'foreignField': '_id',
+                    'from': 'jobs', 
+                    'localField': 'job_id', 
+                    'foreignField': '_id', 
+                    'pipeline': [
+                        {
+                            '$project': {
+                                'role': 1, 
+                                'company': {
+                                    'name': 1, 
+                                    'logo': 1
+                                }
+                            }
+                        }
+                    ], 
                     'as': 'job'
                 }
             },
@@ -208,20 +229,19 @@ class User:
                     "preserveNullAndEmptyArrays": False
                 }
             },
-            { "$sort": { "_id": -1 }}
+            { "$sort": { "_id": -1 }},
+            {
+                "$project": {
+                    "responses": 0,
+                }
+            }
         ])
 
         applications = [];
 
         for application in applications_from_db:
-            # pprint(application)
-            application["id"] = str(application["_id"])
-            application["user_id"] = str(application["user_id"])
-            application["job_id"] = str(application["job_id"])
-
-
             try:
-                applications.append(JobSchema.Application.parse_obj(application))
+                applications.append(JobSchema.ApplicationSummary.parse_obj(application))
             except Exception as e:
                 logging.error("Issue with jobID " + application["job_id"])
 
@@ -244,7 +264,8 @@ class User:
                     'as': 'job'
                 }
             },
-            {"$unwind": {
+            {   
+                "$unwind": {
                     "path": "$job",
                     "preserveNullAndEmptyArrays": False
                 }

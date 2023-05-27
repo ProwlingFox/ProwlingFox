@@ -8,7 +8,6 @@
 
     export let data
     let allApplications: Application[] = data.fullApplications
-    
 </script>
 
 <ApplicationSwitcher homePage={true}>
